@@ -188,6 +188,10 @@ function js_method_call(object_method_str) {
     return interop.js_to_mal(res);
 }
 
+function toSet() {
+    return new Set(arguments[0])
+}
+
 function _union(setA, setB) {
     const _union = new Set(setA);
     for (const elem of setB) {
@@ -280,6 +284,7 @@ export var ns = {
     'js-eval': js_eval,
     '.': js_method_call,
 
+    'set': toSet,
     'set/union': _union,
     'set/intersection': _intersection
 };
