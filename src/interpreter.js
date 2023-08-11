@@ -11,11 +11,7 @@ function READ(str) {
 // eval
 function eval_ast(ast, env) {
     if (types._symbol_Q(ast)) {
-        if (ast in env) {
-            return env[ast];
-        } else {
-            throw new Error("'" + ast.value + "' not found");
-        }
+        return env.get(ast);
     } else if (types._list_Q(ast)) {
         return ast.map(function(a) { return EVAL(a, env); });
     } else if (types._vector_Q(ast)) {
@@ -43,8 +39,21 @@ function _EVAL(ast, env) {
     }
 
     // apply list
-    var el = eval_ast(ast, env), f = el[0];
-    return f.apply(f, el.slice(1));
+    var a0 = ast[0], a1 = ast[1], a2 = ast[2], a3 = ast[3];
+    switch (a0.value) {
+    case "def!":
+        var res = EVAL(a2, env);
+        return env.set(a1, res);
+    case "let*":
+        var let_env = new Env(env);
+        for (var i=0; i < a1.length; i+=2) {
+            let_env.set(a1[i], EVAL(a1[i+1], let_env));
+        }
+        return EVAL(a2, let_env);
+    default:
+        var el = eval_ast(ast, env), f = el[0];
+        return f.apply(f, el.slice(1));
+    }
 }
 
 function EVAL(ast, env) {
@@ -60,7 +69,7 @@ function PRINT(exp) {
 export var repl_env = new Env();
 export const evalString = function (str) { return PRINT(EVAL(READ(str), repl_env)); };
 
-repl_env['+'] = function(a,b){return a+b;};
-repl_env['-'] = function(a,b){return a-b;};
-repl_env['*'] = function(a,b){return a*b;};
-repl_env['/'] = function(a,b){return a/b;};
+repl_env.set(types._symbol('+'), function(a,b){return a+b;});
+repl_env.set(types._symbol('-'), function(a,b){return a-b;});
+repl_env.set(types._symbol('*'), function(a,b){return a*b;});
+repl_env.set(types._symbol('/'), function(a,b){return a/b;});
