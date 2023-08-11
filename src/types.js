@@ -77,11 +77,11 @@ export function _clone (obj) {
 
 
 // Scalars
-function _nil_Q(a) { return a === null ? true : false; }
-function _true_Q(a) { return a === true ? true : false; }
-function _false_Q(a) { return a === false ? true : false; }
-function _number_Q(obj) { return typeof obj === 'number'; }
-function _string_Q(obj) {
+export function _nil_Q(a) { return a === null ? true : false; }
+export function _true_Q(a) { return a === true ? true : false; }
+export function _false_Q(a) { return a === false ? true : false; }
+export function _number_Q(obj) { return typeof obj === 'number'; }
+export function _string_Q(obj) {
     return typeof obj === 'string' && obj[0] !== '\u029e';
 }
 

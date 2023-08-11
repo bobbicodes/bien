@@ -4,10 +4,12 @@ import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
 
 let editorState = EditorState.create({
-  doc: `(cond
-    (< 1 0) "negative"
-    (> 1 0) "positive"
-    :else "zero")`,
+  doc: `(defn hi
+  "stufs"
+  ([] "none")
+  ([n] (str n "args")))
+  
+(hi)`,
     extensions: [basicSetup, clojure()]
 })
 
