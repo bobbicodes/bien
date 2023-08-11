@@ -120,6 +120,13 @@ function _EVAL(ast, env) {
             case "def":
                 var res = EVAL(a2, env);
                 return env.set(a1, res);
+            case 'deftest':
+                var res = EVAL(a2, env);
+                env.set(a1, res);
+                deftests.push({ test: a1, result: res })
+                return EVAL(a2, env)
+            case 'testing':
+                return EVAL(a2, env)
             case "defn":
             case "defn-":
                 fnConfig(ast, env)
@@ -202,32 +209,32 @@ function _EVAL(ast, env) {
                 return types._function(EVAL, Env, a2, env, a1);
             default:
                 const args = eval_ast(ast.slice(1), env)
-        const arity = args.length
-        var f
-        var fSym
-        fnName = ast[0].value
-        if (Object.keys(env.data).includes(fnName + "-variadic")) {
-          console.log("Fn has variadic arity defined")
-          if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
-            fSym = types._symbol(ast[0] + "-arity-" + arity)
-          } else {
-            fSym = types._symbol(ast[0] + "-variadic")
-            console.log("Calling variadic function:", f)
-          }
-          f = EVAL(fSym, env)
-        } else if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
-          fSym = types._symbol(fnName + "-arity-" + arity)
-          f = EVAL(fSym, env)
-        } else {
-          fSym = types._symbol(fnName)
-          f = EVAL(fSym, env)
-        }
-        if (f.__ast__) {
-          ast = f.__ast__;
-          env = f.__gen_env__(args);
-        } else {
-          return f.apply(f, args);
-        }
+                const arity = args.length
+                var f
+                var fSym
+                fnName = ast[0].value
+                if (Object.keys(env.data).includes(fnName + "-variadic")) {
+                    console.log("Fn has variadic arity defined")
+                    if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
+                        fSym = types._symbol(ast[0] + "-arity-" + arity)
+                    } else {
+                        fSym = types._symbol(ast[0] + "-variadic")
+                        console.log("Calling variadic function:", f)
+                    }
+                    f = EVAL(fSym, env)
+                } else if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
+                    fSym = types._symbol(fnName + "-arity-" + arity)
+                    f = EVAL(fSym, env)
+                } else {
+                    fSym = types._symbol(fnName)
+                    f = EVAL(fSym, env)
+                }
+                if (f.__ast__) {
+                    ast = f.__ast__;
+                    env = f.__gen_env__(args);
+                } else {
+                    return f.apply(f, args);
+                }
         }
 
     }
