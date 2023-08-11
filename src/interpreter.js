@@ -31,6 +31,8 @@ function eval_ast(ast, env) {
 }
 
 function _EVAL(ast, env) {
+    while (true) {
+
     //printer.println("EVAL:", printer._pr_str(ast, true));
     if (!types._list_Q(ast)) {
         return eval_ast(ast, env);
@@ -50,24 +52,33 @@ function _EVAL(ast, env) {
         for (var i=0; i < a1.length; i+=2) {
             let_env.set(a1[i], EVAL(a1[i+1], let_env));
         }
-        return EVAL(a2, let_env);
+        ast = a2;
+        env = let_env;
+        break;
     case "do":
-        var el = eval_ast(ast.slice(1), env);
-        return el[el.length-1];
+        eval_ast(ast.slice(1, -1), env);
+        ast = ast[ast.length-1];
+        break;
     case "if":
         var cond = EVAL(a1, env);
         if (cond === null || cond === false) {
-            return typeof a3 !== "undefined" ? EVAL(a3, env) : null;
+            ast = (typeof a3 !== "undefined") ? a3 : null;
         } else {
-            return EVAL(a2, env);
+            ast = a2;
         }
+        break;
     case "fn":
-        return function() {
-            return EVAL(a2, new Env(env, a1, arguments));
-        };
+        return types._function(EVAL, Env, a2, env, a1);
     default:
         var el = eval_ast(ast, env), f = el[0];
-        return f.apply(f, el.slice(1));
+        if (f.__ast__) {
+            ast = f.__ast__;
+            env = f.__gen_env__(el.slice(1));
+        } else {
+            return f.apply(f, el.slice(1));
+        }
+    }
+
     }
 }
 

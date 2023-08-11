@@ -110,7 +110,7 @@ function _keyword_Q(obj) {
 
 
 // Functions
-function _function(Eval, Env, ast, env, params) {
+export function _function(Eval, Env, ast, env, params) {
     var fn = function() {
         return Eval(ast, new Env(env, params, arguments));
     };
@@ -120,6 +120,7 @@ function _function(Eval, Env, ast, env, params) {
     fn._ismacro_ = false;
     return fn;
 }
+
 function _function_Q(obj) { return typeof obj == "function"; }
 Function.prototype.clone = function() {
     var that = this;
