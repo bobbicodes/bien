@@ -71,7 +71,7 @@ function eval_ast(ast, env) {
 
 export function clearTests() {
     deftests = []
-  }
+}
 
 export var deftests = []
 var arglist
@@ -121,6 +121,23 @@ function _EVAL(ast, env) {
         switch (a0.value) {
             case "ns":
                 return null
+            case "dispatch":
+                console.log("eval dispatch")
+                // Regex
+                if (types._string_Q(a1)) {
+                    const re = new RegExp(a1, 'g')
+                    return re
+                }
+                // Anonymous function shorthand
+                if (types._list_Q(a1)) {
+                    let fun = [types._symbol('fn')]
+                    const args = ast.toString().match(/%\d?/g).map(types._symbol)
+                    console.log("args:", args)
+                    let body = ast.slice(1)[0]
+                    fun.push(args)
+                    fun.push(body)
+                    return types._function(EVAL, Env, body, env, args);
+                }
             case "def":
                 var res = EVAL(a2, env);
                 return env.set(a1, res);
@@ -210,32 +227,15 @@ function _EVAL(ast, env) {
                 }
                 break;
             case "fn":
+                console.log("defining fn", ast)
                 return types._function(EVAL, Env, a2, env, a1);
             default:
-                const args = eval_ast(ast.slice(1), env)
-                const arity = args.length
-                var f
-                var fSym
-                fnName = ast[0].value
-                if (Object.keys(env.data).includes(fnName + "-variadic")) {
-                    if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
-                        fSym = types._symbol(ast[0] + "-arity-" + arity)
-                    } else {
-                        fSym = types._symbol(ast[0] + "-variadic")
-                    }
-                    f = EVAL(fSym, env)
-                } else if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
-                    fSym = types._symbol(fnName + "-arity-" + arity)
-                    f = EVAL(fSym, env)
-                } else {
-                    fSym = types._symbol(fnName)
-                    f = EVAL(fSym, env)
-                }
+                var el = eval_ast(ast, env), f = el[0];
                 if (f.__ast__) {
                     ast = f.__ast__;
-                    env = f.__gen_env__(args);
+                    env = f.__gen_env__(el.slice(1));
                 } else {
-                    return f.apply(f, args);
+                    return f.apply(f, el.slice(1));
                 }
         }
 

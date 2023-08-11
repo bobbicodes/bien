@@ -7,7 +7,9 @@ import testSuites from './test/foreclojure-tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(or true true)`,
+  doc: `(#(+ % 1) 3)
+
+((fn [n] (+ 1 n)) 56)`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -139,4 +141,4 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testExercises()
+//testExercises()

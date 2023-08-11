@@ -5,8 +5,8 @@ function Reader(tokens) {
     this.tokens = tokens.map(function (a) { return a; });
     this.position = 0;
 }
-Reader.prototype.next = function() { return this.tokens[this.position++]; }
-Reader.prototype.peek = function() { return this.tokens[this.position]; }
+Reader.prototype.next = function () { return this.tokens[this.position++]; }
+Reader.prototype.peek = function () { return this.tokens[this.position]; }
 
 function tokenize(str) {
     var re = /[\s,]*(~@|#{|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
@@ -19,18 +19,18 @@ function tokenize(str) {
     return results;
 }
 
-function read_atom (reader) {
+function read_atom(reader) {
     var token = reader.next();
     //console.log("read_atom:", token);
     if (token.match(/^-?[0-9]+$/)) {
-        return parseInt(token,10)        // integer
+        return parseInt(token, 10)        // integer
     } else if (token.match(/^-?[0-9][0-9.]*$/)) {
-        return parseFloat(token,10);     // float
+        return parseFloat(token, 10);     // float
     } else if (token.match(/^"(?:\\.|[^\\"])*"$/)) {
-        return token.slice(1,token.length-1) 
-            .replace(/\\(.)/g, function (_, c) { return c === "n" ? "\n" : c})
+        return token.slice(1, token.length - 1)
+            .replace(/\\(.)/g, function (_, c) { return c === "n" ? "\n" : c })
     } else if (token[0] === "\"") {
-            throw new Error("expected '\"', got EOF");
+        throw new Error("expected '\"', got EOF");
     } else if (token[0] === ":") {
         return types._keyword(token.slice(1));
     } else if (token === "nil") {
@@ -84,39 +84,43 @@ function read_set(reader) {
 function read_form(reader) {
     var token = reader.peek();
     switch (token) {
-    // reader macros/transforms
-    case ';': return null; // Ignore comments
-    case '\'': reader.next();
-               return [types._symbol('quote'), read_form(reader)];
-    case '`': reader.next();
-              return [types._symbol('quasiquote'), read_form(reader)];
-    case '~': reader.next();
-              return [types._symbol('unquote'), read_form(reader)];
-    case '~@': reader.next();
-               return [types._symbol('splice-unquote'), read_form(reader)];
-    case '^': reader.next();
-              var meta = read_form(reader);
-              return [types._symbol('with-meta'), read_form(reader), meta];
-    case '@': reader.next();
-              return [types._symbol('deref'), read_form(reader)];
+        // reader macros/transforms
+        case ';': return null; // Ignore comments
+        case '\'': reader.next();
+            return [types._symbol('quote'), read_form(reader)];
+        case '`': reader.next();
+            return [types._symbol('quasiquote'), read_form(reader)];
+        case '~': reader.next();
+            return [types._symbol('unquote'), read_form(reader)];
+        case '~@': reader.next();
+            return [types._symbol('splice-unquote'), read_form(reader)];
+        case '^': reader.next();
+            var meta = read_form(reader);
+            return [types._symbol('with-meta'), read_form(reader), meta];
+        case '@': reader.next();
+            return [types._symbol('deref'), read_form(reader)];
+        case '#': reader.next();
+        console.log("reading dispatch")
+            return [types._symbol('dispatch'), read_form(reader)];
+        case '#_': reader.next();
+            return [types._symbol('discard'), read_form(reader)];
+        // list
+        case ')': throw new Error("unexpected ')'");
+        case '(': return read_list(reader);
 
-    // list
-    case ')': throw new Error("unexpected ')'");
-    case '(': return read_list(reader);
+        // vector
+        case ']': throw new Error("unexpected ']'");
+        case '[': return read_vector(reader);
 
-    // vector
-    case ']': throw new Error("unexpected ']'");
-    case '[': return read_vector(reader);
+        // set
+        case '#{': return read_set(reader);
 
-    // set
-    case '#{': return read_set(reader);
+        // hash-map
+        case '}': throw new Error("unexpected '}'");
+        case '{': return read_hash_map(reader);
 
-    // hash-map
-    case '}': throw new Error("unexpected '}'");
-    case '{': return read_hash_map(reader);
-
-    // atom
-    default:  return read_atom(reader);
+        // atom
+        default: return read_atom(reader);
     }
 }
 

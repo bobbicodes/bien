@@ -177,12 +177,12 @@ function swap_BANG(atm, f) {
 }
 
 function js_eval(str) {
-    return interop.js_to_mal(eval(str.toString()));
+    return js_to_mal(eval(str.toString()));
 }
 
 function js_method_call(object_method_str) {
     var args = Array.prototype.slice.call(arguments, 1),
-        r = interop.resolve_js(object_method_str),
+        r = resolve_js(object_method_str),
         obj = r[0], f = r[1];
     var res = f.apply(obj, args);
     return interop.js_to_mal(res);
@@ -216,6 +216,38 @@ function _is(a) {
     } else {
         return false
     }
+}
+
+function resolve_js(str) {
+    if (str.match(/\./)) {
+        var re = /^(.*)\.[^\.]*$/,
+            match = re.exec(str);
+        console.log("match:", match[1])
+        return [eval(match[1]), eval(str)];
+    } else {
+        console.log("no match in", str)
+        return [GLOBAL, eval(str)];
+    }
+}
+
+function js_to_mal(obj) {
+    if (obj === null || obj === undefined) {
+        return null;
+    }
+    var cache = [];
+    var str = JSON.stringify(obj, function(key, value) {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                // Circular reference found, discard key
+                return;
+            }
+            // Store value in our collection
+            cache.push(value);
+        }
+        return value;
+    });
+    cache = null; // Enable garbage collection
+    return JSON.parse(str);
 }
 
 // types.ns is namespace of type functions
