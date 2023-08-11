@@ -26,3 +26,28 @@
     `(~(first form) ~@(rest form) ~acc) (list form acc)))
 
 (defmacro ->> (fn (x & xs) (reduce _iter->> x xs)))
+
+(def gensym
+  (let [counter (atom 0)]
+    (fn []
+      (symbol (str \\ "G__\\" (swap! counter inc))))))
+
+(defn memoize [f]
+  (let [mem (atom {})]
+    (fn [& args]
+      (let [key (str args)]
+        (if (contains? @mem key)
+          (get @mem key)
+          (let [ret (apply f args)]
+            (do
+              (swap! mem assoc key ret)
+              ret)))))))
+
+(defn partial [pfn & args]
+  (fn [& args-inner]
+    (apply pfn (concat args args-inner))))
+
+(defn every? [pred xs]
+  (cond (empty? xs)       true
+        (pred (first xs)) (every? pred (rest xs))
+        true              false))
