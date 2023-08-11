@@ -35,7 +35,6 @@ function quasiquote(ast) {
 }
 
 function is_macro_call(ast, env) {
-    //console.log(ast)
     return types._list_Q(ast) &&
         types._symbol_Q(ast[0]) &&
         env.find(ast[0]) &&
@@ -219,12 +218,10 @@ function _EVAL(ast, env) {
                 var fSym
                 fnName = ast[0].value
                 if (Object.keys(env.data).includes(fnName + "-variadic")) {
-                    console.log("Fn has variadic arity defined")
                     if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
                         fSym = types._symbol(ast[0] + "-arity-" + arity)
                     } else {
                         fSym = types._symbol(ast[0] + "-variadic")
-                        console.log("Calling variadic function:", f)
                     }
                     f = EVAL(fSym, env)
                 } else if (Object.keys(env.data).includes(fnName + "-arity-" + arity)) {
