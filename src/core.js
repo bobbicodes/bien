@@ -8,25 +8,25 @@ function mal_throw(exc) { throw exc; }
 
 // String functions
 function pr_str() {
-    return Array.prototype.map.call(arguments,function(exp) {
+    return Array.prototype.map.call(arguments, function (exp) {
         return _pr_str(exp, true);
     }).join(" ");
 }
 
 function str() {
-    return Array.prototype.map.call(arguments,function(exp) {
+    return Array.prototype.map.call(arguments, function (exp) {
         return _pr_str(exp, false);
     }).join("");
 }
 
 function prn() {
-    println.apply({}, Array.prototype.map.call(arguments,function(exp) {
+    println.apply({}, Array.prototype.map.call(arguments, function (exp) {
         return _pr_str(exp, true);
     }));
 }
 
 function println() {
-    println.apply({}, Array.prototype.map.call(arguments,function(exp) {
+    println.apply({}, Array.prototype.map.call(arguments, function (exp) {
         return _pr_str(exp, false);
     }));
 }
@@ -77,7 +77,7 @@ function contains_Q(hm, key) {
 }
 
 function keys(hm) { return Object.keys(hm); }
-function vals(hm) { return Object.keys(hm).map(function(k) { return hm[k]; }); }
+function vals(hm) { return Object.keys(hm).map(function (k) { return hm[k]; }); }
 
 
 // Sequence functions
@@ -99,7 +99,7 @@ function vec(lst) {
 
 export function nth(lst, idx) {
     if (idx < lst.length) { return lst[idx]; }
-    else                  { throw new Error("nth: index out of range"); }
+    else { throw new Error("nth: index out of range"); }
 }
 
 export function first(lst) { return (lst === null) ? null : lst[0]; }
@@ -110,8 +110,8 @@ function empty_Q(lst) { return lst.length === 0; }
 
 export function count(s) {
     if (Array.isArray(s)) { return s.length; }
-    else if (s === null)  { return 0; }
-    else                  { return Object.keys(s).length; }
+    else if (s === null) { return 0; }
+    else { return Object.keys(s).length; }
 }
 
 function conj(lst) {
@@ -128,7 +128,7 @@ export function seq(obj) {
     if (types._list_Q(obj)) {
         return obj.length > 0 ? obj : null;
     } else if (types._vector_Q(obj)) {
-        return obj.length > 0 ? Array.prototype.slice.call(obj, 0): null;
+        return obj.length > 0 ? Array.prototype.slice.call(obj, 0) : null;
     } else if (types._string_Q(obj)) {
         return obj.length > 0 ? obj.split('') : null;
     } else if (obj === null) {
@@ -141,11 +141,11 @@ export function seq(obj) {
 
 function apply(f) {
     var args = Array.prototype.slice.call(arguments, 1);
-    return f.apply(f, args.slice(0, args.length-1).concat(args[args.length-1]));
+    return f.apply(f, args.slice(0, args.length - 1).concat(args[args.length - 1]));
 }
 
 function map(f, lst) {
-    return lst.map(function(el){ return f(el); });
+    return lst.map(function (el) { return f(el); });
 }
 
 
@@ -188,76 +188,98 @@ function js_method_call(object_method_str) {
     return interop.js_to_mal(res);
 }
 
+function _union(setA, setB) {
+    const _union = new Set(setA);
+    for (const elem of setB) {
+        _union.add(elem);
+    }
+    return _union;
+}
+
+function _intersection(setA, setB) {
+    const _intersection = new Set();
+    for (const elem of setB) {
+        if (setA.has(elem)) {
+            _intersection.add(elem);
+        }
+    }
+    return _intersection;
+}
+
 // types.ns is namespace of type functions
-export var ns = {'type': types._obj_type,
-          '=': types._equal_Q,
-          'throw': mal_throw,
-          'nil?': types._nil_Q,
-          'true?': types._true_Q,
-          'false?': types._false_Q,
-          'number?': types._number_Q,
-          'string?': types._string_Q,
-          'symbol': types._symbol,
-          'symbol?': types._symbol_Q,
-          'keyword': types._keyword,
-          'keyword?': types._keyword_Q,
-          'fn?': types._fn_Q,
-          'macro?': types._macro_Q,
+export var ns = {
+    'type': types._obj_type,
+    '=': types._equal_Q,
+    'throw': mal_throw,
+    'nil?': types._nil_Q,
+    'true?': types._true_Q,
+    'false?': types._false_Q,
+    'number?': types._number_Q,
+    'string?': types._string_Q,
+    'symbol': types._symbol,
+    'symbol?': types._symbol_Q,
+    'keyword': types._keyword,
+    'keyword?': types._keyword_Q,
+    'fn?': types._fn_Q,
+    'macro?': types._macro_Q,
 
-          'pr-str': pr_str,
-          'str': str,
-          'prn': prn,
-          'println': println,
-          //'readline': readline.readline,
-          'read-string': read_str,
-          'slurp': slurp,
-          '<'  : function(a,b){return a<b;},
-          '<=' : function(a,b){return a<=b;},
-          '>'  : function(a,b){return a>b;},
-          '>=' : function(a,b){return a>=b;},
-          '+'  : function(a,b){return a+b;},
-          '-'  : function(a,b){return a-b;},
-          '*'  : function(a,b){return a*b;},
-          '/'  : function(a,b){return a/b;},
-          'inc': function (a) { return a + 1; },
-          "time-ms": time_ms,
+    'pr-str': pr_str,
+    'str': str,
+    'prn': prn,
+    'println': println,
+    //'readline': readline.readline,
+    'read-string': read_str,
+    'slurp': slurp,
+    '<': function (a, b) { return a < b; },
+    '<=': function (a, b) { return a <= b; },
+    '>': function (a, b) { return a > b; },
+    '>=': function (a, b) { return a >= b; },
+    '+': function (a, b) { return a + b; },
+    '-': function (a, b) { return a - b; },
+    '*': function (a, b) { return a * b; },
+    '/': function (a, b) { return a / b; },
+    'inc': function (a) { return a + 1; },
+    "time-ms": time_ms,
 
-          'list': types._list,
-          'list?': types._list_Q,
-          'vector': types._vector,
-          'vector?': types._vector_Q,
-          'hash-map': types._hash_map,
-          'map?': types._hash_map_Q,
-          'assoc': assoc,
-          'dissoc': dissoc,
-          'get': get,
-          'contains?': contains_Q,
-          'keys': keys,
-          'vals': vals,
+    'list': types._list,
+    'list?': types._list_Q,
+    'vector': types._vector,
+    'vector?': types._vector_Q,
+    'hash-map': types._hash_map,
+    'map?': types._hash_map_Q,
+    'assoc': assoc,
+    'dissoc': dissoc,
+    'get': get,
+    'contains?': contains_Q,
+    'keys': keys,
+    'vals': vals,
 
-          'sequential?': types._sequential_Q,
-          'cons': cons,
-          'concat': concat,
-          'vec': vec,
-          'nth': nth,
-          'first': first,
-          'rest': rest,
-          'empty?': empty_Q,
-          'count': count,
-          'apply': apply,
-          'map': map,
+    'sequential?': types._sequential_Q,
+    'cons': cons,
+    'concat': concat,
+    'vec': vec,
+    'nth': nth,
+    'first': first,
+    'rest': rest,
+    'empty?': empty_Q,
+    'count': count,
+    'apply': apply,
+    'map': map,
 
-          'conj': conj,
-          'seq': seq,
+    'conj': conj,
+    'seq': seq,
 
-          'with-meta': with_meta,
-          'meta': meta,
-          'atom': types._atom,
-          'atom?': types._atom_Q,
-          "deref": deref,
-          "reset!": reset_BANG,
-          "swap!": swap_BANG,
+    'with-meta': with_meta,
+    'meta': meta,
+    'atom': types._atom,
+    'atom?': types._atom_Q,
+    "deref": deref,
+    "reset!": reset_BANG,
+    "swap!": swap_BANG,
 
-          'js-eval': js_eval,
-          '.': js_method_call
+    'js-eval': js_eval,
+    '.': js_method_call,
+
+    'set/union': _union,
+    'set/intersection': _intersection
 };

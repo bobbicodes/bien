@@ -15,6 +15,18 @@ let view = new EditorView({
   parent: document.querySelector('#app')
 })
 
+let testState = EditorState.create({
+  readOnly: true,
+  extensions: [
+    //EditorView.editable.of(false),
+    basicSetup, clojure()]
+})
+
+let testView = new EditorView({
+  state: testState,
+  parent: document.querySelector('#test')
+})
+
 let topLevelText = "Alt+Enter = Eval top-level form"
 let keyBindings = "<strong>Key bindings:</strong>,Shift+Enter = Eval cell," +
   topLevelText + ",Ctrl/Cmd+Enter = Eval at cursor";
@@ -35,9 +47,14 @@ function loadExercise(slug) {
   console.log(src)
   const testSuite = testSuites[k].trim()
   const doc = view.state.doc.toString()
+  const testDoc = testView.state.doc.toString()
   const end = doc.length
   view.dispatch({
     changes: { from: 0, to: end, insert: src},
+    selection: { anchor: 0, head: 0 }
+  })
+  testView.dispatch({
+    changes: { from: 0, to: testDoc.length, insert: testSuite},
     selection: { anchor: 0, head: 0 }
   })
 }
@@ -73,7 +90,6 @@ function testSolution(slug) {
     if (!test.result) {
       fails.push(test.test.value)
     }
-    //console.log("fails:", fails)
   }
   const uniqueFails = [...new Set(fails)];
   if (uniqueFails.length == 1) {
