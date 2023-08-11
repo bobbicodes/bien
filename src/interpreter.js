@@ -118,6 +118,12 @@ function _EVAL(ast, env) {
         }
 
         var a0 = ast[0], a1 = ast[1], a2 = ast[2], a3 = ast[3];
+        // Keyword functions:
+        // If the first element is a keyword,
+        // it looks up its value in its argument
+        if (types._keyword_Q(a0)) {
+            return EVAL([types._symbol("get"), a1, a0], env)
+        }
         switch (a0.value) {
             case "ns":
                 return null

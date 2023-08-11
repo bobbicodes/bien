@@ -141,4 +141,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testExercises()
+//testSolution("strings")
+
+testExercises()

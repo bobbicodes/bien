@@ -144,10 +144,6 @@ function apply(f) {
     return f.apply(f, args.slice(0, args.length - 1).concat(args[args.length - 1]));
 }
 
-function map(f, lst) {
-    return lst.map(function (el) { return f(el); });
-}
-
 
 // Metadata functions
 function with_meta(obj, m) {
@@ -185,7 +181,7 @@ function js_method_call(object_method_str) {
         r = resolve_js(object_method_str),
         obj = r[0], f = r[1];
     var res = f.apply(obj, args);
-    return interop.js_to_mal(res);
+    return js_to_mal(res);
 }
 
 function toSet() {
@@ -248,6 +244,17 @@ function js_to_mal(obj) {
     });
     cache = null; // Enable garbage collection
     return JSON.parse(str);
+}
+
+function map(f, s) {
+    if (types._string_Q(s)) {
+        s = seq(s)
+    }
+    return s.map(function (el) { return f(el); });
+}
+
+function filter(f, lst) {
+    return lst.filter(function (el) { return f(el); });
 }
 
 // types.ns is namespace of type functions
@@ -313,6 +320,8 @@ export var ns = {
 
     'conj': conj,
     'seq': seq,
+    'map': map,
+    'filter': filter,
 
     'with-meta': with_meta,
     'meta': meta,
