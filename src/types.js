@@ -139,7 +139,7 @@ export function _list_Q(obj) { return Array.isArray(obj) && !obj.__isvector__; }
 
 
 // Vectors
-function _vector() {
+export function _vector() {
     var v = Array.prototype.slice.call(arguments, 0);
     v.__isvector__ = true;
     return v;
@@ -149,7 +149,7 @@ export function _vector_Q(obj) { return Array.isArray(obj) && !!obj.__isvector__
 
 
 // Hash Maps
-function _hash_map() {
+export function _hash_map() {
     if (arguments.length % 2 === 1) {
         throw new Error("Odd number of hash map arguments");
     }
