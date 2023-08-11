@@ -75,6 +75,12 @@ function read_hash_map(reader) {
     return types._hash_map.apply(null, lst);
 }
 
+// read set
+function read_set(reader) {
+    var lst = read_list(reader, '#{', '}');
+    return types._set.apply(null, lst);
+}
+
 function read_form(reader) {
     var token = reader.peek();
     switch (token) {
@@ -101,6 +107,9 @@ function read_form(reader) {
     // vector
     case ']': throw new Error("unexpected ']'");
     case '[': return read_vector(reader);
+
+    // set
+    case '#{': return read_set(reader);
 
     // hash-map
     case '}': throw new Error("unexpected '}'");

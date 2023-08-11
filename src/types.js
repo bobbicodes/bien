@@ -3,6 +3,7 @@ export function _obj_type(obj) {
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
+    else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
     else if (_true_Q(obj)) {     return 'true'; }
     else if (_false_Q(obj)) {    return 'false'; }
@@ -161,6 +162,7 @@ export function _hash_map_Q(hm) {
     return typeof hm === "object" &&
            !Array.isArray(hm) &&
            !(hm === null) &&
+           !(hm instanceof Set)
            !(hm instanceof Symbol) &&
            !(hm instanceof Atom);
 }
@@ -186,6 +188,15 @@ function _dissoc_BANG(hm) {
     return hm;
 }
 
+// Sets
+export function _set() {
+    return new Set(arguments)
+}
+
+export function _set_Q(set) {
+    return typeof set === "object" &&
+    (set instanceof Set)
+}
 
 // Atoms
 function Atom(val) { this.val = val; }
