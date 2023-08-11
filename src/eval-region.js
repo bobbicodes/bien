@@ -1,6 +1,7 @@
 import {Prec} from '@codemirror/state'
 import {keymap} from '@codemirror/view'
 import {syntaxTree} from "@codemirror/language"
+import {evalString} from "./interpreter"
 
 const up = (node) => node.parent;
 const isTopType = (nodeType) => nodeType.isTop
