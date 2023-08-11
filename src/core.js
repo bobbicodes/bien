@@ -117,12 +117,15 @@ export function count(s) {
 function conj(lst) {
     if (types._list_Q(lst)) {
         return Array.prototype.slice.call(arguments, 1).reverse().concat(lst);
-    } else {
+    } else if (types._vector_Q(lst)) {
         var v = lst.concat(Array.prototype.slice.call(arguments, 1));
         v.__isvector__ = true;
         return v;
+    } else if (types._set_Q(lst)) {
+        return lst.add(arguments[1])
     }
 }
+
 
 export function seq(obj) {
     if (types._list_Q(obj)) {
@@ -231,7 +234,7 @@ function js_to_mal(obj) {
         return null;
     }
     var cache = [];
-    var str = JSON.stringify(obj, function(key, value) {
+    var str = JSON.stringify(obj, function (key, value) {
         if (typeof value === 'object' && value !== null) {
             if (cache.indexOf(value) !== -1) {
                 // Circular reference found, discard key
