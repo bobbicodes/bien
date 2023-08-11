@@ -93,7 +93,7 @@ function Symbol(name) {
 }
 Symbol.prototype.toString = function() { return this.value; }
 export function _symbol(name) { return new Symbol(name); }
-function _symbol_Q(obj) { return obj instanceof Symbol; }
+export function _symbol_Q(obj) { return obj instanceof Symbol; }
 
 
 // Keywords
@@ -135,7 +135,7 @@ function _macro_Q(obj) { return _function_Q(obj) && !!obj._ismacro_; }
 
 // Lists
 function _list() { return Array.prototype.slice.call(arguments, 0); }
-function _list_Q(obj) { return Array.isArray(obj) && !obj.__isvector__; }
+export function _list_Q(obj) { return Array.isArray(obj) && !obj.__isvector__; }
 
 
 // Vectors
@@ -144,7 +144,7 @@ function _vector() {
     v.__isvector__ = true;
     return v;
 }
-function _vector_Q(obj) { return Array.isArray(obj) && !!obj.__isvector__; }
+export function _vector_Q(obj) { return Array.isArray(obj) && !!obj.__isvector__; }
 
 
 
@@ -156,7 +156,7 @@ function _hash_map() {
     var args = [{}].concat(Array.prototype.slice.call(arguments, 0));
     return _assoc_BANG.apply(null, args);
 }
-function _hash_map_Q(hm) {
+export function _hash_map_Q(hm) {
     return typeof hm === "object" &&
            !Array.isArray(hm) &&
            !(hm === null) &&
