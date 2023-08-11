@@ -1,8 +1,9 @@
+import { read_str } from './reader.js'
 import { Env } from './env.js'
 
 // read
 function READ(str) {
-    return str;
+    return read_str(str);
 }
 
 // eval
