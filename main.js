@@ -4,12 +4,7 @@ import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
 
 let editorState = EditorState.create({
-  doc: `(defn hi
-  "stufs"
-  ([] "none")
-  ([n] (str n "args")))
-  
-(hi)`,
+  doc: `(or true true)`,
     extensions: [basicSetup, clojure()]
 })
 

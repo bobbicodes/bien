@@ -7,7 +7,7 @@
     (if (> (count xs) 0)
       (list 'if (first xs)
             (if (> (count xs) 1)
-              (nth xs 1) (throw \\ "odd number of forms to cond \\"))
+              (nth xs 1) (throw \\"odd number of forms to cond\\"))
             (cons 'cond (rest (rest xs)))))))
 
 (def dec (fn (a) (- a 1)))
@@ -30,7 +30,7 @@
 (def gensym
   (let [counter (atom 0)]
     (fn []
-      (symbol (str \\ "G__\\" (swap! counter inc))))))
+      (symbol (str "G__" (swap! counter inc))))))
 
 (defn memoize [f]
   (let [mem (atom {})]
@@ -51,3 +51,33 @@
   (cond (empty? xs)       true
         (pred (first xs)) (every? pred (rest xs))
         true              false))
+
+(defmacro when (fn [x & xs] (list 'if x (cons 'do xs))))
+
+(defmacro if-not
+  (fn [test then else]
+    `(if (not ~test) ~then ~else)))
+
+(defmacro when-not
+  (fn [test & body]
+    (list 'if test nil (cons 'do body))))
+
+(defn fnext [x] (first (next x)))
+
+(defmacro or
+  (fn [& xs]
+    (if (empty? xs) nil
+        (if (= 1 (count xs))
+          (first xs)
+          (let [condvar (gensym)]
+            `(let [~condvar ~(first xs)]
+               (if ~condvar ~condvar (or ~@(rest xs)))))))))
+
+(defmacro and
+    (fn [& xs]
+      (cond (empty? xs)      true
+            (= 1 (count xs)) (first xs)
+            true
+            (let [condvar (gensym)]
+              `(let [~condvar ~(first xs)]
+                 (if ~condvar (and ~@(rest xs)) ~condvar))))))
