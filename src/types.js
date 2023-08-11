@@ -46,7 +46,7 @@ function _equal_Q (a, b) {
 }
 
 
-function _clone (obj) {
+export function _clone (obj) {
     var new_obj;
     switch (_obj_type(obj)) {
     case 'list':
@@ -97,14 +97,14 @@ export function _symbol_Q(obj) { return obj instanceof Symbol; }
 
 
 // Keywords
-function _keyword(obj) {
+export function _keyword(obj) {
     if (typeof obj === 'string' && obj[0] === '\u029e') {
         return obj;
     } else {
         return "\u029e" + obj;
     }
 }
-function _keyword_Q(obj) {
+export function _keyword_Q(obj) {
     return typeof obj === 'string' && obj[0] === '\u029e';
 }
 
@@ -125,7 +125,7 @@ function _function_Q(obj) { return typeof obj == "function"; }
 Function.prototype.clone = function() {
     var that = this;
     var temp = function () { return that.apply(this, arguments); };
-    for( key in this ) {
+    for(var key in this) {
         temp[key] = this[key];
     }
     return temp;
@@ -135,7 +135,7 @@ function _macro_Q(obj) { return _function_Q(obj) && !!obj._ismacro_; }
 
 
 // Lists
-function _list() { return Array.prototype.slice.call(arguments, 0); }
+export function _list() { return Array.prototype.slice.call(arguments, 0); }
 export function _list_Q(obj) { return Array.isArray(obj) && !obj.__isvector__; }
 
 

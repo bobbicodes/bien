@@ -81,7 +81,7 @@ function vals(hm) { return Object.keys(hm).map(function(k) { return hm[k]; }); }
 
 
 // Sequence functions
-function cons(a, b) { return [a].concat(b); }
+export function cons(a, b) { return [a].concat(b); }
 
 function concat(lst) {
     lst = lst || [];
@@ -97,18 +97,18 @@ function vec(lst) {
     }
 }
 
-function nth(lst, idx) {
+export function nth(lst, idx) {
     if (idx < lst.length) { return lst[idx]; }
     else                  { throw new Error("nth: index out of range"); }
 }
 
-function first(lst) { return (lst === null) ? null : lst[0]; }
+export function first(lst) { return (lst === null) ? null : lst[0]; }
 
-function rest(lst) { return (lst == null) ? [] : lst.slice(1); }
+export function rest(lst) { return (lst == null) ? [] : lst.slice(1); }
 
 function empty_Q(lst) { return lst.length === 0; }
 
-function count(s) {
+export function count(s) {
     if (Array.isArray(s)) { return s.length; }
     else if (s === null)  { return 0; }
     else                  { return Object.keys(s).length; }
@@ -124,7 +124,7 @@ function conj(lst) {
     }
 }
 
-function seq(obj) {
+export function seq(obj) {
     if (types._list_Q(obj)) {
         return obj.length > 0 ? obj : null;
     } else if (types._vector_Q(obj)) {

@@ -4,7 +4,10 @@ import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
 
 let editorState = EditorState.create({
-  doc: `((fn [n] (+ 1 n)) 2)`,
+  doc: `(cond
+    (< 1 0) "negative"
+    (> 1 0) "positive"
+    :else "zero")`,
     extensions: [basicSetup, clojure()]
 })
 
