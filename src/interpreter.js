@@ -10,6 +10,44 @@ function READ(str) {
 }
 
 // eval
+function qqLoop (acc, elt) {
+    if (types._list_Q(elt) && elt.length
+        && types._symbol_Q(elt[0]) && elt[0].value == 'splice-unquote') {
+        return [types._symbol("concat"), elt[1], acc];
+    } else {
+        return [types._symbol("cons"), quasiquote (elt), acc];
+    }
+}
+function quasiquote(ast) {
+    if (types._list_Q(ast) && 0<ast.length
+        && types._symbol_Q(ast[0]) && ast[0].value == 'unquote') {
+        return ast[1];
+    } else if (types._list_Q(ast)) {
+        return ast.reduceRight(qqLoop,[]);
+    } else if (types._vector_Q(ast)) {
+        return [types._symbol("vec"), ast.reduceRight(qqLoop,[])];
+    } else if (types._symbol_Q(ast) || types._hash_map_Q(ast)) {
+        return [types._symbol("quote"), ast];
+    } else {
+        return ast;
+    }
+}
+
+function is_macro_call(ast, env) {
+    return types._list_Q(ast) &&
+           types._symbol_Q(ast[0]) &&
+           env.find(ast[0]) &&
+           env.get(ast[0])._ismacro_;
+}
+
+function macroexpand(ast, env) {
+    while (is_macro_call(ast, env)) {
+        var mac = env.get(ast[0]);
+        ast = mac.apply(mac, ast.slice(1));
+    }
+    return ast;
+}
+
 function eval_ast(ast, env) {
     if (types._symbol_Q(ast)) {
         return env.get(ast);
@@ -37,11 +75,16 @@ function _EVAL(ast, env) {
     if (!types._list_Q(ast)) {
         return eval_ast(ast, env);
     }
+
+    // apply list
+    ast = macroexpand(ast, env);
+    if (!types._list_Q(ast)) {
+        return eval_ast(ast, env);
+    }
     if (ast.length === 0) {
         return ast;
     }
 
-    // apply list
     var a0 = ast[0], a1 = ast[1], a2 = ast[2], a3 = ast[3];
     switch (a0.value) {
     case "def":
@@ -55,6 +98,30 @@ function _EVAL(ast, env) {
         ast = a2;
         env = let_env;
         break;
+    case "quote":
+        return a1;
+    case "quasiquoteexpand":
+        return quasiquote(a1);
+    case "quasiquote":
+        ast = quasiquote(a1);
+        break;
+    case 'defmacro':
+        var func = types._clone(EVAL(a2, env));
+        func._ismacro_ = true;
+        return env.set(a1, func);
+    case 'macroexpand':
+        return macroexpand(a1, env);
+    case "try":
+        try {
+            return EVAL(a1, env);
+        } catch (exc) {
+            if (a2 && a2[0].value === "catch") {
+                if (exc instanceof Error) { exc = exc.message; }
+                return EVAL(a2[2], new Env(env, [a2[1]], [exc]));
+            } else {
+                throw exc;
+            }
+        }
     case "do":
         eval_ast(ast.slice(1, -1), env);
         ast = ast[ast.length-1];
@@ -97,3 +164,6 @@ export const evalString = function (str) { return PRINT(EVAL(READ(str), repl_env
 
 // core.js: defined using javascript
 for (var n in core.ns) { repl_env.set(types._symbol(n), core.ns[n]); }
+repl_env.set(types._symbol('eval'), function(ast) {
+    return EVAL(ast, repl_env); });
+repl_env.set(types._symbol('*ARGV*'), []);
