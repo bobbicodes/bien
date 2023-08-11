@@ -1,3 +1,5 @@
+import { Env } from './env.js'
+
 // read
 function READ(str) {
     return str;
@@ -13,4 +15,5 @@ function PRINT(exp) {
     return exp;
 }
 
+export var repl_env = new Env();
 export const evalString = function (str) { return PRINT(EVAL(READ(str), repl_env)); };
