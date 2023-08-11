@@ -115,6 +115,7 @@ function BlankException(msg) {
 }
 
 export function read_str(str) {
+    console.log("read_str:", str)
     var tokens = tokenize(str);
     if (tokens.length === 0) { throw new BlankException(); }
     return read_form(new Reader(tokens))

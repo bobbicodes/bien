@@ -1,5 +1,9 @@
 import { _obj_type } from './types.js'
 
+export function _println() {
+    console.log.apply(console, arguments)
+}
+
 export function _pr_str(obj, print_readably) {
     if (typeof print_readably === 'undefined') { print_readably = true; }
     var _r = print_readably;
