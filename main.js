@@ -73,7 +73,6 @@ function testSolution(slug) {
   clearTests()
   const testSuite = testSuites[k].trim()
   try {
-    //console.log(evalString("(do " + doc + ")"))
     evalString("(do " + doc + ")")
   } catch (error) {
     results.innerHTML = error
@@ -81,7 +80,6 @@ function testSolution(slug) {
     return null
   }
   try {
-    //console.log(evalString("(do " + testSuite + ")"))
     evalString("(do " + testSuite + ")")
   } catch (error) {
     results.innerHTML = error
@@ -95,7 +93,6 @@ function testSolution(slug) {
     }
   }
   const uniqueFails = [...new Set(fails)];
-  console.log("fails:", uniqueFails)
   if (uniqueFails.length == 1) {
     results.innerHTML = "1 fail: " + uniqueFails[0]
     results.style.color = 'red';
@@ -109,7 +106,19 @@ function testSolution(slug) {
   }
 }
 
-const exercisesToTest = Object.keys(solutions)
+function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
+const exercisesToTest = shuffle(Object.keys(solutions))
 
 function testExercises() {
   let passes = []
