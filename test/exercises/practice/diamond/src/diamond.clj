@@ -1,0 +1,4 @@
+(ns diamond)
+
+(defn diamond [] 
+  )

@@ -1,0 +1,20 @@
+{
+  "map" : "(deftest map-test\r\n  (is (= l (map #(+ % 5) '(1 2 3))))",
+  "vectors" : "(deftest vectors-test\r\n  (is (= v (list :a :b :c) (vec '(:a :b :c)) (vector :a :b :c))))",
+  "lists" : "(deftest lists-test\r\n  (is (= l '(:a :b :c))))",
+  "hello" : "(deftest hello-test\r\n  (is (= (hello \\\"Dave \\\") \\\"Hello, Dave!\\\"))\r\n  (is (= (hello \\\"Jenn \\\") \\\"Hello, Jenn! \\\"))\r\n  (is (= (hello \\\"Rhea \\\") \\\"Hello, Rhea! \\\")))",
+  "maths" : "(deftest maths-test\r\n  (is (true? expr))",
+  "strings" : "(deftest strings-test\r\n  (is (= \"HELLO\" s)))",
+  "maps" : "(deftest maps-test\r\n  (is (= n ((hash-map :a 10, :b 20, :c 30) :b)))\r\n  (is (= n (:b {:a 10, :b 20, :c 30}))))",
+  "rest" : "(deftest rest-test\r\n  (is (= v (rest [10 20 30 40]))))",
+  "conj_list" : "(deftest conj-list-test\r\n  (is (= l (conj '(2 3 4) 1)))\r\n  (is (= l (conj '(3 4) 2 1))))",
+  "conj_map" : "(deftest conj-map-test\r\n  (is (= {:a 1, :b 2, :c 3} (conj {:a 1} kv [:c 3]))))",
+  "conj_vector" : "(deftest conj-vectors-test\r\n  (is (= v (conj [1 2 3] 4)))\r\n  (is (= v (conj [1 2] 3 4))))",
+  "filter" : "(deftest filter-test\r\n  (is (= l (filter #(> % 5) '(3 4 5 6 7)))))",
+  "functions" : "(deftest functions-test\r\n  (is (= n ((fn add-five [x] (+ x 5)) 3)))\r\n  (is (= n ((fn [x] (+ x 5)) 3)))\r\n  (is (= n (#(+ % 5) 3)))\r\n  (is (= n ((partial + 5) 3))))",
+  "seqs" : "(deftest seqs-test\r\n  (is (= n (first '(3 2 1))))\r\n  (is (= n (second [2 3 4])))\r\n  (is (= n (last (list 1 2 3)))))",
+  "truth" : "(deftest equality-test\r\n  (is (true? truth)))",
+  "conj_set" : "(deftest conj-set-test\r\n  (is (= #{1 2 3 4} (conj #{1 4 3} n))))",
+  "double" : "(deftest double-test\r\n  (is (= (f 2) 4))\r\n  (is (= (f 3) 6))\r\n  (is (= (f 11) 22))\r\n  (is (= (f 7) 14)))",
+  "sets" : "(deftest sets-test\r\n  (is (= s (set '(:a :a :b :c :c :c :c :d :d))))\r\n  (is (= s (set/union #{:a :b :c} #{:b :c :d}))))"
+}

@@ -1,0 +1,4 @@
+(ns proverb)
+
+(defn recite [] 
+    )

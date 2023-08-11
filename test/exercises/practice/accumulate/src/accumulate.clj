@@ -1,0 +1,4 @@
+(ns accumulate)
+
+(defn accumulate [] 
+      )

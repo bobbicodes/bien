@@ -1,0 +1,4 @@
+(ns gigasecond)
+
+(defn from []  
+    )

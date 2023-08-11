@@ -1,2 +1,16 @@
 node_modules/
 *.cache
+test/**/deps.edn
+test/**/tests.toml
+test/**/instructions.md
+test/**/help.md
+test/**/tests.md
+test/**/project.clj
+test/**/representations.md
+test/**/config.json
+test/**/introduction.md
+test/**/example.clj
+test/**/*.mustache
+test/**/instructions.append.md
+test/**/hints.md
+test/**/exemplar.clj

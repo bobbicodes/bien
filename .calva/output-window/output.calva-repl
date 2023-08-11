@@ -1,0 +1,84 @@
+; This is the Calva evaluation results output window.
+; TIPS: The keyboard shortcut `ctrl+alt+o o` shows and focuses this window
+;   when connected to a REPL session.
+; Please see https://calva.io/output/ for more info.
+; Happy coding! ♥️
+
+; Jacking in...
+; Connecting using "Babashka" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+; Starting Jack-in Terminal: pushd c:\Users\porko\Documents\GitHub\lisp-tutorial & bb --nrepl-server 53736 & popd
+; Using host:port 127.0.0.1:53736 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; TIPS:
+;   - You can edit the contents here. Use it as a REPL if you like.
+;   - `alt+enter` evaluates the current top level form.
+;   - `ctrl+enter` evaluates the current form.
+;   - `alt+up` and `alt+down` traverse up and down the REPL command history
+;      when the cursor is after the last contents at the prompt
+;   - Clojure lines in stack traces are peekable and clickable.
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉user꞉>  ; Use `alt+enter` to evaluate
+clj꞉user꞉> 
+; Jack-in done.
+clj꞉user꞉> 
+nil
+clj꞉user꞉> 
+[#object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x5e14a991 "test\\foreclojure\\1"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x2f99146b "test\\foreclojure\\10"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x476deb58 "test\\foreclojure\\11"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x58237852 "test\\foreclojure\\12"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x5b2bad4e "test\\foreclojure\\13"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x7558cd27 "test\\foreclojure\\14"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x2a440cb4 "test\\foreclojure\\15"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x64657e03 "test\\foreclojure\\16"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x63855d35 "test\\foreclojure\\17"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x64ace9b0 "test\\foreclojure\\18"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0xdf2d89c "test\\foreclojure\\2"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x870e643 "test\\foreclojure\\3"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x6cf7476c "test\\foreclojure\\4"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x19390093 "test\\foreclojure\\5"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x7c2adda6 "test\\foreclojure\\6"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x53b7ea49 "test\\foreclojure\\7"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x376754db "test\\foreclojure\\8"]
+ #object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x7e92ad52 "test\\foreclojure\\9"]]
+clj꞉user꞉> 
+#'user/foreclojure
+clj꞉user꞉> 
+; java.lang.IllegalArgumentException: Cannot open <#object[sun.nio.fs.WindowsPath$WindowsPathWithAttributes 0x300f5d2e "test\\foreclojure\\1"]> as an InputStream. user c:\Users\porko\Documents\GitHub\lisp-tutorial\scratch.clj:1:1
+clj꞉user꞉> 
+#'user/foreclojure-problems
+clj꞉user꞉> 
+#'user/foreclojure
+clj꞉user꞉> 
+"(def truth (= false true))"
+clj꞉user꞉> 
+("(def truth (= false true))"
+ "(def expr (= (- 10 (* 2 3)) n))"
+ "(def s (. \"'goodbye'.toUpperCase\"))"
+ "(def l (list 1 2 3))"
+ "(def l '(3 4))"
+ "(def v [])"
+ "(def v [1 2])"
+ "(def s #{:a :b :c})"
+ "(def n 0)"
+ "(def n 0)"
+ "(def kv [:a 1])"
+ "(def n 0)"
+ "(def v [10 20 30 40])"
+ "(def n 0)"
+ "(def f \r\n  (fn [n]\r\n    ))"
+ "(defn hello [name]\r\n  )"
+ "(def l '(1 2 3))"
+ "(def l '(3 4 5 6 7))")
+clj꞉user꞉> 
+nil
+clj꞉user꞉> 
+#'user/foreclojure-tests
+clj꞉user꞉> 
+nil
+clj꞉user꞉> 

@@ -2,6 +2,8 @@ import './style.css'
 import { EditorView, basicSetup } from 'codemirror'
 import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
+import solutions from './test/foreclojure-solutions.json';
+import testSuites from './test/foreclojure-tests.json';
 
 let editorState = EditorState.create({
   doc: `(or true true)`,
