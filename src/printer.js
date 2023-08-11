@@ -5,8 +5,8 @@ export function _println() {
 }
 
 export function _pr_str(obj, print_readably) {
-    console.log(obj)
-    console.log(_obj_type(obj))
+    //console.log(obj)
+    //console.log(_obj_type(obj))
     if (typeof print_readably === 'undefined') { print_readably = true; }
     var _r = print_readably;
     var ot = _obj_type(obj);

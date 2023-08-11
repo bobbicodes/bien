@@ -16,5 +16,5 @@
   "truth" : "(def truth (= false true))",
   "conj_set" : "(def n 0)",
   "double" : "(def f \r\n  (fn [n]\r\n    ))",
-  "sets" : "(def s #{:a :b :c})"
+  "sets" : "(def s #{:a :b :c :d})"
 }

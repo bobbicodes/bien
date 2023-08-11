@@ -4,6 +4,7 @@ import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
 import solutions from './test/foreclojure-solutions.json';
 import testSuites from './test/foreclojure-tests.json';
+import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
   doc: `(or true true)`,
@@ -44,7 +45,6 @@ function loadExercise(slug) {
   exercise = slug
   const k = slug.replaceAll("-", "_")
   const src = solutions[k].trim()
-  console.log(src)
   const testSuite = testSuites[k].trim()
   const doc = view.state.doc.toString()
   const testDoc = testView.state.doc.toString()
@@ -70,8 +70,10 @@ function testSolution(slug) {
     selection: { anchor: 0, head: 0 }
   })
   doc = view.state.doc.toString()
+  clearTests()
   const testSuite = testSuites[k].trim()
   try {
+    //console.log(evalString("(do " + doc + ")"))
     evalString("(do " + doc + ")")
   } catch (error) {
     results.innerHTML = error
@@ -79,6 +81,7 @@ function testSolution(slug) {
     return null
   }
   try {
+    //console.log(evalString("(do " + testSuite + ")"))
     evalString("(do " + testSuite + ")")
   } catch (error) {
     results.innerHTML = error
@@ -92,6 +95,7 @@ function testSolution(slug) {
     }
   }
   const uniqueFails = [...new Set(fails)];
+  console.log("fails:", uniqueFails)
   if (uniqueFails.length == 1) {
     results.innerHTML = "1 fail: " + uniqueFails[0]
     results.style.color = 'red';
@@ -114,6 +118,7 @@ function testExercises() {
     console.log("Testing ", exercisesToTest[exercise])
     testSolution(exercisesToTest[exercise])
     if (results.innerHTML === "Passed 😍") {
+      console.log("exercise passed")
       passes.push(exercisesToTest[exercise])
       results.innerHTML = passes.length + " tests passed 😍"
     } else {

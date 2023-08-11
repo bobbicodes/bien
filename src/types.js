@@ -21,28 +21,32 @@ export function _obj_type(obj) {
 function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
 
 
-export function _equal_Q (a, b) {
+export function _equal_Q(a, b) {
     var ota = _obj_type(a), otb = _obj_type(b);
     if (!(ota === otb || (_sequential_Q(a) && _sequential_Q(b)))) {
         return false;
     }
     switch (ota) {
-    case 'symbol': return a.value === b.value;
-    case 'list':
-    case 'vector':
-        if (a.length !== b.length) { return false; }
-        for (var i=0; i<a.length; i++) {
-            if (! _equal_Q(a[i], b[i])) { return false; }
-        }
-        return true;
-    case 'hash-map':
-        if (Object.keys(a).length !== Object.keys(b).length) { return false; }
-        for (var k in a) {
-            if (! _equal_Q(a[k], b[k])) { return false; }
-        }
-        return true;
-    default:
-        return a === b;
+        case 'symbol': return a.value === b.value;
+        case 'list':
+        case 'vector':
+        case 'set':
+            //console.log("comparing", ota, "and", otb)
+            if (a.length !== b.length) { return false; }
+            for (var i = 0; i < a.length; i++) {
+                if (!_equal_Q(a[i], b[i])) { return false; }
+            }
+            return true;
+        case 'hash-map':
+            a = a.toObject()
+            b = b.toObject()
+            if (Object.keys(a).length !== Object.keys(b).length) { return false; }
+            for (var k in a) {
+                if (!_equal_Q(a[k], b[k])) { return false; }
+            }
+            return true;
+        default:
+            return a === b;
     }
 }
 

@@ -210,6 +210,14 @@ function _intersection(setA, setB) {
     return _intersection;
 }
 
+function _is(a) {
+    if (a) {
+        return true
+    } else {
+        return false
+    }
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -217,6 +225,7 @@ export var ns = {
     'throw': mal_throw,
     'nil?': types._nil_Q,
     'true?': types._true_Q,
+    'is': _is,
     'false?': types._false_Q,
     'number?': types._number_Q,
     'string?': types._string_Q,

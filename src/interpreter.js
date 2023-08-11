@@ -35,7 +35,7 @@ function quasiquote(ast) {
 }
 
 function is_macro_call(ast, env) {
-    console.log(ast)
+    //console.log(ast)
     return types._list_Q(ast) &&
         types._symbol_Q(ast[0]) &&
         env.find(ast[0]) &&
@@ -70,6 +70,11 @@ function eval_ast(ast, env) {
     }
 }
 
+export function clearTests() {
+    deftests = []
+  }
+
+export var deftests = []
 var arglist
 var fnBody
 var isMultiArity
