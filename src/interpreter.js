@@ -1,4 +1,5 @@
 import { read_str } from './reader.js'
+import {_pr_str} from './printer.js'
 import { Env } from './env.js'
 
 // read
@@ -13,7 +14,7 @@ function EVAL(ast, env) {
 
 // print
 function PRINT(exp) {
-    return exp;
+    return _pr_str(exp, true);
 }
 
 export var repl_env = new Env();
