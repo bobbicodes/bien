@@ -1,0 +1,21 @@
+{
+  "name": "web-editor-template",
+  "version": "1.0.0",
+  "description": "This repo is a template for following along with the Lisp tutorial I am writing. It is based on [mal](https://github.com/kanaka/mal), the Make a Lisp process, but instead of having a REPL prompt, forms are evaluated in a web editor which is much more convenient.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@lezer/common": "^1.0.3",
+    "@nextjournal/lezer-clojure": "^1.0.0",
+    "codemirror": "^6.0.1",
+    "vite": "^4.4.9"
+  }
+}
