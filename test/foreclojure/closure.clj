@@ -1,0 +1,1 @@
+(defn closure [n] #(apply * (repeat n %)))
