@@ -143,4 +143,4 @@ function testExercises() {
 
 //testSolution("conj_map")
 
-testExercises()
+//testExercises()

@@ -142,7 +142,9 @@ function _EVAL(ast, env) {
                     let body = ast.slice(1)[0]
                     fun.push(args)
                     fun.push(body)
-                    return types._function(EVAL, Env, body, env, args);
+                    var lambda = types._function(EVAL, Env, body, env, args);
+                    lambda.lambda = true
+                    return lambda
                 }
             case "def":
                 var res = EVAL(a2, env);
