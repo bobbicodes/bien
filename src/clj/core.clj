@@ -81,3 +81,13 @@
             (let [condvar (gensym)]
               `(let [~condvar ~(first xs)]
                  (if ~condvar (and ~@(rest xs)) ~condvar))))))
+
+(defn ffirst [x] (first (first x)))
+
+(defn second [l] (nth l 1))
+
+(defn some [pred xs]
+  (if (empty? xs)
+    nil
+    (or (pred (first xs))
+        (some pred (rest xs)))))

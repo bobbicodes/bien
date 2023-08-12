@@ -4,6 +4,8 @@ import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
 import solutions from './test/foreclojure-exercises.json';
 import testSuites from './test/foreclojure-tests.json';
+import exercism from './test/exercises.json';
+import exercism_tests from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
@@ -122,6 +124,7 @@ function shuffle(array) {
 }
 
 const exercisesToTest = shuffle(Object.keys(solutions))
+
 
 function testExercises() {
   let passes = []

@@ -148,7 +148,10 @@ export function seq(obj) {
         return obj.length > 0 ? Array.prototype.slice.call(obj, 0) : null;
     } else if (types._string_Q(obj)) {
         return obj.length > 0 ? obj.split('') : null;
-    } else if (obj === null) {
+    } else if (types._set_Q(obj)) {
+        return Array.from(obj)
+    }
+    else if (obj === null) {
         return null;
     } else {
         throw new Error("seq: called on non-sequence");
