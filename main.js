@@ -141,6 +141,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("conj_set")
+//testSolution("conj_map")
 
 testExercises()

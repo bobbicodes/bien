@@ -234,9 +234,14 @@ function _EVAL(ast, env) {
                 break;
             case "fn":
                 console.log("defining fn", ast)
-                return types._function(EVAL, Env, a2, env, a1);
+                var lambda = types._function(EVAL, Env, a2, env, a1);
+                lambda.lambda = true
+                return lambda
             default:
                 var el = eval_ast(ast, env), f = el[0];
+                if (f.lambda) {
+                    console.log("fn is a lambda", f.__ast__)
+                }
                 if (f.__ast__) {
                     ast = f.__ast__;
                     env = f.__gen_env__(el.slice(1));

@@ -115,6 +115,7 @@ export function count(s) {
 }
 
 function conj(lst) {
+    console.log(lst)
     if (types._list_Q(lst)) {
         return Array.prototype.slice.call(arguments, 1).reverse().concat(lst);
     } else if (types._vector_Q(lst)) {
@@ -123,6 +124,19 @@ function conj(lst) {
         return v;
     } else if (types._set_Q(lst)) {
         return lst.add(arguments[1])
+    } else if (types._hash_map_Q(lst)) {
+        console.log("conj on hashmap")
+        var hm = types._clone(lst);
+        const args = Array.prototype.slice.call(arguments, 1)
+        for (var i=1; i<args.length; i+=2) {
+            var ktoken = args[i],
+                vtoken = args[i+1];
+            if (typeof ktoken !== "string") {
+                throw new Error("expected hash-map key string, got: " + (typeof ktoken));
+            }
+            hm[ktoken] = vtoken;
+        }
+        return hm
     }
 }
 
