@@ -1,0 +1,10 @@
+(deftest test-101
+  (is (= (lev "kitten" "sitting") 3))
+  (is (= (lev "closure" "clojure") (lev "clojure" "closure") 1))
+  (is (= (lev "xyx" "xyyyx") 2))
+  (is (= (lev "" "123456") 6))
+  (is (= (lev "Clojure" "Clojure") (lev "" "") (lev [] []) 0))
+  (is (= (lev [1 2 3 4] [0 2 3 4 5]) 2))
+  (is (= (lev '(:a :b :c :d) '(:a :d)) 2))
+  (is (= (lev "ttttattttctg" "tcaaccctaccat") 10))
+  (is (= (lev "gaattctaatctc" "caaacaaaaaattt") 9)))
