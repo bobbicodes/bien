@@ -274,7 +274,7 @@ function map(f, s) {
 }
 
 function filter(f, lst) {
-    return lst.filter(function (el) { return f(el); });
+    return seq(lst).filter(function (el) { return f(el); });
 }
 
 // types.ns is namespace of type functions
