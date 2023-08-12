@@ -1,0 +1,10 @@
+(deftest test-115
+  (is (= true (bal-num 11)))
+  (is (= true (bal-num 121)))
+  (is (= false (bal-num 123)))
+  (is (= true (bal-num 0)))
+  (is (= false (bal-num 88099)))
+  (is (= true (bal-num 89098)))
+  (is (= true (bal-num 89089)))
+  (is (= (take 20 (filter bal-num (range)))
+         [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])))
