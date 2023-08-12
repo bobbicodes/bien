@@ -10,7 +10,7 @@ function READ(str) {
     return read_str(str);
 }
 
-// eval
+// eval 
 function qqLoop(acc, elt) {
     if (types._list_Q(elt) && elt.length
         && types._symbol_Q(elt[0]) && elt[0].value == 'splice-unquote') {
@@ -128,7 +128,7 @@ function _EVAL(ast, env) {
             case "ns":
                 return null
             case "dispatch":
-                console.log("eval dispatch")
+                //console.log("eval dispatch")
                 // Regex
                 if (types._string_Q(a1)) {
                     const re = new RegExp(a1, 'g')
@@ -138,7 +138,7 @@ function _EVAL(ast, env) {
                 if (types._list_Q(a1)) {
                     let fun = [types._symbol('fn')]
                     const args = ast.toString().match(/%\d?/g).map(types._symbol)
-                    console.log("args:", args)
+                    //console.log("args:", args)
                     let body = ast.slice(1)[0]
                     fun.push(args)
                     fun.push(body)
@@ -235,14 +235,14 @@ function _EVAL(ast, env) {
                 }
                 break;
             case "fn":
-                console.log("defining fn", ast)
+                //console.log("defining fn", ast)
                 var lambda = types._function(EVAL, Env, a2, env, a1);
                 lambda.lambda = true
                 return lambda
             default:
                 var el = eval_ast(ast, env), f = el[0];
                 if (f.lambda) {
-                    console.log("fn is a lambda", f.__ast__)
+                    //console.log("fn is a lambda", f.__ast__)
                 }
                 if (f.__ast__) {
                     ast = f.__ast__;

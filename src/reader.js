@@ -100,7 +100,7 @@ function read_form(reader) {
         case '@': reader.next();
             return [types._symbol('deref'), read_form(reader)];
         case '#': reader.next();
-        console.log("reading dispatch")
+        //console.log("reading dispatch")
             return [types._symbol('dispatch'), read_form(reader)];
         case '#_': reader.next();
             return [types._symbol('discard'), read_form(reader)];

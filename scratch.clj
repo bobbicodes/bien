@@ -3,53 +3,61 @@
          '[cheshire.core :as json]
          '[clojure.test :refer [is]])
 
-(def foreclojure-problems
-  ["truth" "maths" "strings" "lists" "conj_list" "vectors" 
-   "conj_vector" "sets" "conj_set" "maps" "conj_map" "seqs" 
-   "rest" "functions" "double" "hello" "map" "filter"])
+(def foreclojure-exercises
+  (map #(subs (str/replace % ".clj" "") 17)
+       (fs/list-dir "test\\foreclojure")))
 
-(def foreclojure 
-  (map #(slurp (fs/file "test\\foreclojure\\" (str % ".clj")))
-       foreclojure-problems))
+(def ex-test
+  (group-by #(str/ends-with? % "_test") 
+            foreclojure-exercises))
 
-(def foreclojure-tests
-  (map #(slurp (fs/file "test\\foreclojure\\" (str % "_test.clj")))
-       foreclojure-problems))
-
-(def practice-exercises
-  (map #(subs (str %) 19)
-       (fs/list-dir "exercises\\practice")))
-
-(def instructions-all
-  (for [slug practice-exercises]
-    (let [f (fs/file "exercises\\practice" slug "\\.docs\\instructions.md")]
-      (slurp f))))
-
-(def solutions-all
-  (for [slug practice-exercises]
-    (let [f (fs/file "exercises\\practice" slug "\\.meta\\src\\example.clj")]
-      (slurp f))))
+(def exercises (flatten (nfirst ex-test)))
+(def tests (flatten (rest (last ex-test))))
 
 (def src-all
-  (for [slug practice-exercises]
+  (for [slug exercises]
     (let [filename (str/replace slug "-" "_")
-          f (fs/file "exercises\\practice" slug "src" (str filename ".clj"))]
+          f (fs/file "test" "foreclojure" (str filename ".clj"))]
       (slurp f))))
+
+(first exercises)
+
+(let [slug "anagram"
+      filename (str/replace slug "-" "_")
+      f (fs/file "test" (str filename ".clj"))]
+  f
+  #_(slurp f))
+
+(def test-all
+  (for [slug tests]
+    (let [filename (str/replace slug "-" "_")
+          f (fs/file "test" "foreclojure" (str filename ".clj"))]
+      (slurp f))))
+
+(def foreclojure
+  (map #(slurp (fs/file "test\\foreclojure\\" (str % ".clj")))
+       foreclojure-exercises))
+
+(first foreclojure-exercises)
+
+(map str (fs/list-dir "test\\foreclojure"))
 
 (def exercises
   (map #(subs (str/replace % ".clj" "") 15)
        (fs/list-dir "exercise_tests")))
 
-(def test-all
-  (for [e exercises]
-    (let [f (fs/file "exercise_tests" (str e ".clj"))]
-      (slurp f))))
+
 
 (comment
-  (spit "exercises.json"
+  (spit "foreclojure-exercises.json"
         (json/generate-string
-         (zipmap practice-exercises src-all)
+         (zipmap exercises src-all)
          {:pretty true}))
+
+ (spit "foreclojure-tests.json"
+      (json/generate-string
+       (zipmap tests test-all)
+       {:pretty true}))
   (spit "tests.json"
         (json/generate-string
          (zipmap exercises test-all)
@@ -66,7 +74,7 @@
          {:pretty true}))
   (spit "foreclojure-solutions.json"
         (json/generate-string
-         (zipmap foreclojure-problems
+         (zipmap foreclojure-exercises
                  foreclojure)
          {:pretty true}))
   (spit "foreclojure-tests.json"

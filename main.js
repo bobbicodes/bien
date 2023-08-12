@@ -2,7 +2,7 @@ import './style.css'
 import { EditorView, basicSetup } from 'codemirror'
 import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
-import solutions from './test/foreclojure-solutions.json';
+import solutions from './test/foreclojure-exercises.json';
 import testSuites from './test/foreclojure-tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
@@ -47,7 +47,8 @@ function loadExercise(slug) {
   exercise = slug
   const k = slug.replaceAll("-", "_")
   const src = solutions[k].trim()
-  const testSuite = testSuites[k].trim()
+  //console.log("loading test suite", testSuites[k + "_test"])
+  const testSuite = testSuites[k + "_test"].trim()
   const doc = view.state.doc.toString()
   const testDoc = testView.state.doc.toString()
   const end = doc.length
@@ -73,7 +74,7 @@ function testSolution(slug) {
   })
   doc = view.state.doc.toString()
   clearTests()
-  const testSuite = testSuites[k].trim()
+  const testSuite = testSuites[k + "_test"].trim()
   try {
     evalString("(do " + doc + ")")
   } catch (error) {
@@ -141,6 +142,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("conj_map")
+//testSolution("vectors")
 
-//testExercises()
+testExercises()

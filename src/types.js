@@ -171,8 +171,8 @@ export function _hash_map_Q(hm) {
            !(hm instanceof Atom);
 }
 export function _assoc_BANG(hm) {
-    console.log("assoc args", arguments)
-    console.log("length", arguments.length)
+    //console.log("assoc args", arguments)
+    //console.log("length", arguments.length)
     if (arguments.length % 2 !== 1) {
         throw new Error("Odd number of assoc arguments");
     }

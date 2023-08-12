@@ -235,7 +235,7 @@ function resolve_js(str) {
     if (str.match(/\./)) {
         var re = /^(.*)\.[^\.]*$/,
             match = re.exec(str);
-        console.log("match:", match[1])
+        //console.log("match:", match[1])
         return [eval(match[1]), eval(str)];
     } else {
         console.log("no match in", str)
