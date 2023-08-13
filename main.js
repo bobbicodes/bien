@@ -145,6 +145,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("myjuxt")
+testSolution("nth_element")
 
 //testExercises()

@@ -40,3 +40,6 @@
 (defn juxt [& f]
   (fn [& a]
     (map #(apply % a) f)))
+
+(defn upper-case [s]
+  (. (str "'" s "'" ".toUpperCase")))

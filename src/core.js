@@ -103,6 +103,7 @@ export function nth(lst, idx) {
 }
 
 export function first(lst) { return (lst === null) ? null : lst[0]; }
+export function last(lst) { return (lst === null) ? null : lst[lst.length-1]; }
 
 export function rest(lst) { return (lst == null) ? [] : lst.slice(1); }
 
@@ -289,6 +290,14 @@ function sum() {
     return Array.from(arguments).reduce((acc, a) => acc + a, 0);
 }
 
+function take(n, coll) {
+    return coll.slice(0, n)
+}
+
+function drop(n, coll) {
+    return coll.slice(n)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -347,6 +356,9 @@ export var ns = {
     'nth': nth,
     'first': first,
     'rest': rest,
+    'last': last,
+    'take': take,
+    'drop': drop,
     'empty?': empty_Q,
     'count': count,
     'apply': apply,
