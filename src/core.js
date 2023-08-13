@@ -299,6 +299,21 @@ function drop(n, coll) {
     return coll.slice(n)
 }
 
+function repeat(n, x) {
+    return Array(n).fill(x)
+}
+
+function range(start, end) {
+    if (!end) {
+        return range(0, start)
+    }
+    var ans = [];
+    for (let i = start; i < end; i++) {
+        ans.push(i);
+    }
+    return ans;
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -336,6 +351,7 @@ export var ns = {
     "time-ms": time_ms,
     'max': max,
     'min': min,
+    'range': range,
 
     'list': types._list,
     'list?': types._list_Q,
@@ -365,6 +381,7 @@ export var ns = {
     'count': count,
     'apply': apply,
     'map': map,
+    'repeat': repeat,
 
     'conj': conj,
     'seq': seq,

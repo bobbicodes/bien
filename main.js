@@ -145,6 +145,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("seqs")
+testSolution("myrange")
 
 //testExercises()

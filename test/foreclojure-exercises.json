@@ -151,7 +151,7 @@
   "sublist" : "(ns sublist)\r\n\r\n(defn classify [list1 list2] \r\n      \r\n)\r\n",
   "prime_factors" : "(ns prime-factors)\r\n\r\n(defn of [] \r\n      \r\n)\r\n",
   "triangle" : "(ns triangle)\r\n\r\n(defn is-valid? [])\r\n\r\n(defn equilateral? [])\r\n\r\n(defn isosceles? [])\r\n\r\n(defn scalene? [])\r\n",
-  "reverse_string" : "(ns reverse-string)\r\n\r\n(defn reverse-string [s])\r\n",
+  "reverse_string" : "(ns reverse-string)\r\n\r\n(defn reverse-string [s] (apply str (reverse s)))\r\n",
   "beer_song" : "(ns beer-song)\r\n\r\n(defn verse\r\n  \"Returns the nth verse of the song.\"\r\n  [num])\r\n\r\n(defn sing\r\n  \"Given a start and an optional end, returns all verses in this interval. If\r\n  end is not given, the whole song from start is sung.\"\r\n  ([start])\r\n  ([start end]))\r\n",
   "binary_search" : "(ns binary-search)\r\n\r\n(defn search-for [])\r\n\r\n(defn middle [])\r\n",
   "clock" : "(ns clock)\r\n\r\n(defn clock->string [clock])\r\n\r\n(defn clock [hours minutes])\r\n\r\n(defn add-time [clock time])\r\n",
