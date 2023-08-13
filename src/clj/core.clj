@@ -23,3 +23,11 @@
   (if (= 1 (count s))
     nil
     (rest s)))
+
+(defn reduce [f init xs]
+  (if (empty? xs)
+    init
+    (reduce f (f init (first xs)) (rest xs))))
+
+(defn reverse [coll]
+  (reduce conj '() coll))
