@@ -103,6 +103,7 @@ export function nth(lst, idx) {
 }
 
 export function first(lst) { return (lst === null) ? null : lst[0]; }
+export function second(lst) { return (lst === null) ? null : lst[1]; }
 export function last(lst) { return (lst === null) ? null : lst[lst.length-1]; }
 
 export function rest(lst) { return (lst == null) ? [] : lst.slice(1); }
@@ -355,6 +356,7 @@ export var ns = {
     'vec': vec,
     'nth': nth,
     'first': first,
+    'second': second,
     'rest': rest,
     'last': last,
     'take': take,

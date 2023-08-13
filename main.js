@@ -145,6 +145,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("nth_element")
+testSolution("seqs")
 
 //testExercises()
