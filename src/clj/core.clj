@@ -16,8 +16,7 @@
 
 (defmacro defn
   (fn [name arglist & value]
-    `(def ~name (fn ~arglist ~@value)))
-  (str "defined" name))
+      `(def ~name (fn ~arglist ~@value))))
 
 (defn next [s]
   (if (= 1 (count s))
@@ -31,3 +30,9 @@
 
 (defn reverse [coll]
   (reduce conj '() coll))
+
+(defmacro if-not
+  (fn [test then else]
+    (if else
+      `(if (not ~test) ~then ~else)
+      `(if-not ~test ~then nil))))

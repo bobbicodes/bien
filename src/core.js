@@ -277,6 +277,18 @@ function filter(f, lst) {
     return seq(lst).filter(function (el) { return f(el); });
 }
 
+function min() {
+    return Math.min.apply(null, arguments);
+}
+
+function max() {
+    return Math.max.apply(null, arguments);
+}
+
+function sum() {
+    return Array.from(arguments).reduce((acc, a) => acc + a, 0);
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -306,12 +318,14 @@ export var ns = {
     '<=': function (a, b) { return a <= b; },
     '>': function (a, b) { return a > b; },
     '>=': function (a, b) { return a >= b; },
-    '+': function (a, b) { return a + b; },
+    '+': sum,
     '-': function (a, b) { return a - b; },
     '*': function (a, b) { return a * b; },
     '/': function (a, b) { return a / b; },
     'inc': function (a) { return a + 1; },
     "time-ms": time_ms,
+    'max': max,
+    'min': min,
 
     'list': types._list,
     'list?': types._list_Q,

@@ -1095,3 +1095,5 @@ nil
 clj꞉user꞉> 
 nil
 clj꞉user꞉> 
+; java.lang.IllegalArgumentException: Don't know how to create ISeq from: clojure.lang.Symbol core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:1:1
+clj꞉core꞉> 

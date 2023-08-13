@@ -126,7 +126,8 @@ function _EVAL(ast, env) {
                 }
             case "def":
                 var res = EVAL(a2, env);
-                return env.set(a1, res);
+                env.set(a1, res);
+                return "#'" + a1
             case 'deftest':
                 var res = EVAL(a2, env);
                 env.set(a1, res);
