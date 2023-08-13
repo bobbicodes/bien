@@ -19,3 +19,7 @@
     `(def ~name (fn ~arglist ~@value)))
   (str "defined" name))
 
+(defn next [s]
+  (if (= 1 (count s))
+    nil
+    (rest s)))

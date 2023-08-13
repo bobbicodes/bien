@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("vectors")
+testSolution("last")
 
-testExercises()
+//testExercises()
