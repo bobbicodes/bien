@@ -78,28 +78,6 @@ var arglist
 var fnBody
 var isMultiArity
 
-function fnConfig(ast) {
-    var a0 = ast[0], a1 = ast[1], a2 = ast[2], a3 = ast[3], a4 = ast[4]
-    if (types._string_Q(a2) && types._vector_Q(a3)) {
-        arglist = a3
-        fnBody = a4
-        isMultiArity = false
-    }
-    if (types._vector_Q(a2)) {
-        arglist = a2
-        fnBody = a3
-        isMultiArity = false
-    }
-    if (types._string_Q(a2) && types._list_Q(a3)) {
-        fnBody = ast.slice(3)
-        isMultiArity = true
-    }
-    if (types._list_Q(a2)) {
-        fnBody = ast.slice(2)
-        isMultiArity = true
-    }
-}
-
 function _EVAL(ast, env) {
     while (true) {
 
@@ -156,40 +134,6 @@ function _EVAL(ast, env) {
                 return EVAL(a2, env)
             case 'testing':
                 return EVAL(a2, env)
-            case "defn":
-            case "defn-":
-                fnConfig(ast, env)
-                if (isMultiArity) {
-                    let arities = []
-                    for (let i = 0; i < fnBody.length; i++) {
-                        if (types._list_Q(fnBody[i])) {
-                            arities.push(fnBody[i])
-                        }
-                    }
-                    for (let i = 0; i < arities.length; i++) {
-                        const args = arities[i][0]
-                        const body = arities[i][1]
-                        let variadic = false
-                        for (let i = 0; i < args.length; i++) {
-                            if (args[i].value === '&') {
-                                variadic = true
-                            }
-                        }
-                        const fn = types._function(EVAL, Env, body, env, args);
-                        var fnName
-                        if (variadic) {
-                            fnName = a1 + "-variadic"
-                        } else {
-                            fnName = a1 + "-arity-" + args.length
-                        }
-                        env.set(types._symbol(fnName), fn)
-                    }
-                    return "#'" + a1 + " defined"
-                } else {
-                    const fn = types._function(EVAL, Env, fnBody, env, arglist);
-                    env.set(types._symbol(a1), fn)
-                    return "#'" + a1 + " defined"
-                }
             case "let":
                 var let_env = new Env(env);
                 for (var i = 0; i < a1.length; i += 2) {
@@ -240,6 +184,7 @@ function _EVAL(ast, env) {
                 lambda.lambda = true
                 return lambda
             default:
+                //console.log("calling", ast[0], env)
                 var el = eval_ast(ast, env), f = el[0];
                 if (f.lambda) {
                     //console.log("fn is a lambda", f.__ast__)

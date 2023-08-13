@@ -4,14 +4,12 @@ import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
 import solutions from './test/foreclojure-exercises.json';
 import testSuites from './test/foreclojure-tests.json';
-import exercism from './test/exercises.json';
-import exercism_tests from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(#(+ % 1) 3)
+  doc: `(defn a [n] (str "hello " n))
 
-((fn [n] (+ 1 n)) 56)`,
+(a "kitty")`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -145,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("vectors")
+testSolution("last")
 
-testExercises()
+//testExercises()
