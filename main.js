@@ -91,10 +91,12 @@ function testSolution(slug) {
   }
   let fails = []
   for (const test of deftests) {
-    if (!test.result) {
-      fails.push(test.test.value)
+      if (test.result.includes(false)) {
+        fails.push(test.test.value)
     }
   }
+  //console.log("deftests:", deftests)
+  //console.log("fails:", fails)
   const uniqueFails = [...new Set(fails)];
   if (uniqueFails.length == 1) {
     results.innerHTML = "1 fail: " + uniqueFails[0]

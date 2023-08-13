@@ -36,3 +36,7 @@
     (if else
       `(if (not ~test) ~then ~else)
       `(if-not ~test ~then nil))))
+
+(defn juxt [& f]
+  (fn [& a]
+    (map #(apply % a) f)))

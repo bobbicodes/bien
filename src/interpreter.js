@@ -129,10 +129,10 @@ function _EVAL(ast, env) {
                 env.set(a1, res);
                 return "#'" + a1
             case 'deftest':
-                var res = EVAL(a2, env);
+                var res = ast.slice(2).map((x) => EVAL(x, env))
                 env.set(a1, res);
                 deftests.push({ test: a1, result: res })
-                return EVAL(a2, env)
+                return res
             case 'testing':
                 return EVAL(a2, env)
             case "let":
