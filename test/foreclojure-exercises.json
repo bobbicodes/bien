@@ -57,7 +57,7 @@
   "mymap" : "(defn mymap [f l]\r\n  (rest (reductions #(f %2) 0 l)))",
   "classes" : "(defn classes [f c]\r\n  (set (map set (vals (group-by f c)))))",
   "bin" : "(defn bin [n]\r\n  (apply + (map #(if (= \\1 %1)\r\n                   (apply * (repeat %2 2)) 0)\r\n                (reverse n) (range))))",
-  "myrange" : "(defn myrange [a b]\r\n  (take (- b a) (iterate inc a)))",
+  "myrange" : "(defn myrange [start end]\r\n  (loop [n start res []]\r\n   (if (>= n end) res (recur (inc n) (conj res n)))))",
   "conj_vector" : "(def v [1 2 3 4])",
   "my_interleave" : "(defn my-interleave [a b]\r\n  (mapcat list a b))",
   "factorial" : "(defn factorial [n]\r\n  (reduce * (range 1 (inc n))))",
