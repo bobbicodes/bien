@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("reverse_seq")
+testSolution("makeflat")
 //loadExercise("primes")
-testExercises()
+//testExercises()

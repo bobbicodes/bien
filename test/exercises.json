@@ -67,7 +67,7 @@
   "uce" : "(defn uce [x]\r\n  (fn [m] ((fn e [x m]\r\n             (if (seq? x)\r\n               (apply ({'+ + '- - '* * '/ /} (first x))\r\n                      (map #(e % m) (rest x)))\r\n               (m x x)))\r\n           x m)))",
   "make_map" : "(defn make-map [keys vals]\r\n  (apply hash-map (interleave keys vals)))",
   "my_group_by" : "(defn my-group-by [f s]\r\n  (reduce\r\n   (fn [m x] (assoc m (f x) (conj (m (f x) []) x)))\r\n   {} s))",
-  "fib" : "(defn fib [a b]\r\n  (lazy-seq (cons a (fib b (+ a b)))))",
+  "fib" : "(defn fib [n]\r\n  (loop [f [1 1]]\r\n    (if (= n (count f))\r\n      f\r\n      (recur (conj f (+ (last f)\r\n                        (nth f (- (count f) 2))))))))",
   "shifter" : "(defn shifter [n s]\r\n  (take (count s) (drop (mod n (count s)) (cycle s))))",
   "nth_element" : "(defn nth-element [s n]\r\n  (last (take (inc n) s)))",
   "truth" : "(def truth (= true true))",

@@ -135,3 +135,13 @@
 
 (defn pos? [n]
   (> n 0))
+
+(defn complement [f]
+  (fn [x y & zs]
+    (if zs
+      (not (apply f x y zs))
+      (if y
+        (not (f x y))
+        (if x
+          (not (f x))
+          (not (f)))))))
