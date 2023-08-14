@@ -7,9 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(defn a [n] (str "hello " n))
-
-(a "kitty")`,
+  doc: `(reductions conj [] '(1 2 3))`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -145,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("myrange")
-
-//testExercises()
+//testSolution("reverse_seq")
+//loadExercise("primes")
+testExercises()

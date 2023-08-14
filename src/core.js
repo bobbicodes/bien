@@ -102,11 +102,11 @@ export function nth(lst, idx) {
     else { throw new Error("nth: index out of range"); }
 }
 
-export function first(lst) { return (lst === null) ? null : lst[0]; }
-export function second(lst) { return (lst === null) ? null : lst[1]; }
-export function last(lst) { return (lst === null) ? null : lst[lst.length-1]; }
+export function first(lst) { return (lst === null) ? null : seq(lst)[0]; }
+export function second(lst) { return (lst === null) ? null : seq(lst)[1]; }
+export function last(lst) { return (lst === null) ? null : seq(lst)[seq(lst).length-1]; }
 
-export function rest(lst) { return (lst == null) ? [] : lst.slice(1); }
+export function rest(lst) { return (lst == null) ? [] : seq(lst).slice(1); }
 
 function empty_Q(lst) { return lst.length === 0; }
 
@@ -117,7 +117,7 @@ export function count(s) {
 }
 
 function conj(lst) {
-    console.log(lst)
+    //console.log(lst)
     if (types._list_Q(lst)) {
         return Array.prototype.slice.call(arguments, 1).reverse().concat(lst);
     } else if (types._vector_Q(lst)) {
@@ -275,6 +275,17 @@ function map(f, s) {
     return s.map(function (el) { return f(el); });
 }
 
+function int(x) {
+    if (types._number_Q(x)) {
+        return Math.floor(x)
+    } else if (x[0] === '\\') {
+        // is a char
+        return x.charCodeAt(1)
+    } else {
+        return x.charCodeAt(0)
+    }
+}
+
 function filter(f, lst) {
     return seq(lst).filter(function (el) { return f(el); });
 }
@@ -304,6 +315,9 @@ function repeat(n, x) {
 }
 
 function range(start, end) {
+    if (arguments.length === 0) {
+        return range(1000)
+    }
     if (!end) {
         return range(0, start)
     }
@@ -312,6 +326,26 @@ function range(start, end) {
         ans.push(i);
     }
     return ans;
+}
+
+function mod(x, y) {
+    return x % y
+}
+
+function sort(x) {
+    if (types._string_Q(x)) {
+        return x.split('').sort().join('');
+    }
+    if (types._list_Q(x)) {
+        return x.sort()
+    }
+    if (types._set_Q(x)) {
+        return new Set(Array.from(x).sort())
+    } else {
+        var v = x.sort()
+        v.__isvector__ = true;
+        return v;
+    }
 }
 
 // types.ns is namespace of type functions
@@ -352,6 +386,7 @@ export var ns = {
     'max': max,
     'min': min,
     'range': range,
+    'sort': sort,
 
     'list': types._list,
     'list?': types._list_Q,
@@ -365,6 +400,8 @@ export var ns = {
     'contains?': contains_Q,
     'keys': keys,
     'vals': vals,
+    'int': int,
+    'mod': mod,
 
     'sequential?': types._sequential_Q,
     'cons': cons,
@@ -385,7 +422,6 @@ export var ns = {
 
     'conj': conj,
     'seq': seq,
-    'map': map,
     'filter': filter,
 
     'with-meta': with_meta,
