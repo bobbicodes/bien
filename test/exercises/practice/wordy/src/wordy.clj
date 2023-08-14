@@ -1,4 +1,0 @@
-(ns wordy)
-
-(defn evaluate [] 
-      )

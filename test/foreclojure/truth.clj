@@ -1,1 +1,0 @@
-(def truth (= false true))

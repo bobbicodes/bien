@@ -1,4 +1,0 @@
-(ns luhn)
-
-(defn valid? [] 
-  )

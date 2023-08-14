@@ -1,4 +1,0 @@
-(ns sieve)
-
-(defn sieve [] 
-      )

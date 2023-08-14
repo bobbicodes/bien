@@ -1,4 +1,0 @@
-(ns change)
-
-(defn issue [] 
-  )

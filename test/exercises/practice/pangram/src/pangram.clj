@@ -1,4 +1,0 @@
-(ns pangram)
-
-(defn pangram? [] 
-  )

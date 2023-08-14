@@ -1,4 +1,0 @@
-(ns diamond)
-
-(defn diamond [] 
-  )

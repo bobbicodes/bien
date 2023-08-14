@@ -2,8 +2,8 @@ import './style.css'
 import { EditorView, basicSetup } from 'codemirror'
 import { EditorState } from '@codemirror/state'
 import { clojure } from "./src/clojure"
-import solutions from './test/foreclojure-exercises.json';
-import testSuites from './test/foreclojure-tests.json';
+import solutions from './test/exercises.json';
+import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({

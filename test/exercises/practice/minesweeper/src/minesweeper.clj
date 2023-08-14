@@ -1,4 +1,0 @@
-(ns minesweeper)
-
-(defn draw [] 
-  )

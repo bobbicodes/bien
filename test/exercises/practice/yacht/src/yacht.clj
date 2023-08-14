@@ -1,4 +1,0 @@
-(ns yacht)
-
-(defn score []
-  )

@@ -1,5 +1,0 @@
-(ns meetup)
-
-(defn meetup [] 
-  
-  )
