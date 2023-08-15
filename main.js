@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("trinary")
+testSolution("rotational_cipher")
 //loadExercise("lev")
-testExercises()
+//testExercises()

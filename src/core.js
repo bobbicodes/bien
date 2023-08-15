@@ -285,6 +285,10 @@ function int(x) {
     }
 }
 
+function char(int) {
+    return String.fromCharCode(int)
+}
+
 function filter(f, lst) {
     return seq(lst).filter(function (el) { return f(el); });
 }
@@ -365,6 +369,22 @@ function peek(lst) {
     }
 }
 
+function upperCase(s) {
+    return s.toUpperCase()
+}
+
+function isLetter(c) {
+    return c.toLowerCase() != c.toUpperCase();
+  }
+
+function lowerCase(s) {
+    return s.toLowerCase()
+}
+
+function int_Q(x) {
+    return Number.isInteger(x)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -383,6 +403,8 @@ export var ns = {
     'keyword?': types._keyword_Q,
     'fn?': types._fn_Q,
     'macro?': types._macro_Q,
+    'char': char,
+    'int?': int_Q,
 
     'pr-str': pr_str,
     'str': str,
@@ -407,6 +429,9 @@ export var ns = {
     'sort': sort,
     'peek': peek,
     'pop': pop,
+    'lower-case': lowerCase,
+    'upper-case': upperCase,
+    'Character/isLetter': isLetter,
 
     'list': types._list,
     'list?': types._list_Q,
@@ -421,7 +446,7 @@ export var ns = {
     'keys': keys,
     'vals': vals,
     'int': int,
-    'mod': mod,
+    //'mod': mod,
     'rem': mod,
 
     'sequential?': types._sequential_Q,

@@ -164,6 +164,12 @@
                   (mapcat (fn [x] (tree-seq branch? children x)) 
                           (children node))))))
 
+(defn mod [num div]
+  (let [m (rem num div)]
+    (if (or (zero? m) (= (pos? num) (pos? div)))
+      m
+      (+ m div))))
+
 (defn partition [n step coll]
   (if-not coll
     (partition n n step)
@@ -182,3 +188,27 @@
       (let [k (f x)]
         (assoc ret k (conj (get ret k []) x))))
     {} coll))
+
+
+(defn fromCharCode [int]
+  (js-eval (str "String.fromCharCode(" int ")")))
+
+(defn Character/isAlphabetic [int]
+  (not= (upper-case (fromCharCode int))
+        (lower-case (fromCharCode int))))
+
+(defn Character/isUpperCase [x]
+  (if (int? x)
+    (and (Character/isLetter (fromCharCode x))
+         (= (fromCharCode x)
+            (upper-case (fromCharCode x))))
+    (and (Character/isLetter x)
+         (= x (upper-case x)))))
+
+(defn Character/isLowerCase [x]
+  (if (int? x)
+    (and (Character/isLetter (fromCharCode x))
+         (= (fromCharCode x)
+            (lower-case (fromCharCode x))))
+    (and (Character/isLetter x)
+         (= x (lower-case x)))))
