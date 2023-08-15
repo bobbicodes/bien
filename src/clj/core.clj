@@ -141,6 +141,9 @@
 (defn pos? [n]
   (> n 0))
 
+(defn neg? [n]
+  (> 0 n))
+
 (defn complement [f]
   (fn [x y & zs]
     (if zs
@@ -230,3 +233,10 @@
     (set? coll) #{}
     (map? coll) {}
     (string? coll) ""))
+
+(defn take-while [pred coll]
+  (loop [s (seq coll) res []]
+    (if (empty? s) res
+          (if (pred (first s))
+            (cons (first s) (take-while pred (rest s)))
+            res))))

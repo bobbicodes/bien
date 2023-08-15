@@ -45,7 +45,7 @@
   "perfect_nums" : "(defn perfect-nums [x]\r\n  (= x (apply + (filter #(= 0 (mod x %)) (range 1 x)))))",
   "closure" : "(defn closure [n] #(apply * (repeat n %)))",
   "intervals" : "(defn intervals [coll]\r\n  (reverse (reduce (fn [[[a b] & r :as is] n]\r\n                     (if (and a (= (inc b) n))\r\n                       (cons [a n] r)\r\n                       (cons [n n] is)))\r\n                   ()\r\n                   (distinct (sort coll)))))",
-  "gtw" : "(defn gtw [n p [x & r]]\r\n  (lazy-seq\r\n   (when x\r\n     (let [remaining (if (p x) (dec n) n)]\r\n       (when (pos? remaining)\r\n         (cons x (gtw remaining p r)))))))",
+  "gtw" : "(defn gtw [n prd col]\r\n  (let [a (atom 0)]\r\n    (take-while (fn [x] (if (prd x) (swap! a inc)) (< @a n)) col)))",
   "conj_list" : "(def l '(1 2 3 4))",
   "camel" : "(defn camel [s]\r\n  (let [words (re-seq #\"[a-zA-Z]+\" s)\r\n        words (cons (first words)\r\n                    (map clojure.string/capitalize\r\n                         (rest words)))]\r\n    (apply str words)))",
   "splatter" : "(defn splatter [s n]\r\n  (mapcat\r\n   (fn [s]\r\n     (repeat n s)) s))",

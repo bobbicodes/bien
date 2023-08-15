@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("black_box")
+//testSolution("gtw")
 //loadExercise("lev")
-//testExercises()
+testExercises()
