@@ -385,6 +385,10 @@ function int_Q(x) {
     return Number.isInteger(x)
 }
 
+function _join(separator, coll) {
+    return coll.join(separator)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -465,6 +469,7 @@ export var ns = {
     'apply': apply,
     'map': map,
     'repeat': repeat,
+    'str/join': _join,
 
     'conj': conj,
     'seq': seq,
