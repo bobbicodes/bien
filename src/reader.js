@@ -72,6 +72,7 @@ function read_vector(reader) {
 // read hash-map key/value pairs
 function read_hash_map(reader) {
     var lst = read_list(reader, '{', '}');
+    console.log("reading hash-map", types._hash_map.apply(null, lst))
     return types._hash_map.apply(null, lst);
 }
 
