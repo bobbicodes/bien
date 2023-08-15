@@ -61,7 +61,7 @@
   "conj_vector" : "(def v [1 2 3 4])",
   "my_interleave" : "(defn my-interleave [a b]\r\n  (mapcat list a b))",
   "factorial" : "(defn factorial [n]\r\n  (reduce * 1 (range 1 (inc n))))",
-  "filter" : "(def l '(3 4 5 6 7))",
+  "filter" : "(def l '(6 7))",
   "functions" : "(def n 8)",
   "seqs" : "(def n 3)",
   "uce" : "(defn uce [x]\r\n  (fn [m] ((fn e [x m]\r\n             (if (seq? x)\r\n               (apply ({'+ + '- - '* * '/ /} (first x))\r\n                      (map #(e % m) (rest x)))\r\n               (m x x)))\r\n           x m)))",

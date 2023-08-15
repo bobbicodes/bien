@@ -7,9 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(hash-map :a 1 2 "b")
-
-{1 5}`,
+  doc: `(conj {:a 1} [:c 3])`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -145,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("hello_world")
+testSolution("conj_map")
 //loadExercise("lev")
-testExercises()
+//testExercises()
