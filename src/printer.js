@@ -5,8 +5,8 @@ export function _println() {
 }
 
 export function _pr_str(obj, print_readably) {
-    //console.log(obj)
-    //console.log(_obj_type(obj))
+    //console.log("printing:", obj)
+    //console.log("obj type:", _obj_type(obj))
     if (typeof print_readably === 'undefined') { print_readably = true; }
     var _r = print_readably;
     var ot = _obj_type(obj);
@@ -19,8 +19,8 @@ export function _pr_str(obj, print_readably) {
             return "[" + ret.join(' ') + "]";
         case 'hash-map':
             var ret = [];
-            for (var k in obj) {
-                ret.push(_pr_str(k, _r), _pr_str(obj[k], _r));
+            for (const [key, value] of obj) {
+                ret.push(_pr_str(key, _r), _pr_str(value, _r));
             }
             return "{" + ret.join(' ') + "}";
         case 'set':

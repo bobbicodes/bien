@@ -175,3 +175,10 @@
 
 (defn coll? [x]
   (or (list? x) (vector? x) (set? x) (map? x)))
+
+(defn group-by [f coll]
+   (reduce
+    (fn [ret x]
+      (let [k (f x)]
+        (assoc ret k (conj (get ret k []) x))))
+    {} coll))

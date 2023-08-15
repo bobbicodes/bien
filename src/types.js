@@ -1,8 +1,9 @@
 export function _obj_type(obj) {
+    //console.log("obj_type:", obj)
     if      (_symbol_Q(obj)) {   return 'symbol'; }
+    else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
-    else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
     else if (_true_Q(obj)) {     return 'true'; }
@@ -52,6 +53,7 @@ export function _equal_Q(a, b) {
 
 
 export function _clone (obj) {
+    //console.log("cloning", obj)
     var new_obj;
     switch (_obj_type(obj)) {
     case 'list':
@@ -62,10 +64,7 @@ export function _clone (obj) {
         new_obj.__isvector__ = true;
         break;
     case 'hash-map':
-        new_obj = {};
-        for (var k in obj) {
-            if (obj.hasOwnProperty(k)) { new_obj[k] = obj[k]; }
-        }
+        new_obj = new Map(obj);
         break;
     case 'function':
         new_obj = obj.clone();
@@ -159,37 +158,34 @@ export function _hash_map() {
     if (arguments.length % 2 === 1) {
         throw new Error("Odd number of hash map arguments");
     }
-    var args = [{}].concat(Array.prototype.slice.call(arguments, 0));
+    const hm = new Map();
+    var args = [hm].concat(Array.prototype.slice.call(arguments, 0));
     return _assoc_BANG.apply(null, args);
 }
+
 export function _hash_map_Q(hm) {
     return typeof hm === "object" &&
-           !Array.isArray(hm) &&
-           !(hm === null) &&
-           !(hm instanceof Set)
-           !(hm instanceof Symbol) &&
-           !(hm instanceof Atom);
+           (hm instanceof Map)
 }
+
 export function _assoc_BANG(hm) {
-    //console.log("assoc args", arguments)
-    //console.log("length", arguments.length)
+    //console.log("assoc:", hm)
     if (arguments.length % 2 !== 1) {
         throw new Error("Odd number of assoc arguments");
     }
     for (var i=1; i<arguments.length; i+=2) {
         var ktoken = arguments[i],
             vtoken = arguments[i+1];
-        if (typeof ktoken !== "string") {
-            throw new Error("expected hash-map key string, got: " + (typeof ktoken));
-        }
-        hm[ktoken] = vtoken;
+        hm.set(ktoken, vtoken)
     }
+    //console.log("returning hm", hm)
+    //console.log("_hash_map_Q", _hash_map_Q(hm))
     return hm;
 }
 function _dissoc_BANG(hm) {
     for (var i=1; i<arguments.length; i++) {
         var ktoken = arguments[i];
-        delete hm[ktoken];
+        hm.delete(ktoken)
     }
     return hm;
 }
