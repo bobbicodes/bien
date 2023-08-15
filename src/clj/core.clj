@@ -163,3 +163,12 @@
                 (when (branch? node)
                   (mapcat (fn [x] (tree-seq branch? children x)) 
                           (children node))))))
+
+(defn partition [n step coll]
+  (if-not coll
+    (partition n n step)
+    (loop [s coll p []]
+      (if (= 0 (count s))
+        (filter #(= n (count %)) p)
+        (recur (drop step s)
+               (conj p (take n s)))))))
