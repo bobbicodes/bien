@@ -389,6 +389,15 @@ function _join(separator, coll) {
     return coll.join(separator)
 }
 
+function rand_int() {
+    return Math.floor(Math.random() * arguments[0]);
+}
+
+function rand_nth() {
+    const n = Math.floor(Math.random() * arguments[0].size)
+    return arguments[0].get(n)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -409,6 +418,8 @@ export var ns = {
     'macro?': types._macro_Q,
     'char': char,
     'int?': int_Q,
+    'rand-int': rand_int,
+    'rand-nth': rand_nth,
 
     'pr-str': pr_str,
     'str': str,

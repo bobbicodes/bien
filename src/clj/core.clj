@@ -212,3 +212,21 @@
             (lower-case (fromCharCode x))))
     (and (Character/isLetter x)
          (= x (lower-case x)))))
+
+(defn zipmap [keys vals]
+  (loop [map {}
+         ks (seq keys)
+         vs (seq vals)]
+    (if (and ks vs)
+      (recur (assoc map (first ks) (first vs))
+             (next ks)
+             (next vs))
+      map)))
+
+(defn empty [coll]
+  (cond
+    (list? coll) '()
+    (vector? coll) []
+    (set? coll) #{}
+    (map? coll) {}
+    (string? coll) ""))
