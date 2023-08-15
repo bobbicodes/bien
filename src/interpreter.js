@@ -238,15 +238,8 @@ function PRINT(exp) {
 export var repl_env = new Env();
 
 export const evalString = function (str) {
-    console.log(repl_env)
-    var read = READ(str)
-    var _eval = EVAL(read, repl_env)
-    console.log("READ:", read)
-    console.log("EVAL:", eval)
     return PRINT(EVAL(READ(str), repl_env))
 };
-
-console.log(EVAL(READ("{:a 1}"), repl_env))
 
 // core.js: defined using javascript
 for (var n in core.ns) { repl_env.set(types._symbol(n), core.ns[n]); }
@@ -256,4 +249,4 @@ repl_env.set(types._symbol('eval'), function (ast) {
 repl_env.set(types._symbol('*ARGV*'), []);
 
 // load core.clj
-//evalString("(do " + core_clj + ")")
+evalString("(do " + core_clj + ")")

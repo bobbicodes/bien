@@ -18,7 +18,6 @@ export function _pr_str(obj, print_readably) {
             var ret = obj.map(function (e) { return _pr_str(e, _r); });
             return "[" + ret.join(' ') + "]";
         case 'hash-map':
-            console.log("printing hashmap")
             var ret = [];
             for (const [key, value] of obj) {
                 ret.push(_pr_str(key, _r), _pr_str(value, _r));

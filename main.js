@@ -145,6 +145,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("split_by_type")
-//loadExercise("primes")
-//testExercises()
+//testSolution("hello_world")
+//loadExercise("lev")
+testExercises()

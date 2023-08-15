@@ -1,5 +1,5 @@
 export function _obj_type(obj) {
-    console.log("obj_type:", obj)
+    //console.log("obj_type:", obj)
     if      (_symbol_Q(obj)) {   return 'symbol'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_list_Q(obj)) {     return 'list'; }
@@ -53,7 +53,7 @@ export function _equal_Q(a, b) {
 
 
 export function _clone (obj) {
-    console.log("cloning", obj)
+    //console.log("cloning", obj)
     var new_obj;
     switch (_obj_type(obj)) {
     case 'list':
