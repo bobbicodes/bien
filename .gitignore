@@ -14,3 +14,4 @@ test/**/*.mustache
 test/**/instructions.append.md
 test/**/hints.md
 test/**/exemplar.clj
+.calva/

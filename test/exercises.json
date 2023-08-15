@@ -75,7 +75,7 @@
   "spaz_out" : "(defn spaz-out [f init]\r\n  (cons init\r\n        (lazy-seq\r\n         (spaz-out f (f init)))))",
   "mycomp" : "(defn mycomp [f & gs]\r\n  (if gs\r\n    #(f (apply (apply mycomp gs) (conj %& %)))\r\n    f))",
   "k" : "(defn k [i s]\r\n  (set\r\n   (if (= i 0)\r\n     [#{}]\r\n     (mapcat #(for [p (k (- i 1) %2)] (conj p %))\r\n             s (next (iterate next s))))))",
-  "myreductions" : "(defn my-reductions\r\n  ([f [a & b]] (my-reductions f a b))\r\n  ([f a b]\r\n   (let [m (atom a)]\r\n     (cons a (map #(swap! m f %) b)))))",
+  "myreductions" : "(defn my-reductions [f init xs]\r\n  (loop [s xs acc init res [init]]\r\n    (if (empty? s)\r\n      res\r\n      (recur (rest s)\r\n              (f acc (first s))\r\n             (conj res (f acc (first s)))))))",
   "conj_set" : "(def n 0)",
   "double" : "(def f \r\n  (fn [n]\r\n    (* n 2)))",
   "sym_diff" : "(defn sym-diff [a b]\r\n  (into (set (remove b a)) (remove a b)))",

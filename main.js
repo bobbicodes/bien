@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("makeflat")
+//testSolution("myreductions")
 //loadExercise("primes")
 testExercises()
