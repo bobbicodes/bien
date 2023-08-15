@@ -9,7 +9,7 @@
   "penultimate" : "(defn penultimate [s]\r\n  (second (reverse s)))",
   "dupseq" : "(defn dupseq [s]\r\n  (interleave s s))",
   "digits" : "(defn digits [x y]\r\n  (map #(- (int %) (int \\0)) (str (* x y))))",
-  "primes" : "(defn primes [n]\r\n  (take n (filter\r\n           (fn [x]\r\n             (every? pos? (map (fn [n] (mod x n))\r\n                               (range 2 (- x 1)))))\r\n          (drop 2 (range 600)))))",
+  "primes" : "(defn primes [n]\r\n  (loop [p [] c n x 2]\r\n    (if (= 0 c)\r\n      p\r\n      (if (not-any? zero? (map #(mod x %) p))\r\n        (recur (conj p x) (dec c) (inc x))\r\n        (recur p c (inc x))))))",
   "getcaps" : "(defn getcaps [s]\r\n  (apply str (re-seq #\"[A-Z]\" s)))",
   "roman" : "(defn roman [x]\r\n  (let [thousands [\"\" \"M\" \"MM\" \"MMM\" \"MMMM\" \"MMMMM\" \"MMMMMM\" \"MMMMMMM\" \"MMMMMMMM\" \"MMMMMMMMM\"]\r\n        hundreds [\"\" \"C\" \"CC\" \"CCC\" \"CD\" \"D\" \"DC\" \"DCC\" \"DCCC\" \"CM\"]\r\n        tens [\"\" \"X\" \"XX\" \"XXX\" \"XL\" \"L\" \"LX\" \"LXX\" \"LXXX\" \"XC\"]\r\n        ones [\"\" \"I\" \"II\" \"III\" \"IV\" \"V\" \"VI\" \"VII\" \"VIII\" \"IX\"]]\r\n    (str (get thousands (quot x 1000))\r\n         (get hundreds (quot (mod x 1000) 100))\r\n         (get tens (quot (mod (mod x 1000) 100) 10))\r\n         (get ones (mod (mod (mod x 1000) 100) 10)))))",
   "totient" : "(defn totient [a]\r\n  (count\r\n   (for [b (range a)\r\n         :when (not-any? #(= 0 (rem a %) (rem b %)) (range 2 a))]\r\n     b)))",

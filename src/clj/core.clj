@@ -1,6 +1,12 @@
 (ns core {:clj-kondo/ignore true})
 
-(def not (fn [a] (if a false true)))
+(defmacro defn
+  (fn [name arglist & value]
+    `(def ~name (fn ~arglist ~@value))))
+
+(defn not [a] (if a false true))
+
+(defn not= [a b] (not (= a b)))
 
 (defmacro cond
   (fn [& xs]
@@ -13,10 +19,6 @@
 (def dec (fn (a) (- a 1)))
 (def zero? (fn (n) (= 0 n)))
 (def identity (fn (x) x))
-
-(defmacro defn
-  (fn [name arglist & value]
-      `(def ~name (fn ~arglist ~@value))))
 
 (defn next [s]
   (if (= 1 (count s))
@@ -130,6 +132,9 @@
     (or (pred (first xs))
         (some pred (rest xs)))))
 
+(defn not-any? [pred coll]
+  (not (some pred coll)))
+
 (defn quot [n d]
   (int (/ n d)))
 
@@ -155,6 +160,6 @@
 (defn tree-seq [branch? children node]
   (remove nil?
           (cons node
-                (if (branch? node)
+                (when (branch? node)
                   (mapcat (fn [x] (tree-seq branch? children x)) 
                           (children node))))))

@@ -316,7 +316,7 @@ function repeat(n, x) {
 
 function range(start, end) {
     if (arguments.length === 0) {
-        return range(1000)
+        return "infinite ranges not implemented"
     }
     if (!end) {
         return range(0, start)
@@ -402,6 +402,7 @@ export var ns = {
     'vals': vals,
     'int': int,
     'mod': mod,
+    'rem': mod,
 
     'sequential?': types._sequential_Q,
     'cons': cons,
