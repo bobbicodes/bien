@@ -60,7 +60,7 @@
   "myrange" : "(defn myrange [start end]\r\n  (loop [n start res []]\r\n   (if (>= n end) res (recur (inc n) (conj res n)))))",
   "conj_vector" : "(def v [1 2 3 4])",
   "my_interleave" : "(defn my-interleave [a b]\r\n  (mapcat list a b))",
-  "factorial" : "(defn factorial [n]\r\n  (reduce * (range 1 (inc n))))",
+  "factorial" : "(defn factorial [n]\r\n  (reduce * 1 (range 1 (inc n))))",
   "filter" : "(def l '(3 4 5 6 7))",
   "functions" : "(def n 8)",
   "seqs" : "(def n 3)",

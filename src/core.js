@@ -361,6 +361,7 @@ export var ns = {
     'string?': types._string_Q,
     'symbol': types._symbol,
     'symbol?': types._symbol_Q,
+    'set?': types._set_Q,
     'keyword': types._keyword,
     'keyword?': types._keyword_Q,
     'fn?': types._fn_Q,

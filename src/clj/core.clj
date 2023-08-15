@@ -172,3 +172,6 @@
         (filter #(= n (count %)) p)
         (recur (drop step s)
                (conj p (take n s)))))))
+
+(defn coll? [x]
+  (or (list? x) (vector? x) (set? x) (map? x)))
