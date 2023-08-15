@@ -41,7 +41,7 @@ export function _equal_Q(a, b) {
         case 'hash-map':
             if (a.size !== b.size) { return false; }
             for (var [key, value] of a) {
-                if (!_equal_Q(a.get(k), b.get(k))) { return false; }
+                if (!_equal_Q(a.get(key), b.get(key))) { return false; }
             }
             return true;
         default:
