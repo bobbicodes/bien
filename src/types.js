@@ -18,7 +18,7 @@ export function _obj_type(obj) {
     }
 }
 
-function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
+export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
 
 
 export function _equal_Q(a, b) {

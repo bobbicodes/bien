@@ -145,3 +145,16 @@
         (if x
           (not (f x))
           (not (f)))))))
+
+(defn mapcat [f & colls]
+   (apply concat (apply map f colls)))
+
+(defn remove [pred coll]
+  (filter (complement pred) coll))
+
+(defn tree-seq [branch? children node]
+  (remove nil?
+          (cons node
+                (if (branch? node)
+                  (mapcat (fn [x] (tree-seq branch? children x)) 
+                          (children node))))))

@@ -1097,3 +1097,383 @@ nil
 clj꞉user꞉> 
 ; java.lang.IllegalArgumentException: Don't know how to create ISeq from: clojure.lang.Symbol core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:1:1
 clj꞉core꞉> 
+; clojure.lang.ExceptionInfo: Could not resolve symbol: walk core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:6:25
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c"]
+["b"]
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/root
+clj꞉core꞉> 
+true
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+; nREPL connection failed: Error: read ECONNRESET
+; Failed connecting.
+; nREPL Connection was closed
+; Jacking in...
+; Connecting using "Babashka" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+; Starting Jack-in Terminal: pushd c:\Users\porko\Documents\GitHub\lisp-tutorial & bb --nrepl-server 54745 & popd
+; Using host:port 127.0.0.1:54745 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; TIPS:
+;   - You can edit the contents here. Use it as a REPL if you like.
+;   - `alt+enter` evaluates the current top level form.
+;   - `ctrl+enter` evaluates the current form.
+;   - `alt+up` and `alt+down` traverse up and down the REPL command history
+;      when the cursor is after the last contents at the prompt
+;   - Clojure lines in stack traces are peekable and clickable.
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉user꞉> 
+clj꞉user꞉> 
+; Jack-in done.
+clj꞉user꞉> 
+#'core/root
+clj꞉core꞉> 
+true
+clj꞉core꞉> 
+("a" ["b"] "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+; nREPL connection failed: Error: read ECONNRESET
+; Failed connecting.
+; nREPL Connection was closed
+; Jacking in...
+; Connecting using "Babashka" project type.
+; You can make Calva auto-select this.
+;   - See https://calva.io/connect-sequences/
+; 
+; Starting Jack-in Terminal: pushd c:\Users\porko\Documents\GitHub\lisp-tutorial & bb --nrepl-server 54861 & popd
+; Using host:port 127.0.0.1:54861 ...
+; Hooking up nREPL sessions ...
+; Connected session: clj
+; TIPS:
+;   - You can edit the contents here. Use it as a REPL if you like.
+;   - `alt+enter` evaluates the current top level form.
+;   - `ctrl+enter` evaluates the current form.
+;   - `alt+up` and `alt+down` traverse up and down the REPL command history
+;      when the cursor is after the last contents at the prompt
+;   - Clojure lines in stack traces are peekable and clickable.
+; Evaluating code from settings: 'calva.autoEvaluateCode.onConnect.clj'
+nil
+clj꞉user꞉> 
+clj꞉user꞉> 
+; Jack-in done.
+clj꞉user꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+()
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+()
+clj꞉core꞉> 
+#'core/root
+clj꞉core꞉> 
+true
+clj꞉core꞉> 
+("a" ["b"] "c")
+clj꞉core꞉> 
+#'core/root
+clj꞉core꞉> 
+true
+clj꞉core꞉> 
+("a" ["b"] "c")
+clj꞉core꞉> 
+(["b"] "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'user/tree-seq
+clj꞉user꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+()
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+()
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+Checking if branch: [a [b] c]
+Checking if branch: a
+Checking if branch: [b]
+Checking if branch: b
+Checking if branch: c
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+Checking if branch: [a [b] c]
+[a [b] c] is branch
+Checking if branch: a
+Checking if branch: [b]
+[b] is branch
+Checking if branch: b
+Checking if branch: c
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+Checking if branch: [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+Checking if branch: a
+Checking if branch: [b]
+[b] is branch
+walking b
+Checking if branch: b
+Checking if branch: c
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+[b] is branch
+walking b
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+()
+clj꞉core꞉> 
+#'core/root
+clj꞉core꞉> 
+("a" ["b"] "c")
+clj꞉core꞉> 
+(["b"] "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+("a" ["b"] "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+[b] is branch
+walking b
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/root
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+()
+clj꞉core꞉> 
+(["b"] "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[a]
+[a [b]]
+[a [b] c]
+()
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[a]
+[a [b]]
+[a [b] c]
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'user/tree-seq
+clj꞉user꞉> 
+[a]
+[a [b]]
+[a [b] c]
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+[b] is branch
+walking b
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+[b] is branch
+walking b
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+["a" ["b"] "c" "a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[["a" ["b"] "c"] "a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/walk
+clj꞉core꞉> 
+["b"]
+clj꞉core꞉> 
+(\a "b" \c)
+clj꞉core꞉> 
+([\a] ["b"] [\c])
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[["a" ["b"] "c"] "a" ["b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+; java.lang.IllegalArgumentException: Don't know how to create ISeq from: java.lang.Character core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:3:9
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[["a" ["b"] "c"] "a" [["b"] "b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[["a" ["b"] "c"] "a" [["b"] "b"] "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[["a" ["b"] "c"] "a" (["b"] "b" "c" \c) "c"]
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+[b] is branch
+walking b
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+[["a" ["b"] "c"] (["b"] ()) (["b"] ()) ()]
+clj꞉core꞉> 
+#'core/walk
+clj꞉core꞉> 
+([\a] ["b"] [\c])
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+walking c
+[b] is branch
+walking b
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+walking [a [b] c]
+[a [b] c] is branch
+walking a
+walking [b]
+[b] is branch
+walking b
+walking c
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/walk
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+; clojure.lang.ArityException: Wrong number of args (1) passed to: sci.impl.fns/fun/arity-3--1177 core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:2:3
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+; clojure.lang.ArityException: Wrong number of args (1) passed to: sci.impl.fns/fun/arity-3--1177 core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:4:11
+clj꞉core꞉> 
+#'core/walk
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+; clojure.lang.ArityException: Wrong number of args (1) passed to: sci.impl.fns/fun/arity-3--1177 core c:\Users\porko\Documents\GitHub\lisp-tutorial\src\clj\core.clj:4:11
+clj꞉core꞉> 
+#'core/walk
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(["a" ["b"] "c"] "a" ["b"] "b" "c")
+clj꞉core꞉> 
+(((1 2) 3 [4 [5 6]]) (1 2) 1 2 3 [4 [5 6]] 4 [5 6] 5 6)
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
+(((1 2) 3 [4 [5 6]]) (1 2) 1 2 3 [4 [5 6]] 4 [5 6] 5 6)
+clj꞉core꞉> 
+#'core/tree-seq
+clj꞉core꞉> 
