@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("conj_map")
+//testSolution("trinary")
 //loadExercise("lev")
-//testExercises()
+testExercises()
