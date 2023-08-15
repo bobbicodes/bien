@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("tree")
+//testSolution("matching_brackets")
 //loadExercise("primes")
 testExercises()

@@ -72,8 +72,11 @@ function get(hm, key) {
     }
 }
 
-function contains_Q(hm, key) {
-    if (key in hm) { return true; } else { return false; }
+function contains_Q(coll, key) {
+    if (types._set_Q(coll)) {
+        return coll.has(key)
+    }
+    if (key in coll) { return true; } else { return false; }
 }
 
 function keys(hm) { return Object.keys(hm); }
@@ -348,6 +351,24 @@ function sort(x) {
     }
 }
 
+function pop(lst) {
+    if (types._list_Q(lst)) {
+        return lst.slice(1);
+    } else {
+        var v = lst.slice(0, -1);
+        v.__isvector__ = true;
+        return v;
+    }
+}
+
+function peek(lst) {
+    if (types._list_Q(lst)) {
+        return lst[0]
+    } else {
+        return lst[lst.length - 1]
+    }
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -388,6 +409,8 @@ export var ns = {
     'min': min,
     'range': range,
     'sort': sort,
+    'peek': peek,
+    'pop': pop,
 
     'list': types._list,
     'list?': types._list_Q,

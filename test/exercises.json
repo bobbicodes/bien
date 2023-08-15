@@ -114,7 +114,7 @@
   "roman_numerals" : "(def numeral-mapping\r\n   [[1000 \"M\"]\r\n   [900 \"CM\"]\r\n   [500 \"D\"]\r\n   [400 \"CD\"]\r\n   [100 \"C\"]\r\n   [90 \"XC\"]\r\n   [50 \"L\"]\r\n   [40 \"XL\"]\r\n   [10 \"X\"]\r\n   [9 \"IX\"]\r\n   [5 \"V\"]\r\n   [4 \"IV\"]\r\n   [1 \"I\"]])\r\n\r\n(defn largest-factor [number]\r\n   (first (filter\r\n          (fn [pl] (<= (first pl) number))\r\n         numeral-mapping)))\r\n\r\n(defn numerals [number]\r\n  (if (zero? number) \"\"\r\n   (let [pl (largest-factor number)\r\n         remainder (- number (first pl))]\r\n     (str (last pl) (numerals remainder)))))\r\n",
   "minesweeper" : "(ns minesweeper)\r\n\r\n(defn draw [])\r\n",
   "pov" : "(ns pov)\r\n\r\n(defn of [] \r\n      \r\n)\r\n\r\n(defn path-from-to [])\r\n",
-  "matching_brackets" : "(ns matching-brackets)\r\n\r\n(defn valid? [])\r\n",
+  "matching_brackets" : "(defn valid? [s]\r\n  (let [pairs {\")\" \"(\" \"]\" \"[\" \"}\" \"{\"}\r\n        opening (set (vals pairs))\r\n        closing (set (keys pairs))]\r\n    (loop [stack [] s s]\r\n      (cond (empty? s) (empty? stack)\r\n            (contains? opening (first s)) (recur (conj stack (first s)) (rest s))\r\n            (contains? closing (first s)) (if (= (peek stack) (get pairs (first s)))\r\n                          (recur (pop stack) (rest s))\r\n                          false)\r\n            :else (recur stack (rest s))))))\r\n",
   "dominoes" : "(ns dominoes)\r\n\r\n(defn can-chain? [])\r\n",
   "rotational_cipher" : "(ns rotational-cipher)\r\n\r\n(defn rotate [] \r\n      \r\n)\r\n",
   "kindergarten_garden" : "(ns kindergarten-garden)\r\n\r\n(defn garden [])\r\n",
