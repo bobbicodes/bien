@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("hamming")
+//testSolution("hamming")
 //loadExercise("lev")
-//testExercises()
+testExercises()
