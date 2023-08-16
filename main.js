@@ -7,7 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(apply map& [+ [1 2] [1 2]])`,
+  doc: `(partition-by #(= 3 %) [1 2 3 4 5])`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("sum_of_multiples")
+testSolution("roman")
 //loadExercise("lev")
 //testExercises()

@@ -173,6 +173,13 @@
       m
       (+ m div))))
 
+(defn take-while [pred coll]
+  (loop [s (seq coll) res []]
+    (if (empty? s) res
+        (if (pred (first s))
+          (recur (rest s) (conj res (first s)))
+          res))))
+
 (defn partition [n step coll]
   (if-not coll
     (partition n n step)
@@ -189,6 +196,12 @@
       (if (= 0 (count s)) p
         (recur (drop step s)
                (conj p (take n s)))))))
+
+(defn partition-by [f coll]
+  (loop [s (seq coll) res []]
+    (if (= 0 (count s)) res
+        (recur (drop (count (take-while (fn [x] (= (f (first s)) (f x))) s)) s)
+               (conj res (take-while (fn [x] (= (f (first s)) (f x))) s))))))
 
 (defn coll? [x]
   (or (list? x) (vector? x) (set? x) (map? x)))
@@ -240,13 +253,6 @@
     (set? coll) #{}
     (map? coll) {}
     (string? coll) ""))
-
-(defn take-while [pred coll]
-  (loop [s (seq coll) res []]
-    (if (empty? s) res
-          (if (pred (first s))
-            (cons (first s) (take-while pred (rest s)))
-            res))))
 
 (defn map1 [f coll]
   (loop [s (seq coll) res []]

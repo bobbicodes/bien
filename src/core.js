@@ -64,9 +64,12 @@ function dissoc(src_hm) {
     return types._dissoc_BANG.apply(null, args);
 }
 
-function get(hm, key) {
-    if (hm != null) {
-        return hm.get(key);
+function get(coll, key) {
+    if (types._vector_Q(coll)) {
+        return coll[key]
+    }
+    if (coll != null) {
+        return coll.get(key);
     } else {
         return null;
     }

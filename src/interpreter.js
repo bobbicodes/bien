@@ -50,6 +50,7 @@ function macroexpand(ast, env) {
 }
 
 function eval_ast(ast, env) {
+    //console.log("eval_ast:", ast, env)
     if (types._symbol_Q(ast)) {
         return env.get(ast);
     } else if (types._list_Q(ast)) {
@@ -136,8 +137,11 @@ function _EVAL(ast, env) {
             case "loop":
                 loopVars = []
                 loop_env = new Env(env)
+                //console.log("created loop env:", loop_env)
                 loopAST = ast.slice(2)
+                //console.log("loop body:", loopAST)
                 for (var i = 0; i < a1.length; i += 2) {
+                  //  console.log("defining local", a1[i].value, "in loop_env to", EVAL(a1[i + 1], loop_env))
                     loop_env.set(a1[i], EVAL(a1[i + 1], loop_env))
                     loopVars.push(a1[i])
                 }
@@ -146,7 +150,12 @@ function _EVAL(ast, env) {
                 break;
             case "recur":
                 const savedAST = eval_ast(ast.slice(1), loop_env)
+                //console.log("recurring with")
+                for (let i = 0; i < savedAST.length; i++) {
+                  //  console.log(savedAST[i])
+                }
                 for (var i = 0; i < loopVars.length; i += 1) {
+                   // console.log("setting loop var:", loopVars[i])
                     loop_env.set(loopVars[i], savedAST[i]);
                 }
                 ast = loopAST[0]
@@ -208,14 +217,19 @@ function _EVAL(ast, env) {
                 lambda.lambda = true
                 return lambda
             default:
-                //console.log("calling", ast[0], env)
+                //console.log("calling", ast[0].value, "on")
+                for (let i = 0; i < ast.slice(1).length; i++) {
+                    //console.log(ast.slice(1)[i])
+                }
                 var el = eval_ast(ast, env), f = el[0];
                 if (f.lambda) {
                     //console.log("fn is a lambda", f.__ast__)
                 }
                 if (f.__ast__) {
+                    //console.log("lambda AST:", f.__ast__)
                     ast = f.__ast__;
                     env = f.__gen_env__(el.slice(1));
+                    //console.log("lambda env:", env)
                 } else {
                     var res = f.apply(f, el.slice(1));
                     return res

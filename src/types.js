@@ -128,7 +128,7 @@ export function _function(Eval, Env, ast, env, params) {
     return fn;
 }
 
-function _function_Q(obj) { return typeof obj == "function"; }
+export function _function_Q(obj) { return typeof obj == "function"; }
 Function.prototype.clone = function() {
     var that = this;
     var temp = function () { return that.apply(this, arguments); };
@@ -137,8 +137,8 @@ Function.prototype.clone = function() {
     }
     return temp;
 };
-function _fn_Q(obj) { return _function_Q(obj) && !obj._ismacro_; }
-function _macro_Q(obj) { return _function_Q(obj) && !!obj._ismacro_; }
+export function _fn_Q(obj) { return _function_Q(obj) && !obj._ismacro_; }
+export function _macro_Q(obj) { return _function_Q(obj) && !!obj._ismacro_; }
 
 
 // Lists
@@ -185,7 +185,7 @@ export function _assoc_BANG(hm) {
     //console.log("_hash_map_Q", _hash_map_Q(hm))
     return hm;
 }
-function _dissoc_BANG(hm) {
+export function _dissoc_BANG(hm) {
     for (var i=1; i<arguments.length; i++) {
         var ktoken = arguments[i];
         hm.delete(ktoken)
@@ -206,4 +206,4 @@ export function _set_Q(set) {
 // Atoms
 function Atom(val) { this.val = val; }
 export function _atom(val) { return new Atom(val); }
-function _atom_Q(atm) { return atm instanceof Atom; }
+export function _atom_Q(atm) { return atm instanceof Atom; }
