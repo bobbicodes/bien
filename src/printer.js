@@ -41,6 +41,9 @@ export function _pr_str(obj, print_readably) {
             return ':' + obj.slice(1);
         case 'nil':
             return "nil";
+        case 'regex':
+            const re_str = obj.toString()
+            return "#\"" + re_str.substring(1, re_str.length-2) + "\"" 
         case 'atom':
             return "(atom " + _pr_str(obj.val, _r) + ")";
         default:

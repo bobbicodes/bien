@@ -182,6 +182,14 @@
         (recur (drop step s)
                (conj p (take n s)))))))
 
+(defn partition-all [n step coll]
+  (if-not coll
+    (partition-all n n step)
+    (loop [s coll p []]
+      (if (= 0 (count s)) p
+        (recur (drop step s)
+               (conj p (take n s)))))))
+
 (defn coll? [x]
   (or (list? x) (vector? x) (set? x) (map? x)))
 

@@ -1,11 +1,12 @@
 export function _obj_type(obj) {
-    //console.log("obj_type:", obj)
+    //console.log("obj_type:", typeof obj)
     if      (_symbol_Q(obj)) {   return 'symbol'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
+    else if (_regex_Q(obj)) {      return 'regex'; }
     else if (_true_Q(obj)) {     return 'true'; }
     else if (_false_Q(obj)) {    return 'false'; }
     else if (_atom_Q(obj)) {     return 'atom'; }
@@ -110,6 +111,10 @@ export function _keyword_Q(obj) {
     return typeof obj === 'string' && obj[0] === '\u029e';
 }
 
+
+export function _regex_Q(obj) {
+    return obj instanceof RegExp
+}
 
 // Functions
 export function _function(Eval, Env, ast, env, params) {

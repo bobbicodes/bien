@@ -140,7 +140,7 @@
   "crypto_square" : "(ns crypto-square)\r\n\r\n(defn normalize-plaintext [])\r\n\r\n(defn square-size [])\r\n\r\n(defn plaintext-segments [])\r\n\r\n(defn ciphertext [])\r\n\r\n(defn normalize-ciphertext [])\r\n",
   "word_count" : "(ns word-count)\r\n\r\n(defn word-count [s])\r\n",
   "armstrong_numbers" : "(ns armstrong-numbers)\r\n\r\n(defn armstrong? [num])\r\n",
-  "hamming" : "(defn distance [strand1 strand2]\r\n  (if-not (= (count strand1) (count strand2)) nil\r\n    (js-eval (str \"[...\" \"'\" strand1 \"'\"\r\n               \"].filter((element, index) => element !== \"\r\n               \"'\" strand2 \"'\" \"[index]).length\"))))\r\n",
+  "hamming" : "(defn distance [a b]\r\n  (if (or (empty? a) (empty? b)) 0\r\n    (when (= (count a) (count b))\r\n      (count (filter true? (map not= a b))))))\r\n",
   "scrabble_score" : "(ns scrabble-score)\r\n\r\n(defn score-letter [] \r\n      \r\n)\r\n\r\n(defn score-word [])\r\n",
   "octal" : "(ns octal)\r\n\r\n(defn to-decimal [])\r\n",
   "raindrops" : "(defn convert [n]\r\n  (cond\r\n    (and (= 0 (mod n 3)) (= 0 (mod n 5)) (= 0 (mod n 7))) \"PlingPlangPlong\"\r\n    (and (= 0 (mod n 3)) (= 0 (mod n 5))) \"PlingPlang\"\r\n    (and (= 0 (mod n 3)) (= 0 (mod n 7))) \"PlingPlong\"\r\n    (and (= 0 (mod n 5)) (= 0 (mod n 7))) \"PlangPlong\"\r\n    (= 0 (mod n 3)) \"Pling\"\r\n    (= 0 (mod n 5)) \"Plang\"\r\n    (= 0 (mod n 7)) \"Plong\"\r\n    :else (str n)))\r\n",
