@@ -3,7 +3,7 @@ import { _pr_str, _println } from './printer.js'
 import * as types from './types.js'
 
 // Errors/Exceptions
-function mal_throw(exc) { throw exc; }
+function mal_throw(exc) { throw new Error(exc); }
 
 
 // String functions

@@ -263,9 +263,19 @@
     (= 1 (count colls)) (map1 f (first colls))
     (= 2 (count colls)) (map2 f (first colls) (second colls))
     (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
-    :else (str "Map not implemented on " (count colls) "colls")))
+    :else (throw (str "Map not implemented on " (count colls) " colls"))))
 
 (defn drop-last [n coll]
   (if-not coll
     (drop-last 1 n)
     (map (fn [x _] x) coll (drop n coll))))
+
+(defn interleave [c1 c2]
+  (loop [s1  (seq c1)
+         s2  (seq c2)
+         res []]
+    (if (or (empty? s1) (empty? s2))
+      res
+      (recur (rest s1)
+             (rest s2)
+             (conj res (first s1) (first s2))))))
