@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("space_age")
+testSolution("sum_of_multiples")
 //loadExercise("lev")
 //testExercises()

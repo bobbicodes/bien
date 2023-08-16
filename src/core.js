@@ -321,14 +321,20 @@ function repeat(n, x) {
     return Array(n).fill(x)
 }
 
-function range(start, end) {
+function range(start, end, step) {
     if (arguments.length === 0) {
-        return "infinite ranges not implemented"
+        return new Error("infinite ranges not implemented")
     }
     if (!end) {
         return range(0, start)
     }
     var ans = [];
+    if (step) {
+        for (let i = start; i < end; i += step) {
+            ans.push(i);
+        }
+        return ans
+    }
     for (let i = start; i < end; i++) {
         ans.push(i);
     }
