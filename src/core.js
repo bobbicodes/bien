@@ -305,6 +305,10 @@ function sum() {
     return Array.from(arguments).reduce((acc, a) => acc + a, 0);
 }
 
+function product() {
+    return Array.from(arguments).reduce((acc, a) => acc * a, 1);
+}
+
 function take(n, coll) {
     return coll.slice(0, n)
 }
@@ -398,6 +402,10 @@ function rand_nth() {
     return arguments[0].get(n)
 }
 
+function _round(n) {
+    return Math.round(n)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -420,6 +428,7 @@ export var ns = {
     'int?': int_Q,
     'rand-int': rand_int,
     'rand-nth': rand_nth,
+    'Math/round': _round,
 
     'pr-str': pr_str,
     'str': str,
@@ -434,7 +443,7 @@ export var ns = {
     '>=': function (a, b) { return a >= b; },
     '+': sum,
     '-': function (a, b) { return a - b; },
-    '*': function (a, b) { return a * b; },
+    '*': product,
     '/': function (a, b) { return a / b; },
     'inc': function (a) { return a + 1; },
     "time-ms": time_ms,
