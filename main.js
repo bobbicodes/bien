@@ -143,6 +143,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("dupseq")
+testSolution("triangle")
 //loadExercise("lev")
 //testExercises()

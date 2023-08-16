@@ -220,11 +220,10 @@
   (loop [map {}
          ks (seq keys)
          vs (seq vals)]
-    (if (and ks vs)
+    (if-not (and ks vs) map
       (recur (assoc map (first ks) (first vs))
              (next ks)
-             (next vs))
-      map)))
+             (next vs)))))
 
 (defn empty [coll]
   (cond
