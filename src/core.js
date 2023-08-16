@@ -478,7 +478,7 @@ export var ns = {
     'empty?': empty_Q,
     'count': count,
     'apply': apply,
-    'map': map,
+    //'map': map,
     'repeat': repeat,
     'str/join': _join,
 

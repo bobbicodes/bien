@@ -240,3 +240,32 @@
           (if (pred (first s))
             (cons (first s) (take-while pred (rest s)))
             res))))
+
+(defn map1 [f coll]
+  (loop [s (seq coll) res []]
+    (if (empty? s) res
+        (recur (rest s) (conj res (f (first s)))))))
+
+(defn map2 [f c1 c2]
+  (loop [s1 (seq c1) s2 (seq c2) res []]
+    (if (or (empty? s1) (empty? s2)) res
+        (recur (rest s1) (rest s2)
+               (conj res (f (first s1) (first s2)))))))
+
+(defn map3 [f c1 c2 c3]
+  (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
+    (if (or (empty? s1) (empty? s2) (empty? s3)) res
+        (recur (rest s1) (rest s2) (rest s3)
+               (conj res (f (first s1) (first s2) (first s3)))))))
+
+(defn map [f & colls]
+  (cond
+    (= 1 (count colls)) (map1 f (first colls))
+    (= 2 (count colls)) (map2 f (first colls) (second colls))
+    (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
+    :else (str "Map not implemented on " (count colls) "colls")))
+
+(defn drop-last [n coll]
+  (if-not coll
+    (drop-last 1 n)
+    (map (fn [x _] x) coll (drop n coll))))

@@ -171,7 +171,7 @@
   "proverb" : "(ns proverb)\r\n\r\n(defn recite [] \r\n    \r\n)\r\n",
   "flatten_array" : "(ns flatten-array)\r\n\r\n(defn flatten [arr])\r\n",
   "pangram" : "(ns pangram)\r\n\r\n(defn pangram? [])\r\n",
-  "bank_account" : "(ns bank-account)\r\n\r\n(defn open-account [] \r\n  )\r\n\r\n(defn close-account [] \r\n  )\r\n\r\n(defn get-balance [] \r\n  )\r\n\r\n(defn update-balance [] \r\n  )\r\n",
+  "bank_account" : "(defn open-account []\r\n  (atom 0))\r\n\r\n(defn close-account [acct]\r\n  (reset! acct nil))\r\n\r\n(defn get-balance [acct]\r\n  @acct)\r\n\r\n(defn update-balance [account amount]\r\n  (swap! account + amount))\r\n",
   "strain" : "(ns strain)\r\n\r\n(defn retain [] \r\n      \r\n)\r\n\r\n(defn discard [])\r\n",
   "sum_of_multiples" : "(ns sum-of-multiples)\r\n\r\n(defn sum-of-multiples [] \r\n      \r\n)\r\n",
   "collatz_conjecture" : "(ns collatz-conjecture)\r\n\r\n(defn collatz [num])\r\n",
