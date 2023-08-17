@@ -99,11 +99,8 @@ function walk(inner, outer, form) {
         mapEntry.__mapEntry__ = true
         return outer(mapEntry)
     } else if (types._hash_map_Q(form)) {
-        const entries = seq(form).map(inner)
-        let newMap = {}
-        entries.forEach(mapEntry => {
-            newMap[mapEntry[0]] = mapEntry[1]
-        });
+        let newMap = new Map()
+        form.forEach((value, key, map) => newMap.set(key, inner(value)))
         return outer(newMap)
     } else {
         return outer(form)
