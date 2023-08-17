@@ -1,20 +1,18 @@
 (ns core {:clj-kondo/ignore true})
 
-(defmacro defn
-  (fn [name arglist & value]
-    `(def ~name (fn ~arglist ~@value))))
+(defmacro defn [name arglist & value]
+  `(def ~name (fn ~arglist ~@value)))
 
 (defn not [a] (if a false true))
 
 (defn not= [a b] (not (= a b)))
 
-(defmacro cond
-  (fn [& xs]
+(defmacro cond [& xs]
     (if (> (count xs) 0)
       (list 'if (first xs)
             (if (> (count xs) 1)
               (nth xs 1) (throw \\"odd number of forms to cond\\"))
-            (cons 'cond (rest (rest xs)))))))
+            (cons 'cond (rest (rest xs))))))
 
 (def dec (fn (a) (- a 1)))
 (def zero? (fn (n) (= 0 n)))
@@ -41,11 +39,10 @@
 (defn reverse [coll]
   (reduce conj '() coll))
 
-(defmacro if-not
-  (fn [test then else]
+(defmacro if-not [test then else]
     (if else
       `(if (not ~test) ~then ~else)
-      `(if-not ~test ~then nil))))
+      `(if-not ~test ~then nil)))
 
 (defn juxt [& f]
   (fn [& a]
@@ -59,13 +56,13 @@
     `(~(first form) ~acc ~@(rest form))
     (list form acc)))
 
-(defmacro -> (fn [x & xs] (reduce _iter-> x xs)))
+(defmacro -> [x & xs] (reduce _iter-> x xs))
 
 (defn _iter->> [acc form]
   (if (list? form)
     `(~(first form) ~@(rest form) ~acc) (list form acc)))
 
-(defmacro ->> (fn (x & xs) (reduce _iter->> x xs)))
+(defmacro ->> [x & xs] (reduce _iter->> x xs))
 
 (def gensym
   (let [counter (atom 0)]
@@ -92,35 +89,31 @@
         (pred (first xs)) (every? pred (rest xs))
         true              false))
 
-(defmacro when (fn [x & xs] (list 'if x (cons 'do xs))))
+(defmacro when [x & xs] (list 'if x (cons 'do xs)))
 
-(defmacro if-not
-  (fn [test then else]
-    `(if (not ~test) ~then ~else)))
+(defmacro if-not [test then else]
+    `(if (not ~test) ~then ~else))
 
-(defmacro when-not
-  (fn [test & body]
-    (list 'if test nil (cons 'do body))))
+(defmacro when-not [test & body]
+    (list 'if test nil (cons 'do body)))
 
 (defn fnext [x] (first (next x)))
 
-(defmacro or
-  (fn [& xs]
+(defmacro or [& xs]
     (if (empty? xs) nil
         (if (= 1 (count xs))
           (first xs)
           (let [condvar (gensym)]
             `(let [~condvar ~(first xs)]
-               (if ~condvar ~condvar (or ~@(rest xs)))))))))
+               (if ~condvar ~condvar (or ~@(rest xs))))))))
 
-(defmacro and
-  (fn [& xs]
+(defmacro and [& xs]
     (cond (empty? xs)      true
           (= 1 (count xs)) (first xs)
           true
           (let [condvar (gensym)]
             `(let [~condvar ~(first xs)]
-               (if ~condvar (and ~@(rest xs)) ~condvar))))))
+               (if ~condvar (and ~@(rest xs)) ~condvar)))))
 
 (defn ffirst [x] (first (first x)))
 

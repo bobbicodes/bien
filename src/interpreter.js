@@ -232,7 +232,8 @@ function _EVAL(ast, env) {
                 ast = quasiquote(a1);
                 break;
             case 'defmacro':
-                var func = types._clone(EVAL(a2, env));
+                var body = [types._symbol("do")].concat(ast.slice(3))
+                var func = types._function(EVAL, Env, body, env, a2)
                 func._ismacro_ = true;
                 return env.set(a1, func);
             case 'macroexpand':
