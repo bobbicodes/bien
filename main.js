@@ -7,7 +7,10 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(partition-by #(= 3 %) [1 2 3 4 5])`,
+  doc: `(loop [x [1 2 3] res []]
+  (let [y 2]
+    (if (empty? x) res
+      (recur (rest x) (conj res (* y (first x)))))))`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -143,6 +146,6 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-testSolution("roman")
+//testSolution("roman")
 //loadExercise("lev")
-//testExercises()
+testExercises()
