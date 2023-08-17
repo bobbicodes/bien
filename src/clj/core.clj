@@ -8,15 +8,16 @@
 (defn not= [a b] (not (= a b)))
 
 (defmacro cond [& xs]
-    (if (> (count xs) 0)
-      (list 'if (first xs)
-            (if (> (count xs) 1)
-              (nth xs 1) (throw \\"odd number of forms to cond\\"))
-            (cons 'cond (rest (rest xs))))))
+  (when (> (count xs) 0)
+    (list 'if (first xs)
+          (if (> (count xs) 1)
+            (nth xs 1)
+            (throw "odd number of forms to cond"))
+          (cons 'cond (rest (rest xs))))))
 
-(def dec (fn (a) (- a 1)))
-(def zero? (fn (n) (= 0 n)))
-(def identity (fn (x) x))
+(defn dec [a] (- a 1))
+(defn zero? [n] (= 0 n))
+(defn identity [x] x)
 
 (defn next [s]
   (if (= 1 (count s))
@@ -32,7 +33,7 @@
   (loop [s xs acc init res [init]]
     (if (empty? s)
       res
-      (recur (rest s) 
+      (recur (rest s)
              (f acc (first s))
              (conj res (f acc (first s)))))))
 
@@ -40,9 +41,9 @@
   (reduce conj '() coll))
 
 (defmacro if-not [test then else]
-    (if else
-      `(if (not ~test) ~then ~else)
-      `(if-not ~test ~then nil)))
+  (if else
+    `(if (not ~test) ~then ~else)
+    `(if-not ~test ~then nil)))
 
 (defn juxt [& f]
   (fn [& a]
@@ -76,9 +77,8 @@
         (if (contains? @mem key)
           (get @mem key)
           (let [ret (apply f args)]
-            (do
-              (swap! mem assoc key ret)
-              ret)))))))
+            (do (swap! mem assoc key ret)
+                ret)))))))
 
 (defn partial [pfn & args]
   (fn [& args-inner]
@@ -92,28 +92,28 @@
 (defmacro when [x & xs] (list 'if x (cons 'do xs)))
 
 (defmacro if-not [test then else]
-    `(if (not ~test) ~then ~else))
+  `(if (not ~test) ~then ~else))
 
 (defmacro when-not [test & body]
-    (list 'if test nil (cons 'do body)))
+  (list 'if test nil (cons 'do body)))
 
 (defn fnext [x] (first (next x)))
 
 (defmacro or [& xs]
-    (if (empty? xs) nil
-        (if (= 1 (count xs))
-          (first xs)
-          (let [condvar (gensym)]
-            `(let [~condvar ~(first xs)]
-               (if ~condvar ~condvar (or ~@(rest xs))))))))
+  (if (empty? xs) nil
+      (if (= 1 (count xs))
+        (first xs)
+        (let [condvar (gensym)]
+          `(let [~condvar ~(first xs)]
+             (if ~condvar ~condvar (or ~@(rest xs))))))))
 
 (defmacro and [& xs]
-    (cond (empty? xs)      true
-          (= 1 (count xs)) (first xs)
-          true
-          (let [condvar (gensym)]
-            `(let [~condvar ~(first xs)]
-               (if ~condvar (and ~@(rest xs)) ~condvar)))))
+  (cond (empty? xs)      true
+        (= 1 (count xs)) (first xs)
+        true
+        (let [condvar (gensym)]
+          `(let [~condvar ~(first xs)]
+             (if ~condvar (and ~@(rest xs)) ~condvar)))))
 
 (defn ffirst [x] (first (first x)))
 
@@ -148,7 +148,7 @@
           (not (f)))))))
 
 (defn mapcat [f & colls]
-   (apply concat (apply map f colls)))
+  (apply concat (apply map f colls)))
 
 (defn remove [pred coll]
   (filter (complement pred) coll))
@@ -157,7 +157,7 @@
   (remove nil?
           (cons node
                 (when (branch? node)
-                  (mapcat (fn [x] (tree-seq branch? children x)) 
+                  (mapcat (fn [x] (tree-seq branch? children x))
                           (children node))))))
 
 (defn mod [num div]
@@ -187,8 +187,8 @@
     (partition-all n n step)
     (loop [s coll p []]
       (if (= 0 (count s)) p
-        (recur (drop step s)
-               (conj p (take n s)))))))
+          (recur (drop step s)
+                 (conj p (take n s)))))))
 
 (defn partition-by [f coll]
   (loop [s (seq coll) res []]
@@ -200,11 +200,11 @@
   (or (list? x) (vector? x) (set? x) (map? x)))
 
 (defn group-by [f coll]
-   (reduce
-    (fn [ret x]
-      (let [k (f x)]
-        (assoc ret k (conj (get ret k []) x))))
-    {} coll))
+  (reduce
+   (fn [ret x]
+     (let [k (f x)]
+       (assoc ret k (conj (get ret k []) x))))
+   {} coll))
 
 
 (defn fromCharCode [int]
@@ -235,9 +235,9 @@
          ks (seq keys)
          vs (seq vals)]
     (if-not (and ks vs) map
-      (recur (assoc map (first ks) (first vs))
-             (next ks)
-             (next vs)))))
+            (recur (assoc map (first ks) (first vs))
+                   (next ks)
+                   (next vs)))))
 
 (defn empty [coll]
   (cond
