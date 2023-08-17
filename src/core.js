@@ -114,7 +114,12 @@ export function last(lst) { return (lst === null) ? null : seq(lst)[seq(lst).len
 
 export function rest(lst) { return (lst == null) ? [] : seq(lst).slice(1); }
 
-function empty_Q(lst) { return lst.length === 0; }
+function empty_Q(lst) { 
+    if (!lst) {
+        return true
+    }
+    return lst.length === 0;
+}
 
 export function count(s) {
     if (Array.isArray(s)) { return s.length; }
@@ -293,6 +298,9 @@ function char(int) {
 }
 
 function filter(f, lst) {
+    if (!lst || lst.length === 0) {
+        return []
+    }
     return seq(lst).filter(function (el) { return f(el); });
 }
 
@@ -302,6 +310,10 @@ function min() {
 
 function max() {
     return Math.max.apply(null, arguments);
+}
+
+function _pow(x, n) {
+    return Math.pow(x, n)
 }
 
 function sum() {
@@ -415,6 +427,10 @@ function _round(n) {
     return Math.round(n)
 }
 
+function _sqrt(n) {
+    return Math.sqrt(n)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -438,6 +454,8 @@ export var ns = {
     'rand-int': rand_int,
     'rand-nth': rand_nth,
     'Math/round': _round,
+    'Math/sqrt': _sqrt,
+    'Math/pow': _pow,
 
     'pr-str': pr_str,
     'str': str,

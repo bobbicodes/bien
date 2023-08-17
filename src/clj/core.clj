@@ -137,6 +137,12 @@
 (defn neg? [n]
   (> 0 n))
 
+(defn even? [n]
+  (zero? (mod n 2)))
+
+(defn odd? [n]
+  (not (zero? (mod n 2))))
+
 (defn complement [f]
   (fn [x y & zs]
     (if zs
@@ -266,6 +272,7 @@
 
 (defn map [f & colls]
   (cond
+    (empty? (first colls)) '()
     (= 1 (count colls)) (map1 f (first colls))
     (= 2 (count colls)) (map2 f (first colls) (second colls))
     (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))

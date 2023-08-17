@@ -125,7 +125,9 @@ function shuffle(array) {
 }
 
 const exercisesToTest = shuffle(Object.keys(solutions))
-
+function randExercise() {
+  return exercisesToTest[Math.floor(Math.random() * exercisesToTest.length)]
+}
 
 function testExercises() {
   let passes = []
@@ -146,6 +148,7 @@ function testExercises() {
   console.log("Fails:", fails)
 }
 
-//testSolution("roman")
+//testSolution(randExercise())
+testSolution("difference_of_squares")
 //loadExercise("lev")
 //testExercises()
