@@ -148,4 +148,4 @@ function testExercises() {
 
 //testSolution("roman")
 //loadExercise("lev")
-testExercises()
+//testExercises()
