@@ -320,6 +320,13 @@ function sum() {
     return Array.from(arguments).reduce((acc, a) => acc + a, 0);
 }
 
+function subtract() {
+    if (arguments.length === 1) {
+        return 0 - arguments[0]
+    }
+    return Array.from(arguments).slice(1).reduce((acc, a) => acc - a, arguments[0]);
+}
+
 function product() {
     return Array.from(arguments).reduce((acc, a) => acc * a, 1);
 }
@@ -469,7 +476,7 @@ export var ns = {
     '>': function (a, b) { return a > b; },
     '>=': function (a, b) { return a >= b; },
     '+': sum,
-    '-': function (a, b) { return a - b; },
+    '-': subtract,
     '*': product,
     '/': function (a, b) { return a / b; },
     'inc': function (a) { return a + 1; },

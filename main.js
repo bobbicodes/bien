@@ -149,6 +149,6 @@ function testExercises() {
 }
 
 //testSolution(randExercise())
-testSolution("difference_of_squares")
+//testSolution("complex_numbers")
 //loadExercise("lev")
-//testExercises()
+testExercises()
