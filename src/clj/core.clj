@@ -310,3 +310,12 @@
   (reduce (fn [counts x]
             (assoc counts x (inc (get counts x 0))))
           {} coll))
+
+(defn constantly [x] (fn [& args] x))
+
+(defn str/capitalize [s]
+  (let [s (str s)]
+    (if (< (count s) 2)
+      (upper-case s)
+      (str (upper-case (subs s 0 1))
+           (upper-case (subs s 1))))))

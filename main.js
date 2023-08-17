@@ -149,6 +149,6 @@ function testExercises() {
 }
 
 //testSolution(randExercise())
-//testSolution("complex_numbers")
+//testSolution("proverb")
 //loadExercise("lev")
 testExercises()

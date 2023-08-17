@@ -446,13 +446,17 @@ function _join(separator, coll) {
     return coll.join(separator)
 }
 
+function _replace(s, match, replacement) {
+    return s.replace(match, replacement)
+}
+
 function rand_int() {
     return Math.floor(Math.random() * arguments[0]);
 }
 
 function rand_nth() {
-    const n = Math.floor(Math.random() * arguments[0].size)
-    return arguments[0].get(n)
+    const n = Math.floor(Math.random() * arguments[0].length)
+    return arguments[0][n]
 }
 
 function _round(n) {
@@ -461,6 +465,22 @@ function _round(n) {
 
 function _sqrt(n) {
     return Math.sqrt(n)
+}
+
+function _substring(s, start, end) {
+    return s.substring(start, end)
+}
+
+function dec2bin(dec) {
+    return (dec >>> 0).toString(2);
+  }
+
+  function repeatedly(n, f) {
+    let calls = []
+    for (let i = 0; i < n; i++) {
+        calls.push(f())
+    }
+    return calls
 }
 
 // types.ns is namespace of type functions
@@ -483,11 +503,13 @@ export var ns = {
     'macro?': types._macro_Q,
     'char': char,
     'int?': int_Q,
+    'repeatedly': repeatedly,
     'rand-int': rand_int,
     'rand-nth': rand_nth,
     'Math/round': _round,
     'Math/sqrt': _sqrt,
     'Math/pow': _pow,
+    'Integer/toBinaryString': dec2bin,
 
     'pr-str': pr_str,
     'str': str,
@@ -514,7 +536,10 @@ export var ns = {
     'pop': pop,
     'lower-case': lowerCase,
     'upper-case': upperCase,
+    'str/lower-case': lowerCase,
+    'str/upper-case': upperCase,
     'Character/isLetter': isLetter,
+    'subs': _substring,
 
     'list': types._list,
     'list?': types._list_Q,
@@ -550,6 +575,7 @@ export var ns = {
     //'map': map,
     'repeat': repeat,
     'str/join': _join,
+    'str/replace': _replace,
 
     'conj': conj,
     'seq': seq,
