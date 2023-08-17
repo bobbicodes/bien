@@ -292,3 +292,21 @@
       (recur (rest s1)
              (rest s2)
              (conj res (first s1) (first s2))))))
+
+(defn into [to from]
+  (reduce conj to from))
+
+(defmacro if-let [bindings then else & oldform]
+  (if-not else
+     `(if-let ~bindings ~then nil)
+   (let [form (bindings 0) tst (bindings 1)]
+     `(let [temp# ~tst]
+        (if temp#
+          (let [~form temp#]
+            ~then)
+          ~else)))))
+
+(defn frequencies [coll]
+  (reduce (fn [counts x]
+            (assoc counts x (inc (get counts x 0))))
+          {} coll))

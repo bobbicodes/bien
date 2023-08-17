@@ -110,11 +110,11 @@ export function nth(lst, idx) {
 
 export function first(lst) { return (lst === null) ? null : seq(lst)[0]; }
 export function second(lst) { return (lst === null) ? null : seq(lst)[1]; }
-export function last(lst) { return (lst === null) ? null : seq(lst)[seq(lst).length-1]; }
+export function last(lst) { return (lst === null) ? null : seq(lst)[seq(lst).length - 1]; }
 
 export function rest(lst) { return (lst == null) ? [] : seq(lst).slice(1); }
 
-function empty_Q(lst) { 
+function empty_Q(lst) {
     if (!lst) {
         return true
     }
@@ -140,7 +140,7 @@ function conj(lst) {
     } else if (types._hash_map_Q(lst)) {
         var hm = new Map(lst)
         const args = Array.prototype.slice.call(arguments, 1)
-        for (var i=0; i<args.length; i++) {
+        for (var i = 0; i < args.length; i++) {
             var ktoken = args[i][0],
                 vtoken = args[i][1]
             hm.set(ktoken, vtoken)
@@ -235,6 +235,26 @@ function _intersection(setA, setB) {
     return _intersection;
 }
 
+function symmetricDifference(setA, setB) {
+    const _difference = new Set(setA);
+    for (const elem of setB) {
+        if (_difference.has(elem)) {
+            _difference.delete(elem);
+        } else {
+            _difference.add(elem);
+        }
+    }
+    return _difference;
+}
+
+function _difference(setA, setB) {
+    const _difference = new Set(setA);
+    for (const elem of setB) {
+        _difference.delete(elem);
+    }
+    return _difference;
+}
+
 function _is(a) {
     if (a) {
         return true
@@ -314,6 +334,11 @@ function max() {
 
 function _pow(x, n) {
     return Math.pow(x, n)
+}
+
+function reSeq(re, s) {
+    const array = [...s.matchAll(re)];
+    return array
 }
 
 function sum() {
@@ -407,7 +432,7 @@ function upperCase(s) {
 
 function isLetter(c) {
     return c.toLowerCase() != c.toUpperCase();
-  }
+}
 
 function lowerCase(s) {
     return s.toLowerCase()
@@ -500,6 +525,7 @@ export var ns = {
     'assoc': assoc,
     'dissoc': dissoc,
     'get': get,
+    're-seq': reSeq,
     'contains?': contains_Q,
     'keys': keys,
     'vals': vals,
@@ -542,5 +568,7 @@ export var ns = {
 
     'set': toSet,
     'set/union': _union,
-    'set/intersection': _intersection
+    'set/intersection': _intersection,
+    'set/symmetric-difference': symmetricDifference,
+    'set/difference': _difference
 };
