@@ -20,13 +20,13 @@ function str() {
 }
 
 function prn() {
-    println.apply({}, Array.prototype.map.call(arguments, function (exp) {
+    _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
         return _pr_str(exp, true);
     }));
 }
 
 function println() {
-    println.apply({}, Array.prototype.map.call(arguments, function (exp) {
+    _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
         return _pr_str(exp, false);
     }));
 }
@@ -483,6 +483,10 @@ function dec2bin(dec) {
     return calls
 }
 
+function _subvec(v, start, end) {
+    return v.slice(start, end)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -540,6 +544,7 @@ export var ns = {
     'str/upper-case': upperCase,
     'Character/isLetter': isLetter,
     'subs': _substring,
+    'subvec': _subvec,
 
     'list': types._list,
     'list?': types._list_Q,

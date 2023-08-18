@@ -319,3 +319,53 @@
       (upper-case s)
       (str (upper-case (subs s 0 1))
            (upper-case (subs s 1))))))
+
+(defn reduce-kv [m f init]
+  (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
+
+(defmacro when-let [bindings & body]
+  (let [form (get bindings 0) tst (get bindings 1)]
+    `(let [temp# ~tst]
+       (when temp#
+         (let [~form temp#]
+           ~@body)))))
+
+(defmacro when-first [bindings & body]
+  (let [xs bindings]
+    `(when-let [xs# (seq ~xs)]
+       (let [~(first xs) (first xs#)]
+         ~@body))))
+
+(defn emit-bind [bindings body-expr]
+  (let [giter (gensym)
+        gxs (gensym)]
+    (if (next bindings)
+      `(defn ~giter [~gxs]
+         (loop [~gxs ~gxs]
+           (when-first [~(ffirst bindings) ~gxs]
+             ~(do-mod* (subvec (first bindings) 2) body-expr bindings giter gxs))))
+      `(defn ~giter [~gxs]
+         (loop [~gxs ~gxs]
+           (when-let [~gxs (seq ~gxs)]
+             (let [~(ffirst bindings) (first ~gxs)]
+               ~(do-mod* (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
+
+(defn do-mod* [domod body-expr bindings giter gxs]
+  (if (next bindings)
+    `(let [iterys# ~(emit-bind (next bindings) body-expr)
+           fs#     (seq (iterys# ~(second (first (next bindings)))))]
+       (if fs#
+         (concat fs# (~giter (rest ~gxs)))
+         (recur (rest ~gxs))))
+    `(cons ~body-expr
+           (~giter (rest ~gxs)))))
+
+(defmacro for* [seq-exprs body-expr]
+  (let [to-groups (fn [seq-exprs]
+                    (reduce (fn [groups kv]
+                              (if (keyword? (first kv))
+                                (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
+                                (conj groups [(first kv) (last kv)])))
+                            [] (partition 2 seq-exprs)))]
+    `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
+       (iter# ~(second seq-exprs)))))

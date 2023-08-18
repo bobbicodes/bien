@@ -132,6 +132,7 @@ function hasLet(ast) {
 function _EVAL(ast, env) {
     while (true) {
         //printer.println("EVAL:", printer._pr_str(ast, true));
+        console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);
         }
@@ -178,7 +179,7 @@ function _EVAL(ast, env) {
             case "def":
                 var res = EVAL(a2, env);
                 env.set(a1, res);
-                return "#'" + a1
+                return res
             case "let":
                 var let_env = new Env(env);
                 for (var i = 0; i < a1.length; i += 2) {

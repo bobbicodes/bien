@@ -191,8 +191,7 @@
             :cljs (new js/Error (str "Unsupported binding key: " (ffirst kwbs)))))
         (reduce process-entry [] bents)))))
 
-(destructure* '[[[bind expr & mod-pairs]
-                & [[_ next-expr] :as next-groups]]])
+(destructure* '[[[bind expr & mod-pairs] & next-groups]])
 
 (def client {:name "Super Co."
              :location "Philadelphia"
@@ -236,20 +235,14 @@
                                     n/from-to
                                     (j/assoc! :insert " "))])})))))))
 
-(fn [seq-exprs]
-  (reduce (fn [groups [k v]]
-            (if (keyword? k)
-              (conj (pop groups) (conj (peek groups) [k v]))
-              (conj groups [k v])))
-          [] (partition 2 seq-exprs)))
-
 (defmacro for [seq-exprs body-expr]
   (let [to-groups (fn [seq-exprs]
                     (reduce (fn [groups [k v]]
-                              (if (keyword? k)
-                                (conj (pop groups) (conj (peek groups) [k v]))
-                                (conj groups [k v])))
-                            [] (partition 2 seq-exprs)))
+                               (if (keyword? k)
+                                 (conj (pop groups) (conj (peek groups) [k v]))
+                                 (conj groups [k v])))
+                             [] (partition 2 seq-exprs)))
+        err (fn [& msg] (throw (IllegalArgumentException. ^String (apply str msg))))
         emit-bind (fn emit-bind [[[bind expr & mod-pairs]
                                   & [[_ next-expr] :as next-groups]]]
                     (let [giter (gensym "iter__")
@@ -261,6 +254,7 @@
                                      (= k :when) `(if ~v
                                                     ~(do-mod etc)
                                                     (recur (rest ~gxs)))
+                                     (keyword? k) (err "Invalid 'for' keyword " k)
                                      next-groups
                                      `(let [iterys# ~(emit-bind next-groups)
                                             fs# (seq (iterys# ~next-expr))]
@@ -287,7 +281,8 @@
                                                          ~(do-cmod etc)
                                                          (recur
                                                           (unchecked-inc ~gi)))
-
+                                          (keyword? k)
+                                          (err "Invalid 'for' keyword " k)
                                           :else
                                           `(do (chunk-append ~gb ~body-expr)
                                                (recur (unchecked-inc ~gi)))))]
@@ -313,127 +308,93 @@
     `(let [iter# ~(emit-bind (to-groups seq-exprs))]
        (iter# ~(second seq-exprs)))))
 
-(for [x [0 1 2 3 4 5]
-      :let [y (* x 3)]
-      :when (even? y)]
-  y)
+(declare do-mod)
+(declare do-mod*)
 
+(defn emit-bind [bindings body-expr]
+  (let [giter (gensym)
+        gxs (gensym)]
+    (println "bindings:" bindings)
+    (if (next bindings)
+      `(defn ~giter [~gxs]
+         (loop [~gxs ~gxs]
+           (when-first [~(ffirst bindings) ~gxs]
+             ~(do-mod* (subvec (first bindings) 2) body-expr bindings giter gxs))))
+      `(defn ~giter [~gxs]
+         (loop [~gxs ~gxs]
+           (when-let [~gxs (seq ~gxs)]
+             (let [~(ffirst bindings) (first ~gxs)]
+               ~(do-mod* (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
 
-
-(defn to-groups [seq-exprs]
-  (reduce (fn [groups binding]
-            (if (keyword? (first binding))
-              (conj (pop groups) 
-                    (conj (peek groups) 
-                          [(first binding) (last binding)]))
-              (conj groups [(first binding) (last binding)])))
-          [] (partition 2 seq-exprs)))
-
-(let [[[[bind expr & mod-pairs]
-        & [[_ next-expr] :as next-groups]]]]
-  (to-groups '[x [1 2 3]
-               y [1 2 3]
-               :while (<= x y)
-               z [1 2 3]]))
-
-(let [giter  (gensym "iter__")
-      gxs    (gensym "s__")
-      do-mod (fn do-mod [[[k v :as pair] & etc]])])
-
-(defn do-mod [[pair & etc]]
+(defn do-mod [domod body-expr bindings giter gxs]
   (cond
-    (= k :let) `(let ~v ~(do-mod etc))
-    (= k :while) `(when ~v ~(do-mod etc))
-    (= k :when) `(if ~v
-                   ~(do-mod etc)
-                   (recur (rest ~gxs)))
-    next-groups
-    `(let [iterys# ~(emit-bind next-groups)
-           fs#     (seq (iterys# ~next-expr))]
+    (= (ffirst domod) :let) `(let ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
+    (= (ffirst domod) :while) `(when ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
+    (= (ffirst domod) :when) `(if ~(second (first domod))
+                                ~(do-mod (next domod) body-expr bindings giter gxs)
+                                (recur (rest ~gxs)))
+    (keyword? (ffirst domod)) (str "Invalid 'for' keyword " (ffirst domod))
+    (next bindings)
+    `(let [iterys# ~(emit-bind (next bindings) body-expr)
+           fs# (seq (iterys# ~(second (first (next bindings)))))]
        (if fs#
          (concat fs# (~giter (rest ~gxs)))
          (recur (rest ~gxs))))
     :else `(cons ~body-expr
                  (~giter (rest ~gxs)))))
 
-(defmacro for [seq-exprs body-expr]
-  (let [emit-bind 
-        (fn emit-bind [[[bind expr & mod-pairs]
-                        & [[_ next-expr] :as next-groups]]]
-          (let [giter  (gensym "iter__")
-                gxs    (gensym "s__")
-                do-mod (fn do-mod [[[k v :as pair] & etc]]
-                         (cond
-                           (= k :let) `(let ~v ~(do-mod etc))
-                           (= k :while) `(when ~v ~(do-mod etc))
-                           (= k :when) `(if ~v
-                                          ~(do-mod etc)
-                                          (recur (rest ~gxs)))
-                           next-groups
-                           `(let [iterys# ~(emit-bind next-groups)
-                                  fs#     (seq (iterys# ~next-expr))]
-                              (if fs#
-                                (concat fs# (~giter (rest ~gxs)))
-                                (recur (rest ~gxs))))
-                           :else `(cons ~body-expr
-                                        (~giter (rest ~gxs)))))]
-            (if next-groups
-              #_"not the inner-most loop"
-              `(fn ~giter [~gxs]
-                 (lazy-seq
-                  (loop [~gxs ~gxs]
-                    (when-first [~bind ~gxs]
-                      ~(do-mod mod-pairs)))))
-              #_"inner-most loop"
-              (let [gi      (gensym "i__")
-                    gb      (gensym "b__")
-                    do-cmod (fn do-cmod [[[k v :as pair] & etc]]
-                              (cond
-                                (= k :let) `(let ~v ~(do-cmod etc))
-                                (= k :while) `(when ~v ~(do-cmod etc))
-                                (= k :when) `(if ~v
-                                               ~(do-cmod etc)
-                                               (recur
-                                                (unchecked-inc ~gi)))
+(defn do-mod* [domod body-expr bindings giter gxs]
+  (if (next bindings)
+    `(let [iterys# ~(emit-bind (next bindings) body-expr)
+           fs#     (seq (iterys# ~(second (first (next bindings)))))]
+       (if fs#
+         (concat fs# (~giter (rest ~gxs)))
+         (recur (rest ~gxs))))
+    `(cons ~body-expr
+           (~giter (rest ~gxs)))))
 
-                                :else
-                                `(do (chunk-append ~gb ~body-expr)
-                                     (recur (unchecked-inc ~gi)))))]
-                `(fn ~giter [~gxs]
-                   (lazy-seq
-                    (loop [~gxs ~gxs]
-                      (when-let [~gxs (seq ~gxs)]
-                        (if (chunked-seq? ~gxs)
-                          (let [c#           (chunk-first ~gxs)
-                                size#        (int (count c#))
-                                ~gb (chunk-buffer size#)]
-                            (if (loop [~gi (int 0)]
-                                  (if (< ~gi size#)
-                                    (let [~bind (.nth c# ~gi)]
-                                      ~(do-cmod mod-pairs))
-                                    true))
-                              (chunk-cons
-                               (chunk ~gb)
-                               (~giter (chunk-rest ~gxs)))
-                              (chunk-cons (chunk ~gb) nil)))
-                          (let [~bind (first ~gxs)]
-                            ~(do-mod mod-pairs)))))))))))]
-    `(let [iter# ~(emit-bind (to-groups seq-exprs))]
-       (iter# ~(second seq-exprs)))))
+(defmacro for* [seq-exprs body-expr]
+  (let [to-groups (fn [seq-exprs]
+                    (reduce (fn [groups kv]
+                              (if (keyword? (first kv))
+                                (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
+                                (conj groups [(first kv) (last kv)])))
+                            [] (partition 2 seq-exprs)))]
+   `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
+     (iter# ~(second seq-exprs)))))
 
- (for [x [0 1 2 3 4 5]
-       :let [y (* x 3)]
-       :when (even? y)]
-   y)
+(defmacro for* [seq-exprs body-expr]
+  (let [to-groups (fn [seq-exprs]
+                    (reduce (fn [groups kv]
+                              (if (keyword? (first kv))
+                                (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
+                                (conj groups [(first kv) (last kv)])))
+                            [] (partition 2 seq-exprs)))]
+    `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
+       ~(second seq-exprs))))
 
- (for [x [0 1 2]
-      y [0 1 2]]
-  [x y])
+(for* [x ['a 'b 'c]
+       y [1 2 3]]
+      [x y])
 
-(to-groups '[x [0 1 2]
-            y [0 1 2]])
+(for* [x [0 1 2 3 4 5]
+       y [0 1 2 3 4 5]
+       z [0 1 2 3 4 5]
+      :let [y (* x 3)]
+      :when (even? y)]
+  y)
 
- [[[0 0] [0 1]]
-  [[0 2] [1 0]] 
-  [[1 1] [1 2]] 
-  [[2 0] [2 1]]]
+(for* [[x y] '([:a 1] [:b 2] [:c 0]) :when (= y 0)] x)
+
+(for* [x (range 1 6)
+      :let [y (* x x)
+            z (* x x x)]]
+  [x y z])
+
+(for* [x [1 2 3]
+      y [1 2 3]
+      :while (<= x y)
+      z [1 2 3]
+       z1 [4 5 6]
+       z2 [7 8 9]]
+  [x y z])

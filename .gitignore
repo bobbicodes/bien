@@ -15,3 +15,5 @@ test/**/instructions.append.md
 test/**/hints.md
 test/**/exemplar.clj
 .calva/
+.cpcache/
+.nrepl-port

@@ -7,10 +7,9 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(loop [x [1 2 3] res []]
-  (let [y 2]
-    (if (empty? x) res
-      (recur (rest x) (conj res (* y (first x)))))))`,
+  doc: `(for* [x [0 1 2 3 4 5]
+       y [0 1 2 3 4 5]]
+  (* y x))`,
     extensions: [basicSetup, clojure()]
 })
 
@@ -151,4 +150,4 @@ function testExercises() {
 //testSolution(randExercise())
 //testSolution("proverb")
 //loadExercise("lev")
-testExercises()
+//testExercises()
