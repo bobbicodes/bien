@@ -325,7 +325,8 @@
   (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
 
 (defmacro when-let [bindings & body]
-  (let [form (get bindings 0) tst (get bindings 1)]
+  (let [form (get bindings 0) tst (get bindings 1)
+        temp# (gensym)]
     `(let [temp# ~tst]
        (when temp#
          (let [~form temp#]
