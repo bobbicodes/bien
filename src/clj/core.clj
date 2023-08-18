@@ -299,7 +299,8 @@
 (defmacro if-let [bindings then else & oldform]
   (if-not else
      `(if-let ~bindings ~then nil)
-   (let [form (bindings 0) tst (bindings 1)]
+   (let [form (get bindings 0) tst (get bindings 1)
+         temp# (gensym)]
      `(let [temp# ~tst]
         (if temp#
           (let [~form temp#]
