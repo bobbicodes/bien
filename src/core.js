@@ -108,11 +108,14 @@ export function nth(lst, idx) {
     else { throw new Error("nth: index out of range"); }
 }
 
-export function first(lst) { return (lst === null) ? null : seq(lst)[0]; }
-export function second(lst) { return (lst === null) ? null : seq(lst)[1]; }
-export function last(lst) { return (lst === null) ? null : seq(lst)[seq(lst).length - 1]; }
+export function first(lst) {
+    return (lst === null || lst.length === 0) ? null : seq(lst)[0];
+}
 
-export function rest(lst) { return (lst == null) ? [] : seq(lst).slice(1); }
+export function second(lst) { return (lst === null || lst.length === 0) ? null : seq(lst)[1]; }
+export function last(lst) { return (lst === null || lst.length === 0) ? null : seq(lst)[seq(lst).length - 1]; }
+
+export function rest(lst) { return (lst == null || lst.length === 0) ? [] : seq(lst).slice(1); }
 
 function empty_Q(lst) {
     if (!lst) {
@@ -473,9 +476,9 @@ function _substring(s, start, end) {
 
 function dec2bin(dec) {
     return (dec >>> 0).toString(2);
-  }
+}
 
-  function repeatedly(n, f) {
+function repeatedly(n, f) {
     let calls = []
     for (let i = 0; i < n; i++) {
         calls.push(f())

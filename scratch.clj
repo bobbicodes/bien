@@ -319,12 +319,12 @@
       `(defn ~giter [~gxs]
          (loop [~gxs ~gxs]
            (when-first [~(ffirst bindings) ~gxs]
-             ~(do-mod* (subvec (first bindings) 2) body-expr bindings giter gxs))))
+             ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))
       `(defn ~giter [~gxs]
          (loop [~gxs ~gxs]
            (when-let [~gxs (seq ~gxs)]
              (let [~(ffirst bindings) (first ~gxs)]
-               ~(do-mod* (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
+               ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
 
 (defn do-mod [domod body-expr bindings giter gxs]
   (cond
