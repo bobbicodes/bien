@@ -7,7 +7,9 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests} from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(when-first [a [1 2 3]] a)`,
+  doc: `(for [x [0 1 2 3 4 5]
+       y [0 1 2 3 4 5]]
+(str x y))`,
     extensions: [basicSetup, clojure()]
 })
 
