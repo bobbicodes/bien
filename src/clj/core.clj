@@ -333,9 +333,11 @@
            ~@body)))))
 
 (defmacro when-first [bindings & body]
-  (let [xs bindings]
+  (let [x   (first bindings)
+        xs  (last bindings)
+        xs# (gensym)]
     `(when-let [xs# (seq ~xs)]
-       (let [~(first xs) (first xs#)]
+       (let [~x (first xs#)]
          ~@body))))
 
 (defn emit-bind [bindings body-expr]
