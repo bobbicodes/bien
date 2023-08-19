@@ -1,4 +1,4 @@
-import { _obj_type } from './types.js'
+import { _obj_type, _keyword } from './types.js'
 
 export function _println() {
     console.log.apply(console, arguments)
@@ -41,9 +41,11 @@ export function _pr_str(obj, print_readably) {
             return ':' + obj.slice(1);
         case 'nil':
             return "nil";
+        case 'function':
+            return "#function[" + obj.__meta__.get(_keyword("name")) + "]"
         case 'regex':
             const re_str = obj.toString()
-            return "#\"" + re_str.substring(1, re_str.length-2) + "\"" 
+            return "#\"" + re_str.substring(1, re_str.length - 2) + "\""
         case 'atom':
             return "(atom " + _pr_str(obj.val, _r) + ")";
         default:

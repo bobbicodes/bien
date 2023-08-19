@@ -4,6 +4,7 @@ export function _obj_type(obj) {
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
+    else if (_function_Q(obj)) {   return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
     else if (_regex_Q(obj)) {      return 'regex'; }
@@ -117,12 +118,13 @@ export function _regex_Q(obj) {
 }
 
 // Functions
-export function _function(Eval, Env, ast, env, params) {
+export function _function(Eval, Env, ast, env, params, fnName) {
     var fn = function() {
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
     fn.__ast__ = ast;
+    fn.__name__ = fnName
     fn.__gen_env__ = function(args) { return new Env(env, params, args); };
     fn._ismacro_ = false;
     return fn;

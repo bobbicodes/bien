@@ -172,7 +172,7 @@ function _EVAL(ast, env) {
                     let body = ast.slice(1)[0]
                     fun.push(args)
                     fun.push(body)
-                    var lambda = types._function(EVAL, Env, body, env, args);
+                    var lambda = types._function(EVAL, Env, body, env, args, a0);
                     lambda.lambda = true
                     return lambda
                 }
@@ -231,7 +231,7 @@ function _EVAL(ast, env) {
                 break;
             case 'defmacro':
                 var body = [types._symbol("do")].concat(ast.slice(3))
-                var func = types._function(EVAL, Env, body, env, a2)
+                var func = types._function(EVAL, Env, body, env, a2, a1)
                 func._ismacro_ = true;
                 return env.set(a1, func);
             case 'macroexpand':
@@ -261,7 +261,7 @@ function _EVAL(ast, env) {
                 break;
             case "fn":
                 //console.log("defining fn", ast)
-                var lambda = types._function(EVAL, Env, a2, env, a1);
+                var lambda = types._function(EVAL, Env, a2, env, a1, a0);
                 lambda.lambda = true
                 return lambda
             default:

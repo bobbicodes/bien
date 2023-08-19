@@ -3,8 +3,9 @@
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
     `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl))) 
-             ~{:doc (first fdecl)}))
-    `(def ~name (fn ~(first fdecl) (do ~@(rest fdecl))))))
+             ~{:name (str name) :doc (first fdecl)}))
+    `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
+                  ~{:name (str name)}))))
 
 (defn not [a] (if a false true))
 (defn not= [a b] (not (= a b)))
@@ -356,11 +357,7 @@
 (defn parseInt [s r]
   (Integer/parseInt s r))
 
-(defn get-in
-  "Returns the value in a nested associative structure,
-  where ks is a sequence of keys. Returns nil if the key
-  is not present, or the not-found value if supplied."
-  [m ks]
+(defn get-in [m ks]
    (reduce #(get % %2) m ks))
 
 (defmacro for [seq-exprs body-expr]
@@ -419,18 +416,10 @@
       (recur (conj ret (first s)) (next s))
       (seq ret))))
 
-(defn assoc-in
-  "Associates a value in a nested associative structure, where ks is a
-  sequence of keys and v is the new value and returns a new nested structure.
-  If any levels do not exist, hash-maps will be created."
-  [m ks v]
+(defn assoc-in [m ks v]
   (if (next ks)
-    (do (println "m:" m)
-        (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v)))
-    (do (println "ks:" ks "m:" m "v:" v)
-        (assoc m (first ks) v))))
-
-;(assoc-in {} [:cookie :monster :vocals] "Finntroll")
+    (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v))
+    (assoc m (first ks) v)))
 
 ;; not working yet. leaving it here to shame myself into
 ;; finishing it so it won't be taking up 100 lines for nothing

@@ -167,6 +167,6 @@ function testExercisesUntilFail() {
 
 //testSolution(randExercise())
 //testSolution("ttt2")
-loadExercise("ttt2")
-//testExercisesUntilFail()
-///testExercises()
+//loadExercise("ttt2")
+testExercisesUntilFail()
+//testExercises()
