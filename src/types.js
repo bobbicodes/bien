@@ -1,9 +1,12 @@
+import { Fraction } from 'fraction.js'
+
 export function _obj_type(obj) {
     //console.log("obj_type:", typeof obj)
     if      (_symbol_Q(obj)) {   return 'symbol'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
+    else if (_ratio_Q(obj)) {   return 'ratio'; }
     else if (_function_Q(obj)) {   return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
@@ -50,7 +53,6 @@ export function _equal_Q(a, b) {
             return a === b;
     }
 }
-
 
 export function _clone (obj) {
     //console.log("cloning", obj)
@@ -99,6 +101,14 @@ Symbol.prototype.toString = function() { return this.value; }
 export function _symbol(name) { return new Symbol(name); }
 export function _symbol_Q(obj) { return obj instanceof Symbol; }
 
+// Ratios
+
+export function _ratio(x) {
+    return new Fraction(x)
+}
+export function _ratio_Q(obj) {
+    return obj instanceof Fraction
+}
 
 // Keywords
 export function _keyword(obj) {
