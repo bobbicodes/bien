@@ -7,8 +7,10 @@
     `(def ~name (fn ~(first fdecl) (do ~@(rest fdecl))))))
 
 (defn not [a] (if a false true))
-
 (defn not= [a b] (not (= a b)))
+(defn dec [a] (- a 1))
+(defn zero? [n] (= 0 n))
+(defn identity [x] x)
 
 (defmacro cond [& xs]
   (when (> (count xs) 0)
@@ -18,19 +20,13 @@
             (throw "odd number of forms to cond"))
           (cons 'cond (rest (rest xs))))))
 
-(defn dec [a] (- a 1))
-(defn zero? [n] (= 0 n))
-(defn identity [x] x)
-
 (defn next [s]
   (if (or (= 1 (count s)) (= 0 (count s)))
     nil
     (rest s)))
 
 (defn nnext [s]
-  (if (or (= 1 (count s)) (= 0 (count s)))
-    nil
-    (next (next s))))
+  (next (next s)))
 
 (defn reduce [f init xs]
   (if (empty? xs)
@@ -57,8 +53,11 @@
   (fn [& a]
     (map #(apply % a) f)))
 
-(defn upper-case [s]
+(defn .toUpperCase [s]
   (. (str "'" s "'" ".toUpperCase")))
+
+(defn .toLowerCase [s]
+  (. (str "'" s "'" ".toLowerCase")))
 
 (defn _iter-> [acc form]
   (if (list? form)
@@ -76,8 +75,8 @@
 (def gensym-counter
   (atom 0))
 
-(defn gensym [& prefix]
-  (symbol (str (if (seq prefix) (first prefix) "G__")
+(defn gensym [prefix]
+  (symbol (str (if prefix prefix "G__")
                (swap! gensym-counter inc))))
 
 (defn memoize [f]
@@ -357,6 +356,13 @@
 (defn parseInt [s r]
   (Integer/parseInt s r))
 
+(defn get-in
+  "Returns the value in a nested associative structure,
+  where ks is a sequence of keys. Returns nil if the key
+  is not present, or the not-found value if supplied."
+  [m ks]
+   (reduce #(get % %2) m ks))
+
 (defmacro for [seq-exprs body-expr]
   (let [body-expr* body-expr
         iter# (gensym)
@@ -397,9 +403,39 @@
                                   (let [~(ffirst bindings) (first ~gxs)]
                                       ~(do-mod (subvec (first bindings) 2)))))))))]
     `(let [~iter# ~(emit-bind (to-groups seq-exprs))]
-       (~iter# ~(second seq-exprs)))))
+       (remove nil?
+               (~iter# ~(second seq-exprs))))))
 
-(defn destructure* [bindings]
+(defn key [e]
+  (first e))
+
+(defn val [e]
+  (last e))
+
+(defn butlast [s]
+  (loop [ret []
+         s   s]
+    (if (next s)
+      (recur (conj ret (first s)) (next s))
+      (seq ret))))
+
+(defn assoc-in
+  "Associates a value in a nested associative structure, where ks is a
+  sequence of keys and v is the new value and returns a new nested structure.
+  If any levels do not exist, hash-maps will be created."
+  [m ks v]
+  (if (next ks)
+    (do (println "m:" m)
+        (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v)))
+    (do (println "ks:" ks "m:" m "v:" v)
+        (assoc m (first ks) v))))
+
+;(assoc-in {} [:cookie :monster :vocals] "Finntroll")
+
+;; not working yet. leaving it here to shame myself into
+;; finishing it so it won't be taking up 100 lines for nothing
+
+(defn destructure [bindings]
   (let [bents (partition 2 bindings)
         pb (defn pb [bvec b v]
              (let [pvec
@@ -494,7 +530,6 @@
                  (map? b) (pmap bvec b v)
                  :else (throw (str "Unsupported binding form: " b)))))
         process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
-    (println "(pb bvec (first b) (second b)):" (pb bvec (first b) (second b)))
     (if (every? symbol? (map first bents))
       bindings
       (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
@@ -502,5 +537,4 @@
         (reduce process-entry [] bents)))))
 
 
-#_(destructure* '[[a b] ["a" "b"]])
-
+;(destructure '[[a b] ["a" "b"]])

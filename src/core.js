@@ -53,6 +53,9 @@ function time_ms() { return new Date().getTime(); }
 
 // Hash Map functions
 function assoc(src_hm) {
+    if (src_hm === null) {
+        src_hm = new Map()
+    }
     var hm = types._clone(src_hm);
     var args = [hm].concat(Array.prototype.slice.call(arguments, 1));
     return types._assoc_BANG.apply(null, args);
@@ -68,6 +71,9 @@ function get(coll, key) {
     if (types._vector_Q(coll)) {
         return coll[key]
     }
+    if (types._string_Q(coll)) {
+        return coll[key]
+    }
     if (coll != null) {
         return coll.get(key);
     } else {
@@ -76,7 +82,7 @@ function get(coll, key) {
 }
 
 function contains_Q(coll, key) {
-    if (types._set_Q(coll)) {
+    if (types._set_Q(coll) || types._hash_map_Q(coll)) {
         return coll.has(key)
     }
     if (key in coll) { return true; } else { return false; }
@@ -160,6 +166,8 @@ export function seq(obj) {
         return obj.length > 0 ? Array.prototype.slice.call(obj, 0) : null;
     } else if (types._string_Q(obj)) {
         return obj.length > 0 ? obj.split('') : null;
+    } else if (types._hash_map_Q(obj)) {
+        return obj.size > 0 ? [...obj.entries() ] : null;
     } else if (types._set_Q(obj)) {
         return Array.from(obj)
     }

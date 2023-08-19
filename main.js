@@ -7,10 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(defn hi
-    "my docstring"
-    []
-    "hewwo")`,
+  doc: `(destructure '[[a b] ["a" "b"]])`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -124,7 +121,6 @@ function shuffle(array) {
   return array;
 }
 
-//const exercisesToTest = ['isogram', 'powerset', 'go_counting', 'largest_series_product', 'reversi', 'sublist', 'camel', 'robot_simulator', 'inject', 'rna_transcription', 'seq_prons', 'pov', 'compress', 'spaz_out', 'word_chain', 'cartesian', 'wordy', 'luhn', 'my_trampoline', 'say', 'sieve', 'isbn_verifier', 'symmetric', 'happy', 'scrabble_score', 'allergies', 'protein_translation', 'mycomp', 'flipper', 'secret_handshake', 'hexadecimal', 'minesweeper', 'graph', 'lt', 'my_merge_with', 'poker', 'kindergarten_garden', 'k', 'black_box', 'yacht', 'word_count', 'ttt2', 'binary', 'nth_prime', 'perfect_numbers', 'eulerian', 'gigasecond', 'rn', 'matching_brackets', 'leap', 'pangram', 'queen_attack', 'tri_path', 'all_your_base', 'key_val', 'space_age', 'my_group_by', 'binary_search', 'binary_search_tree', 'flatten_array', 'getcaps', 'f', 'change', 'etl', 'pascal', 'pig_latin', 'word_sort', 'perfect_square', 'strain', 'intervals', 'grains', 'phone_number', 'sh', 'prime_factors', 'collatz_conjecture', 'nucleotide_count', 'makeflat', 'run_length_encoding', 'clock', 'find_path', 'longest_subseq', 'bob', 'veitch', 'lev', 'grade_school', 'uce', 'spiral_matrix', 'cards', 'meetup', 'crypto_square', 'ss', 'anagram', 'dominoes', 'ttt', 'lazy', 'atbash_cipher', 'ps', 'conway', 'cw', 'diamond']
 const exercisesToTest = shuffle(Object.keys(solutions))
 function randExercise() {
   return exercisesToTest[Math.floor(Math.random() * exercisesToTest.length)]
@@ -152,26 +148,25 @@ function testExercises() {
 function testExercisesUntilFail() {
   let passes = []
   var fails = []
-  while (fails.length === 0) {
-    for (let exercise = 0; exercise < exercisesToTest.length; exercise++) {
-      console.log("Testing ", exercisesToTest[exercise])
-      testSolution(exercisesToTest[exercise])
-      if (results.innerHTML === "Passed 😍") {
-        console.log("exercise passed")
-        passes.push(exercisesToTest[exercise])
-        results.innerHTML = passes.length + " tests passed 😍"
-      } else {
-        results.innerHTML = passes.length + " tests passed, " + exercisesToTest[exercise] + " failed"
-        fails.push(exercisesToTest[exercise])
-      }
+  for (let exercise = 0; exercise < exercisesToTest.length; exercise++) {
+    console.log("Testing ", exercisesToTest[exercise])
+    testSolution(exercisesToTest[exercise])
+    if (results.innerHTML === "Passed 😍") {
+      console.log("exercise passed")
+      passes.push(exercisesToTest[exercise])
+      results.innerHTML = passes.length + " tests passed 😍"
+    } else {
+      results.innerHTML = passes.length + " tests passed, " + exercisesToTest[exercise] + " failed"
+      fails.push(exercisesToTest[exercise])
+      break
     }
-    console.log("Passes:", passes)
-    console.log("Fails:", fails)
   }
+  console.log("Passes:", passes)
+  console.log("Fails:", fails)
 }
 
 //testSolution(randExercise())
-//testSolution("hello")
-//loadExercise("lev")
+//testSolution("ttt2")
+loadExercise("ttt2")
 //testExercisesUntilFail()
-testExercises()
+///testExercises()
