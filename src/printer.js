@@ -46,6 +46,8 @@ export function _pr_str(obj, print_readably) {
         case 'regex':
             const re_str = obj.toString()
             return "#\"" + re_str.substring(1, re_str.length - 2) + "\""
+        case 'ratio':
+            return obj.n + "/" + obj.d
         case 'atom':
             return "(atom " + _pr_str(obj.val, _r) + ")";
         default:

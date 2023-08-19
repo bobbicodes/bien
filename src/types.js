@@ -6,6 +6,7 @@ export function _obj_type(obj) {
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
+    else if (_ratio_Q(obj)) {   return 'ratio'; }
     else if (_function_Q(obj)) {   return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
@@ -110,6 +111,9 @@ export function _ratio_Q(obj) {
 }
 
 //console.log(_ratio_Q(_ratio(1.88)))
+const myrat = _ratio([1, 4])
+console.log(myrat.n + "/" + myrat.d)
+
 
 // Keywords
 export function _keyword(obj) {
