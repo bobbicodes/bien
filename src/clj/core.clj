@@ -342,53 +342,44 @@
        (let [~x (first xs#)]
          ~@body))))
 
-(defn emit-bind [bindings body-expr]
-  (println "[emit-bind]: body-expr:" body-expr)
-      (let [giter (gensym)
-            gxs (gensym)]
-        (if (next bindings)
-          `(fn [~gxs]
-             (loop [~gxs ~gxs]
-               (when-first [~(ffirst bindings) ~gxs]
-                 ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))
-          `(fn [~gxs]
-             (loop [~gxs ~gxs]
-               (when-let [~gxs (seq ~gxs)]
-                 (let [~(ffirst bindings) (first ~gxs)]
-                   ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
-
-(defn do-mod [domod body-expr bindings giter gxs]
-  (println "[do-mod]: body-expr:" body-expr "giter:" giter)
-  (cond
-    (= (ffirst domod) :let)
-    `(let ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
-    (= (ffirst domod) :while)
-    `(when ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
-    (= (ffirst domod) :when)
-    (do (println "when clause")
-        `(if ~(second (first domod))
-           ~(do-mod (next domod) body-expr bindings giter gxs)
-           (recur (rest ~gxs) ~body-expr ~bindings ~giter ~gxs)))
-    (keyword? (ffirst domod)) (throw (str "Invalid 'for' keyword " (ffirst domod)))
-    (next bindings)
-    (let [iterys# (gensym)
-          fs#     (gensym)]
-      `(let [~iterys# ~(emit-bind (next bindings) body-expr)
-             ~fs#     (seq (~iterys# ~(second (first (next bindings)))))]
-         (if ~fs#
-           (concat ~fs# (~giter (rest ~gxs)))
-           (recur (rest ~gxs) ~body-expr ~bindings ~giter ~gxs))))
-    :else `(cons ~body-expr
-                 (~giter (rest ~gxs)))))
-
 (defmacro for [seq-exprs body-expr]
-  (let [to-groups
-        (fn [seq-exprs]
-          (reduce (fn [groups kv]
-                    (if (keyword? (first kv))
-                      (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
-                      (conj groups [(first kv) (last kv)])))
-                  [] (partition 2 seq-exprs)))
-        iter# (gensym)]
-    `(let [~iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
+  (let [body-expr* body-expr
+        iter# (gensym)
+        to-groups (fn [seq-exprs]
+                    (reduce (fn [groups kv]
+                              (if (keyword? (first kv))
+                                (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
+                                (conj groups [(first kv) (last kv)])))
+                            [] (partition 2 seq-exprs)))
+        emit-bind (defn emit-bind [bindings]
+                    (let [giter (gensym "iter__")
+                          gxs (gensym "s__")
+                          iterys# (gensym "iterys__")
+                          fs#     (gensym "fs__")
+                          do-mod (defn do-mod [mod]
+                                   (cond
+                                     (= (ffirst mod) :let) `(let ~(second (first mod)) ~(do-mod (next mod)))
+                                     (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
+                                     (= (ffirst mod) :when) `(if ~(second (first mod))
+                                                    ~(do-mod (next mod))
+                                                    (recur (rest ~gxs)))
+                                     (keyword?  (ffirst mod)) (throw (str "Invalid 'for' keyword " (ffirst mod)))
+                                     (next bindings)
+                                     `(let [~iterys# ~(emit-bind (next bindings))
+                                            ~fs# (seq (~iterys# ~(second (first (next bindings)))))]
+                                        (if ~fs#
+                                          (concat ~fs# (~giter (rest ~gxs)))
+                                          (recur (rest ~gxs))))
+                                     :else `(cons ~body-expr (~giter (rest ~gxs)))))]
+                      (if (next bindings)
+                        `(defn ~giter [~gxs]
+                           (loop [~gxs ~gxs]
+                             (when-first [~(ffirst bindings) ~gxs]
+                               ~(do-mod (subvec (first bindings) 2)))))
+                          `(defn ~giter [~gxs]
+                              (loop [~gxs ~gxs]
+                                (when-let [~gxs (seq ~gxs)]
+                                  (let [~(ffirst bindings) (first ~gxs)]
+                                      ~(do-mod (subvec (first bindings) 2)))))))))]
+    `(let [~iter# ~(emit-bind (to-groups seq-exprs))]
        (~iter# ~(second seq-exprs)))))
