@@ -1,7 +1,7 @@
 (ns core {:clj-kondo/ignore true})
 
 (defmacro defn [name arglist & value]
-  `(def ~name (fn ~arglist ~@value)))
+  `(def ~name (fn ~arglist (do ~@value))))
 
 (defn not [a] (if a false true))
 
@@ -65,10 +65,12 @@
 
 (defmacro ->> [x & xs] (reduce _iter->> x xs))
 
-(def gensym
-  (let [counter (atom 0)]
-    (fn []
-      (symbol (str "G__" (swap! counter inc))))))
+(def gensym-counter
+  (atom 0))
+
+(defn gensym [& prefix]
+  (symbol (str (if (seq prefix) (first prefix) "G__")
+               (swap! gensym-counter inc))))
 
 (defn memoize [f]
   (let [mem (atom {})]
@@ -341,39 +343,41 @@
          ~@body))))
 
 (defn emit-bind [bindings body-expr]
-  (println "calling emit-bind")
+  (println "[emit-bind]: body-expr:" body-expr)
       (let [giter (gensym)
             gxs (gensym)]
         (if (next bindings)
-          `(defn ~giter [~gxs]
+          `(fn [~gxs]
              (loop [~gxs ~gxs]
                (when-first [~(ffirst bindings) ~gxs]
                  ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))
-          `(defn ~giter [~gxs]
+          `(fn [~gxs]
              (loop [~gxs ~gxs]
                (when-let [~gxs (seq ~gxs)]
                  (let [~(ffirst bindings) (first ~gxs)]
                    ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
 
 (defn do-mod [domod body-expr bindings giter gxs]
+  (println "[do-mod]: body-expr:" body-expr "giter:" giter)
   (cond
     (= (ffirst domod) :let)
     `(let ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
     (= (ffirst domod) :while)
     `(when ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
     (= (ffirst domod) :when)
-    `(if ~(second (first domod))
-       ~(do-mod (next domod) body-expr bindings giter gxs)
-       (recur (rest ~gxs) body-expr bindings giter gxs))
+    (do (println "when clause")
+        `(if ~(second (first domod))
+           ~(do-mod (next domod) body-expr bindings giter gxs)
+           (recur (rest ~gxs) ~body-expr ~bindings ~giter ~gxs)))
     (keyword? (ffirst domod)) (throw (str "Invalid 'for' keyword " (ffirst domod)))
     (next bindings)
     (let [iterys# (gensym)
           fs#     (gensym)]
-      `(let [iterys# ~(emit-bind (next bindings) body-expr)
-             fs#     (seq (iterys# ~(second (first (next bindings)))))]
-         (if fs#
-           (concat fs# (~giter (rest ~gxs)))
-           (recur (rest ~gxs) body-expr bindings giter gxs))))
+      `(let [~iterys# ~(emit-bind (next bindings) body-expr)
+             ~fs#     (seq (~iterys# ~(second (first (next bindings)))))]
+         (if ~fs#
+           (concat ~fs# (~giter (rest ~gxs)))
+           (recur (rest ~gxs) ~body-expr ~bindings ~giter ~gxs))))
     :else `(cons ~body-expr
                  (~giter (rest ~gxs)))))
 
@@ -386,5 +390,5 @@
                       (conj groups [(first kv) (last kv)])))
                   [] (partition 2 seq-exprs)))
         iter# (gensym)]
-    `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
-       (iter# ~(second seq-exprs)))))
+    `(let [~iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
+       (~iter# ~(second seq-exprs)))))
