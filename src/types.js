@@ -53,7 +53,6 @@ export function _equal_Q(a, b) {
     }
 }
 
-
 export function _clone (obj) {
     //console.log("cloning", obj)
     var new_obj;
@@ -101,6 +100,16 @@ Symbol.prototype.toString = function() { return this.value; }
 export function _symbol(name) { return new Symbol(name); }
 export function _symbol_Q(obj) { return obj instanceof Symbol; }
 
+// Ratios
+
+export function _ratio(x) {
+    return new Fraction(x)
+}
+export function _ratio_Q(obj) {
+    return obj instanceof Fraction
+}
+
+//console.log(_ratio_Q(_ratio(1.88)))
 
 // Keywords
 export function _keyword(obj) {
