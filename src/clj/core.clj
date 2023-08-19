@@ -2,8 +2,8 @@
 
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
-    `(do (def ~name (fn ~(second fdecl) (do ~@(nnext fdecl))))
-        (def ~name (with-meta ~name ~{:doc (first fdecl)})))
+    `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl))) 
+             ~{:doc (first fdecl)}))
     `(def ~name (fn ~(first fdecl) (do ~@(rest fdecl))))))
 
 (defn not [a] (if a false true))
