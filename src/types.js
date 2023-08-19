@@ -1,3 +1,5 @@
+import { Fraction } from 'fraction.js'
+
 export function _obj_type(obj) {
     //console.log("obj_type:", typeof obj)
     if      (_symbol_Q(obj)) {   return 'symbol'; }
