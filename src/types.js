@@ -110,11 +110,6 @@ export function _ratio_Q(obj) {
     return obj instanceof Fraction
 }
 
-//console.log(_ratio_Q(_ratio(1.88)))
-const myrat = _ratio([1, 4])
-console.log(myrat.n + "/" + myrat.d)
-
-
 // Keywords
 export function _keyword(obj) {
     if (typeof obj === 'string' && obj[0] === '\u029e') {
