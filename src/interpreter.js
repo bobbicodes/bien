@@ -265,7 +265,7 @@ function _EVAL(ast, env) {
                 lambda.lambda = true
                 return lambda
             default:
-                //console.log("calling", ast[0].value, "on")
+                //console.log("calling", ast)
                 for (let i = 0; i < ast.slice(1).length; i++) {
                     //console.log(ast.slice(1)[i])
                 }
