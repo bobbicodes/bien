@@ -2,7 +2,7 @@
 
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
-    `(do (def ~name (fn ~(second fdecl) (do ~@(last fdecl))))
+    `(do (def ~name (fn ~(second fdecl) (do ~@(nnext fdecl))))
         (def ~name (with-meta ~name ~{:doc (first fdecl)})))
     `(def ~name (fn ~(first fdecl) (do ~@(rest fdecl))))))
 
@@ -26,6 +26,11 @@
   (if (or (= 1 (count s)) (= 0 (count s)))
     nil
     (rest s)))
+
+(defn nnext [s]
+  (if (or (= 1 (count s)) (= 0 (count s)))
+    nil
+    (next (next s))))
 
 (defn reduce [f init xs]
   (if (empty? xs)
