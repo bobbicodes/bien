@@ -99,6 +99,9 @@
         (pred (first xs)) (every? pred (rest xs))
         true              false))
 
+(defn not-every? [pred xs]
+  (not (every? pred xs)))
+
 (defmacro when [x & xs] (list 'if x (cons 'do xs)))
 
 (defmacro if-not [test then else]
@@ -421,6 +424,9 @@
     (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v))
     (assoc m (first ks) v)))
 
+(re-seq #"\d+" "4,5,6,7,8,9")
+
+
 ;; not working yet. leaving it here to shame myself into
 ;; finishing it so it won't be taking up 100 lines for nothing
 
@@ -525,6 +531,13 @@
         (throw (str "Unsupported binding key: " (ffirst kwbs)))
         (reduce process-entry [] bents)))))
 
+;(destructure '[[a b] ["a" "b"]])
+
+(let [vec__7341 ["a" "b"]
+      a (nth vec__7341 0 nil)
+      b (nth vec__7341 1 nil)]
+  b)
+
 ;; https://github.com/kanaka/mal/blob/master/impls/lib/protocols.mal
 
 ;; This function maps a MAL value to a keyword representing its type.
@@ -613,5 +626,3 @@
 ;; Should the type evolve, the calling code needs not change.
 (defn satisfies? [protocol obj]
   (contains? @protocol (find-type obj)))
-
-;(destructure '[[a b] ["a" "b"]])
