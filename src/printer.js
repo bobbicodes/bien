@@ -47,7 +47,11 @@ export function _pr_str(obj, print_readably) {
             const re_str = obj.toString()
             return "#\"" + re_str.substring(1, re_str.length - 2) + "\""
         case 'ratio':
-            return obj.n + "/" + obj.d
+            if (obj.s === -1) {
+                return "-" + obj.n + "/" + obj.d
+            } else {
+                return obj.n + "/" + obj.d
+            }
         case 'atom':
             return "(atom " + _pr_str(obj.val, _r) + ")";
         default:
