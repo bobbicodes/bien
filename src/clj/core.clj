@@ -424,9 +424,6 @@
     (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v))
     (assoc m (first ks) v)))
 
-(re-seq #"\d+" "4,5,6,7,8,9")
-
-
 ;; not working yet. leaving it here to shame myself into
 ;; finishing it so it won't be taking up 100 lines for nothing
 

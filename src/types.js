@@ -2,31 +2,48 @@ import { Fraction } from 'fraction.js'
 
 export function _obj_type(obj) {
     //console.log("obj_type:", typeof obj)
-    if      (_symbol_Q(obj)) {   return 'symbol'; }
+    if (_symbol_Q(obj)) { return 'symbol'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
-    else if (_list_Q(obj)) {     return 'list'; }
-    else if (_vector_Q(obj)) {   return 'vector'; }
-    else if (_ratio_Q(obj)) {   return 'ratio'; }
-    else if (_lazy_range_Q(obj)) {   return 'lazy-range'; }
-    else if (_function_Q(obj)) {   return 'function'; }
+    else if (_list_Q(obj)) { return 'list'; }
+    else if (_vector_Q(obj)) { return 'vector'; }
+    else if (_ratio_Q(obj)) { return 'ratio'; }
+    else if (_lazy_range_Q(obj)) { return 'lazy-range'; }
+    else if (_iterate_Q(obj)) { return 'iterate'; }
+    else if (_function_Q(obj)) { return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
-    else if (_nil_Q(obj)) {      return 'nil'; }
-    else if (_regex_Q(obj)) {      return 'regex'; }
-    else if (_true_Q(obj)) {     return 'true'; }
-    else if (_false_Q(obj)) {    return 'false'; }
-    else if (_atom_Q(obj)) {     return 'atom'; }
+    else if (_nil_Q(obj)) { return 'nil'; }
+    else if (_regex_Q(obj)) { return 'regex'; }
+    else if (_true_Q(obj)) { return 'true'; }
+    else if (_false_Q(obj)) { return 'false'; }
+    else if (_atom_Q(obj)) { return 'atom'; }
     else {
-        switch (typeof(obj)) {
-        case 'number':   return 'number';
-        case 'function': return 'function';
-        case 'string': return obj[0] == '\u029e' ? 'keyword' : 'string';
-        default: throw new Error("Unknown type '" + typeof(obj) + "'");
+        switch (typeof (obj)) {
+            case 'number': return 'number';
+            case 'function': return 'function';
+            case 'string': return obj[0] == '\u029e' ? 'keyword' : 'string';
+            default: throw new Error("Unknown type '" + typeof (obj) + "'");
         }
     }
 }
 
+export function _iterate_Q(x) {
+    if (x === null) {
+        return false
+    }
+    if (typeof (x) === "object") {
+        return Object.hasOwn(x, 'name') && x.name === 'Iterate'
+    }
+    return false
+}
+
 export function _lazy_range_Q(x) {
-    return x.name === 'lazyRange'
+    if (x === null) {
+        return false
+    }
+    if (typeof (x) === "object") {
+        return Object.hasOwn(x, 'name') && x.name === 'lazyRange'
+    }
+    return false
 }
 
 export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
@@ -61,28 +78,28 @@ export function _equal_Q(a, b) {
 
 export function allEqual() {
     const args = Array.from(arguments)
-    return args.every( v => _equal_Q(v, args[0]))
+    return args.every(v => _equal_Q(v, args[0]))
 }
 
-export function _clone (obj) {
+export function _clone(obj) {
     //console.log("cloning", obj)
     var new_obj;
     switch (_obj_type(obj)) {
-    case 'list':
-        new_obj = obj.slice(0);
-        break;
-    case 'vector':
-        new_obj = obj.slice(0);
-        new_obj.__isvector__ = true;
-        break;
-    case 'hash-map':
-        new_obj = new Map(obj);
-        break;
-    case 'function':
-        new_obj = obj.clone();
-        break;
-    default:
-        throw new Error("clone of non-collection: " + _obj_type(obj));
+        case 'list':
+            new_obj = obj.slice(0);
+            break;
+        case 'vector':
+            new_obj = obj.slice(0);
+            new_obj.__isvector__ = true;
+            break;
+        case 'hash-map':
+            new_obj = new Map(obj);
+            break;
+        case 'function':
+            new_obj = obj.clone();
+            break;
+        default:
+            throw new Error("clone of non-collection: " + _obj_type(obj));
     }
     Object.defineProperty(new_obj, "__meta__", {
         enumerable: false,
@@ -107,7 +124,7 @@ function Symbol(name) {
     this.value = name;
     return this;
 }
-Symbol.prototype.toString = function() { return this.value; }
+Symbol.prototype.toString = function () { return this.value; }
 export function _symbol(name) { return new Symbol(name); }
 export function _symbol_Q(obj) { return obj instanceof Symbol; }
 
@@ -139,22 +156,22 @@ export function _regex_Q(obj) {
 
 // Functions
 export function _function(Eval, Env, ast, env, params, fnName) {
-    var fn = function() {
+    var fn = function () {
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
     fn.__ast__ = ast;
     fn.__name__ = fnName
-    fn.__gen_env__ = function(args) { return new Env(env, params, args); };
+    fn.__gen_env__ = function (args) { return new Env(env, params, args); };
     fn._ismacro_ = false;
     return fn;
 }
 
 export function _function_Q(obj) { return typeof obj == "function"; }
-Function.prototype.clone = function() {
+Function.prototype.clone = function () {
     var that = this;
     var temp = function () { return that.apply(this, arguments); };
-    for(var key in this) {
+    for (var key in this) {
         temp[key] = this[key];
     }
     return temp;
@@ -190,7 +207,7 @@ export function _hash_map() {
 
 export function _hash_map_Q(hm) {
     return typeof hm === "object" &&
-           (hm instanceof Map)
+        (hm instanceof Map)
 }
 
 export function _assoc_BANG(hm) {
@@ -198,9 +215,9 @@ export function _assoc_BANG(hm) {
     if (arguments.length % 2 !== 1) {
         throw new Error("Odd number of assoc arguments");
     }
-    for (var i=1; i<arguments.length; i+=2) {
+    for (var i = 1; i < arguments.length; i += 2) {
         var ktoken = arguments[i],
-            vtoken = arguments[i+1];
+            vtoken = arguments[i + 1];
         hm.set(ktoken, vtoken)
     }
     //console.log("returning hm", hm)
@@ -208,7 +225,7 @@ export function _assoc_BANG(hm) {
     return hm;
 }
 export function _dissoc_BANG(hm) {
-    for (var i=1; i<arguments.length; i++) {
+    for (var i = 1; i < arguments.length; i++) {
         var ktoken = arguments[i];
         hm.delete(ktoken)
     }
@@ -222,7 +239,7 @@ export function _set() {
 
 export function _set_Q(set) {
     return typeof set === "object" &&
-    (set instanceof Set)
+        (set instanceof Set)
 }
 
 // Atoms

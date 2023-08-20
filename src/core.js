@@ -115,6 +115,9 @@ export function nth(lst, idx) {
 }
 
 export function first(lst) {
+    if (types._lazy_range_Q(lst)) {
+        return 0
+    }
     return (lst === null || lst.length === 0) ? null : seq(lst)[0];
 }
 
@@ -396,6 +399,12 @@ function take(n, coll) {
     if (types._lazy_range_Q(coll)) {
         return range(0, n)
     }
+    if (types._iterate_Q(coll)) {
+        for (let i = 0; i < n; i++) {
+            coll.next()
+        }
+        return coll.realized.slice(0, -1)
+    }
     return coll.slice(0, n)
 }
 
@@ -412,11 +421,11 @@ function repeat(n, x) {
 function* makeRangeIterator(start = 0, end = Infinity, step = 1) {
     let iterationCount = 0;
     for (let i = start; i < end; i += step) {
-      iterationCount++;
-      yield i;
+        iterationCount++;
+        yield i;
     }
     return iterationCount;
-  }
+}
 
 function range(start, end, step) {
     if (arguments.length === 0) {
@@ -439,6 +448,22 @@ function range(start, end, step) {
         ans.push(i);
     }
     return ans;
+}
+
+class Iterate {
+    constructor(f, x) {
+        this.name = 'Iterate'
+        this.f = f
+        this.realized = [x];
+    }
+    next() {
+        this.realized.push(this.f(this.realized[this.realized.length-1]))
+        return this.realized; 
+    }
+}
+
+function iterate(f, x) {
+    return new Iterate(f, x)
 }
 
 function mod(x, y) {
@@ -627,6 +652,7 @@ export var ns = {
     'int': int,
     //'mod': mod,
     'rem': mod,
+    'iterate': iterate,
 
     'sequential?': types._sequential_Q,
     'cons': cons,
