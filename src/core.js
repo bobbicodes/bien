@@ -353,18 +353,38 @@ function reSeq(re, s) {
 }
 
 function sum() {
-    return Array.from(arguments).reduce((acc, a) => acc + a, 0);
+    var res = Array.from(arguments).reduce((acc, a) => acc + a, 0);
+    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+        res = types._ratio(res)
+    }
+    return res
 }
 
 function subtract() {
     if (arguments.length === 1) {
         return 0 - arguments[0]
     }
-    return Array.from(arguments).slice(1).reduce((acc, a) => acc - a, arguments[0]);
+    var res = Array.from(arguments).slice(1).reduce((acc, a) => acc - a, arguments[0]);
+    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+        res = types._ratio(res)
+    }
+    return res
 }
 
 function product() {
-    return Array.from(arguments).reduce((acc, a) => acc * a, 1);
+    var res = Array.from(arguments).reduce((acc, a) => acc * a, 1);
+    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+        res = types._ratio(res)
+    }
+    return res
+}
+
+function quotient() {
+    var res = Array.from(arguments).reduce((acc, a) => acc / a, 1);
+    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+        res = types._ratio(res)
+    }
+    return res
 }
 
 function take(n, coll) {
@@ -498,6 +518,10 @@ function _subvec(v, start, end) {
     return v.slice(start, end)
 }
 
+function _trim(s) {
+    return s.trim()
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
@@ -525,6 +549,7 @@ export var ns = {
     'Math/sqrt': _sqrt,
     'Math/pow': _pow,
     'Integer/toBinaryString': dec2bin,
+    'str/trim': _trim,
 
     'pr-str': pr_str,
     'str': str,
@@ -540,7 +565,7 @@ export var ns = {
     '+': sum,
     '-': subtract,
     '*': product,
-    '/': function (a, b) { return a / b; },
+    '/': quotient,
     'inc': function (a) { return a + 1; },
     "time-ms": time_ms,
     'max': max,
