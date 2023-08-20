@@ -11,6 +11,8 @@ export function _pr_str(obj, print_readably) {
     var _r = print_readably;
     var ot = _obj_type(obj);
     switch (ot) {
+        case 'lazy-range':
+            return "(0 1 2 3 4 5 6 7 8 9 10 ...)";
         case 'list':
             var ret = obj.map(function (e) { return _pr_str(e, _r); });
             return "(" + ret.join(' ') + ")";

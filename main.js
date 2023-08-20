@@ -7,7 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(- 1/2 1/8 1/8)`,
+  doc: `(range)`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -168,5 +168,5 @@ function testExercisesUntilFail() {
 //testSolution(randExercise())
 //testSolution("atbash_cipher")
 //loadExercise("prime_factors")
-testExercisesUntilFail()
+//testExercisesUntilFail()
 //testExercises()

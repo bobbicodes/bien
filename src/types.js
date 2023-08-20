@@ -7,6 +7,7 @@ export function _obj_type(obj) {
     else if (_list_Q(obj)) {     return 'list'; }
     else if (_vector_Q(obj)) {   return 'vector'; }
     else if (_ratio_Q(obj)) {   return 'ratio'; }
+    else if (_lazy_range_Q(obj)) {   return 'lazy-range'; }
     else if (_function_Q(obj)) {   return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) {      return 'nil'; }
@@ -22,6 +23,10 @@ export function _obj_type(obj) {
         default: throw new Error("Unknown type '" + typeof(obj) + "'");
         }
     }
+}
+
+export function _lazy_range_Q(x) {
+    return x.name === 'lazyRange'
 }
 
 export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }

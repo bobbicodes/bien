@@ -167,7 +167,7 @@ export function seq(obj) {
     } else if (types._string_Q(obj)) {
         return obj.length > 0 ? obj.split('') : null;
     } else if (types._hash_map_Q(obj)) {
-        return obj.size > 0 ? [...obj.entries() ] : null;
+        return obj.size > 0 ? [...obj.entries()] : null;
     } else if (types._set_Q(obj)) {
         return Array.from(obj)
     }
@@ -355,7 +355,7 @@ function reSeq(re, s) {
 
 function sum() {
     var res = Array.from(arguments).reduce((acc, a) => acc + a, 0);
-    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+    if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
         res = types._ratio(res)
     }
     return res
@@ -366,7 +366,7 @@ function subtract() {
         return 0 - arguments[0]
     }
     var res = Array.from(arguments).slice(1).reduce((acc, a) => acc - a, arguments[0]);
-    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+    if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
         res = types._ratio(res)
     }
     return res
@@ -374,7 +374,7 @@ function subtract() {
 
 function product() {
     var res = Array.from(arguments).reduce((acc, a) => acc * a, 1);
-    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+    if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
         res = types._ratio(res)
     }
     return res
@@ -386,13 +386,16 @@ function divide() {
     }
     var divisor = arguments[0]
     var res = Array.from(arguments).slice(1).reduce((acc, a) => acc / a, divisor);
-    if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
+    if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
         res = types._ratio(res)
     }
     return res
 }
 
 function take(n, coll) {
+    if (types._lazy_range_Q(coll)) {
+        return range(0, n)
+    }
     return coll.slice(0, n)
 }
 
@@ -418,7 +421,9 @@ function* makeRangeIterator(start = 0, end = Infinity, step = 1) {
 function range(start, end, step) {
     if (arguments.length === 0) {
         // uses above generator
-        return makeRangeIterator()
+        var iterator = makeRangeIterator()
+        iterator.name = 'lazyRange'
+        return iterator
     }
     if (!end) {
         return range(0, start)
@@ -541,7 +546,7 @@ function _trim(s) {
 
 function doubleEquals() {
     const nums = Array.from(arguments)
-    return nums.every( v => v === nums[0])
+    return nums.every(v => v === nums[0])
 }
 
 // types.ns is namespace of type functions
