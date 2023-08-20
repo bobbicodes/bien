@@ -54,6 +54,11 @@ export function _equal_Q(a, b) {
     }
 }
 
+export function allEqual() {
+    const args = Array.from(arguments)
+    return args.every( v => _equal_Q(v, args[0]))
+}
+
 export function _clone (obj) {
     //console.log("cloning", obj)
     var new_obj;

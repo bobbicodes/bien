@@ -379,11 +379,17 @@ function product() {
     return res
 }
 
-function quotient() {
-    var res = Array.from(arguments).reduce((acc, a) => acc / a, 1);
+function divide() {
+    if (arguments[0] === 0) {
+        return 0
+    }
+    console.log("dividing args:", Array.from(arguments))
+    var divisor = arguments[0]
+    var res = Array.from(arguments).slice(1).reduce((acc, a) => acc / a, divisor);
     if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
         res = types._ratio(res)
     }
+    console.log("result:", res)
     return res
 }
 
@@ -522,15 +528,22 @@ function _trim(s) {
     return s.trim()
 }
 
+function doubleEquals() {
+    const nums = Array.from(arguments)
+    return nums.every( v => v === nums[0])
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'type': types._obj_type,
-    '=': types._equal_Q,
+    '=': types.allEqual,
+    '==': doubleEquals,
     'throw': mal_throw,
     'nil?': types._nil_Q,
     'true?': types._true_Q,
     'is': _is,
     'false?': types._false_Q,
+    'ratio?': types._ratio_Q,
     'number?': types._number_Q,
     'string?': types._string_Q,
     'symbol': types._symbol,
@@ -565,7 +578,7 @@ export var ns = {
     '+': sum,
     '-': subtract,
     '*': product,
-    '/': quotient,
+    '/': divide,
     'inc': function (a) { return a + 1; },
     "time-ms": time_ms,
     'max': max,

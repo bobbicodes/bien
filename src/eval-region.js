@@ -151,9 +151,9 @@ for (let i = 0; i < alphabet.length; i++) {
 
 export const evalExtension = 
      Prec.highest(keymap.of(
-        [{key: "Shift-Enter", run: evalCell},
-         {key: "Mod-Enter", run: evalAtCursor},
-         {key: "Alt-Enter", run: evalTopLevel},
+        [{key: "Alt-Enter", run: evalCell},
+         {key: "Shift-Enter", run: evalAtCursor},
+         {key: "Mod-Enter", run: evalTopLevel},
          {key: "Escape", run: clearEval},
          {key: "ArrowLeft", run: clearEval},
          {key: "ArrowRight", run: clearEval},
