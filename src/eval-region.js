@@ -67,7 +67,7 @@ const updateEditor = (view, text, pos) => {
     const end = doc.length
     view.dispatch({
         changes: {from: 0, to: end, insert: text},
-        selection: {anchor: pos, head: pos}
+        selection: {anchor: testPosBeforeEval, head: testPosBeforeEval}
     })
 }
 
