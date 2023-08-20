@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("complex_numbers")
-//loadExercise("ttt2")
-//testExercisesUntilFail()
+//testSolution("atbash_cipher")
+//loadExercise("prime_factors")
+testExercisesUntilFail()
 //testExercises()

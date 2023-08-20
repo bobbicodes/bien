@@ -68,6 +68,7 @@ function dissoc(src_hm) {
 }
 
 function get(coll, key) {
+    console.log("get:", key, coll)
     if (types._vector_Q(coll)) {
         return coll[key]
     }
@@ -383,13 +384,11 @@ function divide() {
     if (arguments[0] === 0) {
         return 0
     }
-    console.log("dividing args:", Array.from(arguments))
     var divisor = arguments[0]
     var res = Array.from(arguments).slice(1).reduce((acc, a) => acc / a, divisor);
     if (Array.from(arguments).every(function(element) {return types._ratio_Q(element)})) {
         res = types._ratio(res)
     }
-    console.log("result:", res)
     return res
 }
 

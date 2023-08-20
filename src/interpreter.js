@@ -153,6 +153,14 @@ function _EVAL(ast, env) {
         if (types._keyword_Q(a0)) {
             return EVAL([types._symbol("get"), a1, a0], env)
         }
+        // hash-maps as functions of keys
+        if (types._hash_map_Q(a0)) {
+            return EVAL([types._symbol("get"), a0, a1], env)
+        }
+        // vectors as functions of indices
+        if (types._vector_Q(a0)) {
+            return EVAL([types._symbol("get"), a0, a1], env)
+        }
         switch (a0.value) {
             case "ns":
             case "discard":
