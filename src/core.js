@@ -68,7 +68,6 @@ function dissoc(src_hm) {
 }
 
 function get(coll, key) {
-    console.log("get:", key, coll)
     if (types._vector_Q(coll)) {
         return coll[key]
     }
@@ -350,7 +349,8 @@ function _pow(x, n) {
 
 function reSeq(re, s) {
     const array = [...s.matchAll(re)];
-    return array
+    const firsts = array.map(x => x[0])
+    return firsts
 }
 
 function sum() {
@@ -404,9 +404,21 @@ function repeat(n, x) {
     return Array(n).fill(x)
 }
 
+// lazy ranges
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators#generator_functions
+function* makeRangeIterator(start = 0, end = Infinity, step = 1) {
+    let iterationCount = 0;
+    for (let i = start; i < end; i += step) {
+      iterationCount++;
+      yield i;
+    }
+    return iterationCount;
+  }
+
 function range(start, end, step) {
     if (arguments.length === 0) {
-        return new Error("infinite ranges not implemented")
+        // uses above generator
+        return makeRangeIterator()
     }
     if (!end) {
         return range(0, start)

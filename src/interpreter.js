@@ -1,5 +1,5 @@
 import { read_str } from './reader.js'
-import { _pr_str } from './printer.js'
+import { _pr_str} from './printer.js'
 import { Env } from './env.js'
 import * as types from './types.js'
 import * as core from './core.js'
@@ -131,7 +131,7 @@ function hasLet(ast) {
 
 function _EVAL(ast, env) {
     while (true) {
-        //printer.println("EVAL:", printer._pr_str(ast, true));
+        //console.log(ast)
         //console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);
