@@ -7,7 +7,12 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(distinct? 1 2 3)`,
+  doc: `(def bindings '[[a b] ["a" "b"]])
+(def bents (partition 2 bindings))
+(def bvec [])
+(def b (first bents))
+(def b (first b))
+(def val (second (first bents)))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -169,4 +174,4 @@ function testExercisesUntilFail() {
 //testSolution("spaz_out")
 //loadExercise("conway")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

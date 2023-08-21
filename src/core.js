@@ -127,6 +127,13 @@ export function last(lst) { return (lst === null || lst.length === 0) ? null : s
 export function rest(lst) { return (lst == null || lst.length === 0) ? [] : seq(lst).slice(1); }
 
 function empty_Q(lst) {
+    if (types._set_Q(lst)) {
+        if (lst.size === 0) {
+            return true
+        } else {
+            return false
+        }
+    }
     if (!lst) {
         return true
     }

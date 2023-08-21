@@ -88,7 +88,10 @@ function walk(inner, outer, form) {
     //console.log("Walking form:", form)
     if (types._list_Q(form)) {
         return outer(form.map(inner))
-    } else if (types._vector_Q(form)) {
+    } else if (form === null) {
+        return null
+    }
+    else if (types._vector_Q(form)) {
         let v = outer(form.map(inner))
         v.__isvector__ = true;
         return v
@@ -131,7 +134,7 @@ function hasLet(ast) {
 
 function _EVAL(ast, env) {
     while (true) {
-        //console.log(ast)
+        console.log(ast)
         //console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);
