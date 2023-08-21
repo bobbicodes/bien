@@ -367,6 +367,20 @@
         name
         (last forms))))
 
+(defn distinct? [x y & more]
+  (if-not more
+    (if-not y
+      true
+      (not (= x y)))
+    (if (not= x y)
+      (loop [s (set [x y]) xs more]
+            (if xs
+              (if (contains? s (first xs))
+                false
+                (recur (conj s (first xs)) (next xs)))
+              true))
+      false)))
+
 (defn parseInt [s r]
   (Integer/parseInt s r))
 
