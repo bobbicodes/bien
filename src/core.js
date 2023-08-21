@@ -351,8 +351,14 @@ function _pow(x, n) {
 }
 
 function reSeq(re, s) {
+    if (s === null) {
+        return null
+    }
     const array = [...s.matchAll(re)];
     const firsts = array.map(x => x[0])
+    if (firsts.length === 0) {
+        return null
+    }
     return firsts
 }
 
@@ -433,6 +439,13 @@ function range(start, end, step) {
         var iterator = makeRangeIterator()
         iterator.name = 'lazyRange'
         return iterator
+    }
+    if (step < 0) {
+        var ans = [];
+        for (let i = start; i > end; i += step) {
+            ans.push(i);
+        }
+        return ans
     }
     if (!end) {
         return range(0, start)

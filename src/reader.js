@@ -26,6 +26,8 @@ function read_atom(reader) {
         return parseInt(token, 10)        // integer
     } else if (token.match(/(?:|-?[1-9][0-9]*|0)\/[1-9][0-9]*/g)) {
         return types._ratio(token.split('/'))
+    } else if (token[0] === "\\") {
+        return token[1]
     } else if (token.match(/^-?[0-9][0-9.]*$/)) {
         return parseFloat(token, 10);     // float
     } else if (token.match(/^"(?:\\.|[^\\"])*"$/)) {

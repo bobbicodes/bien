@@ -175,8 +175,7 @@ function _EVAL(ast, env) {
                 // Anonymous function shorthand
                 if (types._list_Q(a1)) {
                     let fun = [types._symbol('fn')]
-                    const args = ast.toString().match(/%\d?/g).map(types._symbol)
-                    //console.log("args:", args)
+                    var args = Array.from(new Set(ast.toString().match(/%\d?/g))).map(types._symbol)
                     let body = ast.slice(1)[0]
                     fun.push(args)
                     fun.push(body)

@@ -225,13 +225,15 @@
        (assoc ret k (conj (get ret k []) x))))
    {} coll))
 
-
 (defn fromCharCode [int]
   (js-eval (str "String.fromCharCode(" int ")")))
 
 (defn Character/isAlphabetic [int]
   (not= (upper-case (fromCharCode int))
         (lower-case (fromCharCode int))))
+
+(defn Character/digit [s r]
+  (Integer/parseInt (first s) r))
 
 (defn Character/isUpperCase [x]
   (if (int? x)
@@ -354,8 +356,16 @@
          ~@body))))
 
 (defn Integer/parseInt [s r]
-  (if-not r (js-eval (str "parseInt(" s ")"))
-          (js-eval (str "parseInt(" s r ")"))))
+  (when (re-seq #"\\d" s)
+    (if-not r (js-eval (str "parseInt(" s ")"))
+          (js-eval (str "parseInt(" s ", " r ")")))))
+
+(defmacro as-> [expr name & forms]
+  `(let [~name ~expr
+         ~@(interleave (repeat (count forms) name) (butlast forms))]
+     ~(if (empty? forms)
+        name
+        (last forms))))
 
 (defn parseInt [s r]
   (Integer/parseInt s r))
@@ -423,6 +433,8 @@
   (if (next ks)
     (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v))
     (assoc m (first ks) v)))
+
+
 
 ;; not working yet. leaving it here to shame myself into
 ;; finishing it so it won't be taking up 100 lines for nothing
