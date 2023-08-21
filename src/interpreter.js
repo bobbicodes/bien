@@ -134,7 +134,7 @@ function hasLet(ast) {
 
 function _EVAL(ast, env) {
     while (true) {
-        console.log(ast)
+        //console.log(ast)
         //console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);

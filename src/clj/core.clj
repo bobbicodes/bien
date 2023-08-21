@@ -465,14 +465,21 @@
     (assoc m (first ks) (assoc-in (get m (first ks)) (rest ks) v))
     (assoc m (first ks) v)))
 
+(defn str/includes? [s substr]
+  (. (str "'" s "'" ".toUpperCase")))
+
 ;; destructuring not working yet. leaving it here to shame myself into
 ;; finishing it so it won't be taking up 100 lines for nothing
+
+;; string hack, because `some` fails on symbols 
+(defn has-rest? [b]
+  (js-eval (str "'" b "'" ".includes(" "'" "&" "'" ")")))
 
 (defn pvec [bvec b val]
   (let [gvec (gensym "vec__")
         gseq (gensym "seq__")
         gfirst (gensym "first__")
-        has-rest (some #{'&} b)]
+        has-rest (has-rest? b)]
     (loop [ret (let [ret (conj bvec gvec val)]
                  (if has-rest
                    (conj ret gseq (list seq gvec))
@@ -498,7 +505,7 @@
                                firstb
                                (if has-rest
                                  gfirst
-                                 (list nth gvec n nil)))
+                                 (list 'nth gvec n nil)))
                            (inc n)
                            (next bs)
                            seen-rest?))))
@@ -552,6 +559,14 @@
            (next bes)))
         ret))))
 
+(defn namespace [x]
+  (first (str/split (str x) "/")) )
+
+(defn name [x]
+  (if (keyword? x)
+    (subs (str x) 1)
+    (str x)))
+
 (defn pb [bvec b v]
     (cond
       (symbol? b) (-> bvec (conj (if (namespace b)
@@ -584,7 +599,7 @@
 
 (some #{1 2 3} [3])
 
-
+(some #{(symbol "&")} [(symbol "&")])
 ;(destructure '[[a b] ["a" "b"]])
 
 

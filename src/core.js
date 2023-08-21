@@ -169,6 +169,9 @@ function conj(lst) {
     }
 }
 
+function split(s, re) {
+    return s.split(re)
+}
 
 export function seq(obj) {
     if (types._list_Q(obj)) {
@@ -292,7 +295,6 @@ function resolve_js(str) {
         //console.log("match:", match[1])
         return [eval(match[1]), eval(str)];
     } else {
-        console.log("no match in", str)
         return [GLOBAL, eval(str)];
     }
 }
@@ -426,7 +428,6 @@ function take(n, coll) {
         return coll.realized.slice(0, -1)
     }
     if (types._cycle_Q(coll)) {
-        console.log(coll.coll.length)
         const cycles = Math.floor(n / coll.coll.length)
         const mod = n % coll.coll.length
         let res = []
@@ -656,6 +657,7 @@ export var ns = {
     'Integer/toBinaryString': dec2bin,
     'str/trim': _trim,
     'cycle': cycle,
+    'str/split': split,
 
     'pr-str': pr_str,
     'str': str,

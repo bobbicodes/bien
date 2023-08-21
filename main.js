@@ -8,11 +8,8 @@ import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
   doc: `(def bindings '[[a b] ["a" "b"]])
-(def bents (partition 2 bindings))
-(def bvec [])
-(def b (first bents))
-(def b (first b))
-(def val (second (first bents)))`,
+
+(destructure bindings)`,
   extensions: [basicSetup, clojure()]
 })
 
