@@ -169,4 +169,4 @@ function testExercisesUntilFail() {
 //testSolution("spaz_out")
 //loadExercise("conway")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

@@ -192,6 +192,13 @@
           (recur (rest s) (conj res (first s)))
           res))))
 
+(defn drop-while [pred coll]
+  (loop [s   (seq coll)]
+    (if (empty? s) s
+        (if (and s (pred (first s)))
+          (recur (rest s))
+          s))))
+
 (defn partition [n step coll]
   (if-not coll
     (partition n n step)
