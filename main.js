@@ -29,9 +29,9 @@ let testView = new EditorView({
   parent: document.querySelector('#test')
 })
 
-let topLevelText = "Ctrl/Cmd+Enter = Eval top-level form"
+let topLevelText = "Shift+Enter = Eval top-level form"
 let keyBindings = "<strong>Key bindings:</strong>,Alt+Enter = Eval cell," +
-  topLevelText + ",Shift+Enter= Eval at cursor";
+  topLevelText + ",Ctrl/Cmd+Enter= Eval at cursor";
 keyBindings = keyBindings.split(',');
 for (let i = 0; i < keyBindings.length; i++)
   keyBindings[i] = "" + keyBindings[i] + "<br>";
@@ -167,7 +167,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("spaz_out")
+testSolution("sieve")
 //loadExercise("happy")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

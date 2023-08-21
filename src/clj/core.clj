@@ -401,6 +401,9 @@
 (defn parseInt [s r]
   (Integer/parseInt s r))
 
+(defn Math/floor [x]
+  (js-eval (str "Math.floor(" x ")")))
+
 (defn get-in [m ks]
    (reduce #(get % %2) m ks))
 
