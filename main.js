@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("secret_handshake")
+testSolution("cartesian")
 //loadExercise("conway")
 //testExercisesUntilFail()
 //testExercises()
