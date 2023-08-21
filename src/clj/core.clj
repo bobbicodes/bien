@@ -136,8 +136,10 @@
   (if (set? pred)
     (if (empty? xs)
       nil
-      (or (contains? pred (first xs))
-          (some pred (rest xs))))
+      (or 
+       (when (contains? pred (first xs))
+         (first xs))
+         (some pred (rest xs))))
     (if (empty? xs)
       nil
       (or (pred (first xs))
