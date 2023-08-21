@@ -334,12 +334,15 @@ function char(int) {
 
 function filter(f, lst) {
     if (types._iterate_Q(lst)) {
-        return "filtering iterate object"
+        return "TODO: filter iterate object"
     }
     if (!lst || lst.length === 0) {
         return []
     }
-    return seq(lst).filter(function (el) { return f(el); });
+    if (types._set_Q(f)) {
+        return seq(lst).filter(function (el) { return f.has(el); });
+    }
+    return seq(lst).filter(function (el) { return f(el); })
 }
 
 function min() {
