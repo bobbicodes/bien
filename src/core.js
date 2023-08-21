@@ -415,6 +415,19 @@ function take(n, coll) {
         }
         return coll.realized.slice(0, -1)
     }
+    if (types._cycle_Q(coll)) {
+        console.log(coll.coll.length)
+        const cycles = Math.floor(n / coll.coll.length)
+        const mod = n % coll.coll.length
+        let res = []
+        for (let i = 0; i < cycles; i++) {
+            res = res.concat(coll.coll)            
+        }
+        if (mod != 0) {
+            res = res.concat(coll.coll.slice(0, mod))
+        }
+        return res
+    }
     return coll.slice(0, n)
 }
 
@@ -481,6 +494,17 @@ class Iterate {
 
 function iterate(f, x) {
     return new Iterate(f, x)
+}
+
+class Cycle {
+    constructor(coll) {
+        this.name = 'Cycle'
+        this.coll = coll
+    }
+}
+
+function cycle(coll) {
+    return new Cycle(coll)
 }
 
 function mod(x, y) {
@@ -621,6 +645,7 @@ export var ns = {
     'Math/pow': _pow,
     'Integer/toBinaryString': dec2bin,
     'str/trim': _trim,
+    'cycle': cycle,
 
     'pr-str': pr_str,
     'str': str,

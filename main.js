@@ -7,7 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(range 10 0 -1)`,
+  doc: `(take 9 (cycle [1 2 3])) `,
   extensions: [basicSetup, clojure()]
 })
 
@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("cartesian")
+//testSolution("spaz_out")
 //loadExercise("conway")
 //testExercisesUntilFail()
 testExercises()

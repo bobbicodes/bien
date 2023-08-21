@@ -9,6 +9,7 @@ export function _obj_type(obj) {
     else if (_ratio_Q(obj)) { return 'ratio'; }
     else if (_lazy_range_Q(obj)) { return 'lazy-range'; }
     else if (_iterate_Q(obj)) { return 'iterate'; }
+    else if (_cycle_Q(obj)) { return 'cycle'; }
     else if (_function_Q(obj)) { return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
     else if (_nil_Q(obj)) { return 'nil'; }
@@ -32,6 +33,16 @@ export function _iterate_Q(x) {
     }
     if (typeof (x) === "object") {
         return Object.hasOwn(x, 'name') && x.name === 'Iterate'
+    }
+    return false
+}
+
+export function _cycle_Q(x) {
+    if (x === null) {
+        return false
+    }
+    if (typeof (x) === "object") {
+        return Object.hasOwn(x, 'name') && x.name === 'Cycle'
     }
     return false
 }

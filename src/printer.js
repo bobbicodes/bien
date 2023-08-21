@@ -15,6 +15,8 @@ export function _pr_str(obj, print_readably) {
             return "(0 1 2 3 4 5 6 7 8 9 10 ...)";
         case 'iterate':
             return "#iterate[" + obj.f + "]";
+        case 'cycle':
+            return "#cycle[" + obj.coll + "]";
         case 'list':
             var ret = obj.map(function (e) { return _pr_str(e, _r); });
             return "(" + ret.join(' ') + ")";

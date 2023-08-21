@@ -72,7 +72,7 @@
   "nth_element" : "(defn nth-element [s n]\r\n  (last (take (inc n) s)))",
   "truth" : "(def truth (= true true))",
   "last" : "(defn my-last [s]\r\n  (if (next s)\r\n    (my-last (next s))\r\n    (first s)))",
-  "spaz_out" : "(defn spaz-out [f init]\r\n  (cons init\r\n        (lazy-seq\r\n         (spaz-out f (f init)))))",
+  "spaz_out" : "(defn spaz-out [f x]\r\n  (reductions #(%2 %1) x [] (repeat 100 f)))",
   "mycomp" : "(defn mycomp [f & gs]\r\n  (if gs\r\n    #(f (apply (apply mycomp gs) (conj %& %)))\r\n    f))",
   "k" : "(defn k [i s]\r\n  (set\r\n   (if (= i 0)\r\n     [#{}]\r\n     (mapcat #(for [p (k (- i 1) %2)] (conj p %))\r\n             s (next (iterate next s))))))",
   "myreductions" : "(defn my-reductions [f init xs]\r\n  (loop [s xs acc init res [init]]\r\n    (if (empty? s)\r\n      res\r\n      (recur (rest s)\r\n              (f acc (first s))\r\n             (conj res (f acc (first s)))))))",
