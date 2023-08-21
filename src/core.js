@@ -135,7 +135,7 @@ function empty_Q(lst) {
 
 export function count(s) {
     if (Array.isArray(s)) { return s.length; }
-    if (types._set_Q) { return s.size; }
+    if (types._set_Q(s)) { return s.size; }
     else if (s === null) { return 0; }
     else { return Object.keys(s).length; }
 }

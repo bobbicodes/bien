@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("cartesian")
+//testSolution("cartesian")
 //loadExercise("conway")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()
