@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("isbn_verifier")
-//loadExercise("prime_factors")
+testSolution("secret_handshake")
+//loadExercise("conway")
 //testExercisesUntilFail()
 //testExercises()

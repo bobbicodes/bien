@@ -109,9 +109,9 @@ function vec(lst) {
     }
 }
 
-export function nth(lst, idx) {
+export function nth(lst, idx, notfound) {
     if (idx < lst.length) { return lst[idx]; }
-    else { throw new Error("nth: index out of range"); }
+    else { return notfound }
 }
 
 export function first(lst) {
@@ -332,6 +332,9 @@ function char(int) {
 }
 
 function filter(f, lst) {
+    if (types._iterate_Q(lst)) {
+        return "filtering iterate object"
+    }
     if (!lst || lst.length === 0) {
         return []
     }
