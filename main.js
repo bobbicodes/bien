@@ -7,9 +7,8 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(def bindings '[[a b] ["a" "b"]])
-
-(destructure bindings)`,
+  doc: `(let* [[a b] ["a" "b"]]
+  [a b])`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -169,6 +168,6 @@ function testExercisesUntilFail() {
 
 //testSolution(randExercise())
 //testSolution("spaz_out")
-//loadExercise("conway")
+//loadExercise("happy")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

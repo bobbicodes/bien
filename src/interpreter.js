@@ -117,7 +117,7 @@ export function postwalk(f, form) {
 function hasLet(ast) {
     let lets = []
     postwalk(x => {
-        if (x.value == types._symbol("let")) {
+        if (x.value == types._symbol("let*")) {
             lets.push(true)
             return true
         } else {
@@ -190,7 +190,7 @@ function _EVAL(ast, env) {
                 var res = EVAL(a2, env);
                 env.set(a1, res);
                 return res
-            case "let":
+            case "let*":
                 var let_env = new Env(env);
                 for (var i = 0; i < a1.length; i += 2) {
                     let_env.set(a1[i], EVAL(a1[i + 1], let_env));

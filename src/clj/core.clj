@@ -81,12 +81,12 @@
                (swap! gensym-counter inc))))
 
 (defn memoize [f]
-  (let [mem (atom {})]
+  (let* [mem (atom {})]
     (fn [& args]
-      (let [key (str args)]
+      (let* [key (str args)]
         (if (contains? @mem key)
           (get @mem key)
-          (let [ret (apply f args)]
+          (let* [ret (apply f args)]
             (do (swap! mem assoc key ret)
                 ret)))))))
 
@@ -116,16 +116,16 @@
   (if (empty? xs) nil
       (if (= 1 (count xs))
         (first xs)
-        (let [condvar (gensym)]
-          `(let [~condvar ~(first xs)]
+        (let* [condvar (gensym)]
+          `(let* [~condvar ~(first xs)]
              (if ~condvar ~condvar (or ~@(rest xs))))))))
 
 (defmacro and [& xs]
   (cond (empty? xs)      true
         (= 1 (count xs)) (first xs)
         true
-        (let [condvar (gensym)]
-          `(let [~condvar ~(first xs)]
+        (let* [condvar (gensym)]
+          `(let* [~condvar ~(first xs)]
              (if ~condvar (and ~@(rest xs)) ~condvar)))))
 
 (defn ffirst [x] (first (first x)))
@@ -187,7 +187,7 @@
                           (children node))))))
 
 (defn mod [num div]
-  (let [m (rem num div)]
+  (let* [m (rem num div)]
     (if (or (zero? m) (= (pos? num) (pos? div)))
       m
       (+ m div))))
@@ -238,7 +238,7 @@
 (defn group-by [f coll]
   (reduce
    (fn [ret x]
-     (let [k (f x)]
+     (let* [k (f x)]
        (assoc ret k (conj (get ret k []) x))))
    {} coll))
 
@@ -254,18 +254,18 @@
 
 (defn Character/isUpperCase [x]
   (if (int? x)
-    (and (Character/isLetter (fromCharCode x))
+    (and (Character/islet*ter (fromCharCode x))
          (= (fromCharCode x)
             (upper-case (fromCharCode x))))
-    (and (Character/isLetter x)
+    (and (Character/islet*ter x)
          (= x (upper-case x)))))
 
 (defn Character/isLowerCase [x]
   (if (int? x)
-    (and (Character/isLetter (fromCharCode x))
+    (and (Character/islet*ter (fromCharCode x))
          (= (fromCharCode x)
             (lower-case (fromCharCode x))))
-    (and (Character/isLetter x)
+    (and (Character/islet*ter x)
          (= x (lower-case x)))))
 
 (defn zipmap [keys vals]
@@ -328,14 +328,14 @@
 (defn into [to from]
   (reduce conj to from))
 
-(defmacro if-let [bindings then else & oldform]
+(defmacro if-let* [bindings then else & oldform]
   (if-not else
-    `(if-let ~bindings ~then nil)
-    (let [form (get bindings 0) tst (get bindings 1)
+    `(if-let* ~bindings ~then nil)
+    (let* [form (get bindings 0) tst (get bindings 1)
           temp# (gensym)]
-      `(let [temp# ~tst]
+      `(let* [temp# ~tst]
          (if temp#
-           (let [~form temp#]
+           (let* [~form temp#]
              ~then)
            ~else)))))
 
@@ -347,7 +347,7 @@
 (defn constantly [x] (fn [& args] x))
 
 (defn str/capitalize [s]
-  (let [s (str s)]
+  (let* [s (str s)]
     (if (< (count s) 2)
       (upper-case s)
       (str (upper-case (subs s 0 1))
@@ -356,20 +356,20 @@
 (defn reduce-kv [m f init]
   (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
 
-(defmacro when-let [bindings & body]
-  (let [form (get bindings 0) tst (get bindings 1)
+(defmacro when-let* [bindings & body]
+  (let* [form (get bindings 0) tst (get bindings 1)
         temp# (gensym)]
-    `(let [temp# ~tst]
+    `(let* [temp# ~tst]
        (when temp#
-         (let [~form temp#]
+         (let* [~form temp#]
            ~@body)))))
 
 (defmacro when-first [bindings & body]
-  (let [x   (first bindings)
+  (let* [x   (first bindings)
         xs  (last bindings)
         xs# (gensym)]
-    `(when-let [xs# (seq ~xs)]
-       (let [~x (first xs#)]
+    `(when-let* [xs# (seq ~xs)]
+       (let* [~x (first xs#)]
          ~@body))))
 
 (defn Integer/parseInt [s r]
@@ -378,7 +378,7 @@
           (js-eval (str "parseInt(" s ", " r ")")))))
 
 (defmacro as-> [expr name & forms]
-  `(let [~name ~expr
+  `(let* [~name ~expr
          ~@(interleave (repeat (count forms) name) (butlast forms))]
      ~(if (empty? forms)
         name
@@ -405,7 +405,7 @@
    (reduce #(get % %2) m ks))
 
 (defmacro for [seq-exprs body-expr]
-  (let [body-expr* body-expr
+  (let* [body-expr* body-expr
         iter# (gensym)
         to-groups (fn [seq-exprs]
                     (reduce (fn [groups kv]
@@ -414,20 +414,20 @@
                                 (conj groups [(first kv) (last kv)])))
                             [] (partition 2 seq-exprs)))
         emit-bind (defn emit-bind [bindings]
-                    (let [giter (gensym "iter__")
+                    (let* [giter (gensym "iter__")
                           gxs (gensym "s__")
                           iterys# (gensym "iterys__")
                           fs#     (gensym "fs__")
                           do-mod (defn do-mod [mod]
                                    (cond
-                                     (= (ffirst mod) :let) `(let ~(second (first mod)) ~(do-mod (next mod)))
+                                     (= (ffirst mod) :let*) `(let* ~(second (first mod)) ~(do-mod (next mod)))
                                      (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
                                      (= (ffirst mod) :when) `(if ~(second (first mod))
                                                     ~(do-mod (next mod))
                                                     (recur (rest ~gxs)))
                                      (keyword?  (ffirst mod)) (throw (str "Invalid 'for' keyword " (ffirst mod)))
                                      (next bindings)
-                                     `(let [~iterys# ~(emit-bind (next bindings))
+                                     `(let* [~iterys# ~(emit-bind (next bindings))
                                             ~fs# (seq (~iterys# ~(second (first (next bindings)))))]
                                         (if ~fs#
                                           (concat ~fs# (~giter (rest ~gxs)))
@@ -440,10 +440,10 @@
                                ~(do-mod (subvec (first bindings) 2)))))
                           `(defn ~giter [~gxs]
                               (loop [~gxs ~gxs]
-                                (when-let [~gxs (seq ~gxs)]
-                                  (let [~(ffirst bindings) (first ~gxs)]
+                                (when-let* [~gxs (seq ~gxs)]
+                                  (let* [~(ffirst bindings) (first ~gxs)]
                                       ~(do-mod (subvec (first bindings) 2)))))))))]
-    `(let [~iter# ~(emit-bind (to-groups seq-exprs))]
+    `(let* [~iter# ~(emit-bind (to-groups seq-exprs))]
        (remove nil?
                (~iter# ~(second seq-exprs))))))
 
@@ -468,19 +468,18 @@
 (defn str/includes? [s substr]
   (. (str "'" s "'" ".toUpperCase")))
 
-;; destructuring not working yet. leaving it here to shame myself into
-;; finishing it so it won't be taking up 100 lines for nothing
+;; currently only sequential destructuring is working
 
 ;; string hack, because `some` fails on symbols 
 (defn has-rest? [b]
   (js-eval (str "'" b "'" ".includes(" "'" "&" "'" ")")))
 
 (defn pvec [bvec b val]
-  (let [gvec (gensym "vec__")
+  (let* [gvec (gensym "vec__")
         gseq (gensym "seq__")
         gfirst (gensym "first__")
         has-rest (has-rest? b)]
-    (loop [ret (let [ret (conj bvec gvec val)]
+    (loop [ret (let* [ret (conj bvec gvec val)]
                  (if has-rest
                    (conj ret gseq (list seq gvec))
                    ret))
@@ -488,7 +487,7 @@
            bs b
            seen-rest? false]
       (if (seq bs)
-        (let [firstb (first bs)]
+        (let* [firstb (first bs)]
           (cond
             (= firstb '&) (recur (pb ret (second bs) gseq)
                                  n
@@ -512,7 +511,7 @@
         ret))))
 
 (defn pmap [bvec b v]
-  (let [gmap (gensym "map__")
+  (let* [gmap (gensym "map__")
         defaults (:or b)]
     (loop [ret (-> bvec (conj gmap) (conj v)
                    (conj gmap) (conj (list 'if (list seq? gmap)
@@ -522,11 +521,11 @@
                       (if (:as b)
                         (conj ret (:as b) gmap)
                         ret))))
-           bes (let [transforms
+           bes (let* [transforms
                      (reduce
                       (fn [transforms mk]
                         (if (keyword? mk)
-                          (let [mkns (namespace mk)
+                          (let* [mkns (namespace mk)
                                 mkn (name mk)]
                             (cond (= mkn "keys") (assoc transforms mk #(keyword (or mkns (namespace %)) (name %)))
                                   (= mkn "syms") (assoc transforms mk #(list `quote (symbol (or mkns (namespace %)) (name %))))
@@ -543,7 +542,7 @@
                   (dissoc b :as :or)
                   transforms))]
       (if (seq bes)
-        (let [bb (key (first bes))
+        (let* [bb (key (first bes))
               bk (val (first bes))
               local (if #?(:clj  (instance? clojure.lang.Named bb)
                            :cljs (implements? INamed bb))
@@ -577,36 +576,20 @@
       :else (throw (str "Unsupported binding form: " b))))
 
 (defn destructure [bindings]
-  (let [bents (partition 2 bindings)
+  (let* [bents (partition 2 bindings)
         process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
     (if (every? symbol? (map first bents))
       bindings
-      (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
+      (if-let* [kwbs (seq (filter #(keyword? (first %)) bents))]
         (throw (str "Unsupported binding key: " (ffirst kwbs)))
         (do (println bents)
           (reduce process-entry [] bents))))))
 
-(def bindings '[[a b] ["a" "b"]])
-(def bents (partition 2 bindings))
-(def bvec [])
-(def b (first bents))
-(def b (first b))
-(def val (second (first bents)))
-(vector? b)
-;(pvec bvec b val)
+#_(defmacro let* [bindings & body]
+  `(let** ~(destructure bindings) ~@body))
 
-(some #{'&} b)
-
-(some #{1 2 3} [3])
-
-(some #{(symbol "&")} [(symbol "&")])
-;(destructure '[[a b] ["a" "b"]])
-
-
-(let [vec__7341 ["a" "b"]
-      a (nth vec__7341 0 nil)
-      b (nth vec__7341 1 nil)]
-  b)
+(defmacro let [bindings & body]
+  `(let* ~(destructure bindings) ~@body))
 
 ;; https://github.com/kanaka/mal/blob/master/impls/lib/protocols.mal
 
@@ -625,7 +608,7 @@
     (string?  obj) :mal/string
     (macro?   obj) :mal/macro
     true
-    (let [metadata (meta obj)
+    (let* [metadata (meta obj)
           type     (when (map? metadata) (get metadata :type))]
           (cond
             (keyword? type) type
@@ -655,12 +638,12 @@
 ;; another map from method names as keywords to implementations.
 (defmacro defprotocol
   (fn [proto-name & methods]
-    (let [drop2 (fn [args]
+    (let* [drop2 (fn [args]
                       (if (= 2 (count args))
                         ()
                         (cons (first args) (drop2 (rest args)))))
            rewrite (fn [method]
-                        (let [name     (first method)
+                        (let* [name     (first method)
                                args     (nth method 1)
                                argc     (count args)
                                varargs? (when (<= 2 argc) (= '& (nth args (- argc 2))))
