@@ -254,18 +254,18 @@
 
 (defn Character/isUpperCase [x]
   (if (int? x)
-    (and (Character/islet*ter (fromCharCode x))
+    (and (Character/isletter (fromCharCode x))
          (= (fromCharCode x)
             (upper-case (fromCharCode x))))
-    (and (Character/islet*ter x)
+    (and (Character/isletter x)
          (= x (upper-case x)))))
 
 (defn Character/isLowerCase [x]
   (if (int? x)
-    (and (Character/islet*ter (fromCharCode x))
+    (and (Character/isletter (fromCharCode x))
          (= (fromCharCode x)
             (lower-case (fromCharCode x))))
-    (and (Character/islet*ter x)
+    (and (Character/isletter x)
          (= x (lower-case x)))))
 
 (defn zipmap [keys vals]
@@ -328,9 +328,9 @@
 (defn into [to from]
   (reduce conj to from))
 
-(defmacro if-let* [bindings then else & oldform]
+(defmacro if-let [bindings then else & oldform]
   (if-not else
-    `(if-let* ~bindings ~then nil)
+    `(if-let ~bindings ~then nil)
     (let* [form (get bindings 0) tst (get bindings 1)
           temp# (gensym)]
       `(let* [temp# ~tst]
@@ -356,7 +356,7 @@
 (defn reduce-kv [m f init]
   (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
 
-(defmacro when-let* [bindings & body]
+(defmacro when-let [bindings & body]
   (let* [form (get bindings 0) tst (get bindings 1)
         temp# (gensym)]
     `(let* [temp# ~tst]
@@ -368,7 +368,7 @@
   (let* [x   (first bindings)
         xs  (last bindings)
         xs# (gensym)]
-    `(when-let* [xs# (seq ~xs)]
+    `(when-let [xs# (seq ~xs)]
        (let* [~x (first xs#)]
          ~@body))))
 
@@ -420,7 +420,7 @@
                           fs#     (gensym "fs__")
                           do-mod (defn do-mod [mod]
                                    (cond
-                                     (= (ffirst mod) :let*) `(let* ~(second (first mod)) ~(do-mod (next mod)))
+                                     (= (ffirst mod) :let) `(let* ~(second (first mod)) ~(do-mod (next mod)))
                                      (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
                                      (= (ffirst mod) :when) `(if ~(second (first mod))
                                                     ~(do-mod (next mod))
@@ -440,7 +440,7 @@
                                ~(do-mod (subvec (first bindings) 2)))))
                           `(defn ~giter [~gxs]
                               (loop [~gxs ~gxs]
-                                (when-let* [~gxs (seq ~gxs)]
+                                (when-let [~gxs (seq ~gxs)]
                                   (let* [~(ffirst bindings) (first ~gxs)]
                                       ~(do-mod (subvec (first bindings) 2)))))))))]
     `(let* [~iter# ~(emit-bind (to-groups seq-exprs))]
@@ -580,13 +580,10 @@
         process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
     (if (every? symbol? (map first bents))
       bindings
-      (if-let* [kwbs (seq (filter #(keyword? (first %)) bents))]
+      (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
         (throw (str "Unsupported binding key: " (ffirst kwbs)))
         (do (println bents)
           (reduce process-entry [] bents))))))
-
-#_(defmacro let* [bindings & body]
-  `(let** ~(destructure bindings) ~@body))
 
 (defmacro let [bindings & body]
   `(let* ~(destructure bindings) ~@body))
