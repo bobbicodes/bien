@@ -1,5 +1,5 @@
 import { read_str } from './reader.js'
-import { _pr_str} from './printer.js'
+import { _pr_str } from './printer.js'
 import { Env } from './env.js'
 import * as types from './types.js'
 import * as core from './core.js'
@@ -132,9 +132,12 @@ function hasLet(ast) {
     }
 }
 
+// initialize local counter to ensure unique names
+let localCounter = 0
+
 function _EVAL(ast, env) {
     while (true) {
-        //console.log(ast)
+        //console.log("_EVAL:", ast)
         //console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);
@@ -199,16 +202,18 @@ function _EVAL(ast, env) {
                 env = let_env;
                 break;
             case "loop":
-                loopVars = []
-                loop_env = new Env(env)
-                loopAST = ast.slice(2)
-                for (var i = 0; i < a1.length; i += 2) {
-                    loop_env.set(a1[i], EVAL(a1[i + 1], loop_env))
-                    loopVars.push(a1[i])
+                let locals = new Map()
+                for (let i = 0; i < a1.length; i+=2) {
+                    locals.set(a1[i].value, a1[i] + "__" + localCounter)
                 }
-                ast = a2;
-                env = loop_env;
-                break;
+                const walked = postwalk(x => {
+                    if (types._symbol_Q(x) && locals.get(x.value)) {
+                        return types._symbol(locals.get(x.value))
+                    }
+                    return x
+                }, ast)
+                console.log(walked)
+                return walked
             case "recur":
                 // check if the loop body has a let expr
                 // if so, copy its locals into the loop_env

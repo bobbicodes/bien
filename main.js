@@ -7,8 +7,19 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(let* [[a b] ["a" "b"]]
-  [a b])`,
+  doc: `(def colls [[1 2] [3 4]])
+
+(defn loop1 [coll]
+  (loop [s coll res []]
+    (if (empty? s) res
+      (recur (rest s) (conj res (first s))))))
+  
+(defn loop2 [colls]
+  (loop [s colls res []]
+    (if (empty? s) res
+      (recur (rest s) (conj res (loop1 (first s)))))))
+  
+(loop2 colls)`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -167,7 +178,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("sieve")
+//testSolution("cw")
 //loadExercise("happy")
 //testExercisesUntilFail()
 //testExercises()

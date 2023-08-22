@@ -404,6 +404,15 @@
 (defn Math/floor [x]
   (js-eval (str "Math.floor(" x ")")))
 
+(defn str/escape [s cmap]
+  (loop [index 0
+         buffer ""]
+    (if (= (count s) index)
+      buffer
+      (if (get cmap (nth s index))
+        (recur (inc index) (str buffer (get cmap (nth s index))))
+        (recur (inc index) (str buffer (nth s index)))))))
+
 (defn get-in [m ks]
    (reduce #(get % %2) m ks))
 
