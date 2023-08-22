@@ -205,6 +205,7 @@ function _EVAL(ast, env) {
                 let locals = new Map()
                 for (let i = 0; i < a1.length; i+=2) {
                     locals.set(a1[i].value, a1[i] + "__" + localCounter)
+                    localCounter++
                 }
                 const walked = postwalk(x => {
                     if (types._symbol_Q(x) && locals.get(x.value)) {
