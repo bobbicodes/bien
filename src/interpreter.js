@@ -132,9 +132,6 @@ function hasLet(ast) {
     }
 }
 
-// initialize local counter to ensure unique names
-let localCounter = 0
-
 function _EVAL(ast, env) {
     while (true) {
         //console.log("_EVAL:", ast)
@@ -202,26 +199,35 @@ function _EVAL(ast, env) {
                 env = let_env;
                 break;
             case "loop":
-                let locals = new Map()
-                for (let i = 0; i < a1.length; i+=2) {
-                    locals.set(a1[i].value, a1[i] + "__" + localCounter)
-                    localCounter++
+                let bindingsMap = new Map()
+                for (let i = 0; i < a1.length; i += 2) {
+                    bindingsMap.set(a1[i].value, EVAL(a1[i + 1], env))
                 }
+                // walk code AST and replace locals with binding values
+                // if we reach a vector with a recur in the 1st position,
+                // store the AST representing the return point,
+                // and the bindings map
                 const walked = postwalk(x => {
-                    if (x.value === 'recur') {
-                        x.__locals__ = locals
+                    if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
+                        x.loopAST = ast
+                        x.bindings = bindingsMap
                     }
-                    if (types._symbol_Q(x) && locals.get(x.value)) {
-                        return types._symbol(locals.get(x.value))
+                    if (bindingsMap.get(x.value)) {
+                        return bindingsMap.get(x.value)
+                    } else {
+                        return x
                     }
-                    return x
                 }, ast)
-                for (var i = 0; i < walked[1].length; i+=2) {
-                    env.set(walked[1][i], EVAL(walked[1][i + 1], env));
-                }
-                ast = [types._symbol("do")].concat(walked.slice(2))
+                // wrap loop body in implicit `do`
+                var loopAST = [types._symbol('do')].concat(walked.slice(2))
+                // attach bindings map and loop body as metadata
+                loopAST.bindings = bindingsMap
+                loopAST.ast = ast
+                ast = loopAST
                 break
             case "recur":
+                console.log("[recur] AST:", ast)
+                // 
                 return ast
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
@@ -293,6 +299,8 @@ function _EVAL(ast, env) {
         }
     }
 }
+
+
 
 function EVAL(ast, env) {
     var result = _EVAL(ast, env);

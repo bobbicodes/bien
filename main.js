@@ -7,19 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(def colls [[1 2] [3 4]])
-
-(defn loop1 [coll]
-  (loop [s coll res []]
-    (if (empty? s) res
-      (recur (rest s) (conj res (first s))))))
-  
-(defn loop2 [colls]
-  (loop [s colls res []]
-    (if (empty? s) res
-      (recur (rest s) (conj res (loop1 (first s)))))))
-  
-(loop2 colls)`,
+  doc: "",
   extensions: [basicSetup, clojure()]
 })
 
@@ -176,6 +164,24 @@ function testExercisesUntilFail() {
   console.log("Passes:", passes)
   console.log("Fails:", fails)
 }
+
+let newDoc = 
+`(defn loop1 [coll]
+  (loop [s coll res []]
+    (if (empty? s) res
+      (recur (rest s) (conj res (first s))))))
+
+(defn loop2 [colls]
+  (loop [s colls res []]
+    (if (empty? s) res
+      (recur (rest s) (conj res (loop1 (first s)))))))
+
+(loop2 [[1 2] [3 4]])`
+
+view.dispatch({
+  changes: {from: 0, to: 0, insert: newDoc},
+  selection: {anchor: newDoc.length, head: newDoc.length}
+})
 
 //testSolution(randExercise())
 //testSolution("cw")
