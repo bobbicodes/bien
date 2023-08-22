@@ -219,25 +219,10 @@ function _EVAL(ast, env) {
                 for (var i = 0; i < walked[1].length; i+=2) {
                     env.set(walked[1][i], EVAL(walked[1][i + 1], env));
                 }
-                ast = walked
-                console.log(walked)
-                return walked
+                ast = [types._symbol("do")].concat(walked.slice(2))
+                break
             case "recur":
-                // check if the loop body has a let expr
-                // if so, copy its locals into the loop_env
-                if (hasLet(loopAST)) {
-                    for (const key in let_env.data) {
-                        if (Object.hasOwnProperty.call(env.data, key)) {
-                            env.set(types._symbol(key), env.data[key])
-                        }
-                    }
-                }
-                const recurAST = eval_ast(ast.slice(1), env)
-                for (var i = 0; i < loopVars.length; i += 1) {
-                    loop_env.set(loopVars[i], recurAST[i]);
-                }
-                ast = loopAST[0]
-                break;
+                return ast
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
                 env.set(a1, res);
