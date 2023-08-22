@@ -208,11 +208,18 @@ function _EVAL(ast, env) {
                     localCounter++
                 }
                 const walked = postwalk(x => {
+                    if (x.value === 'recur') {
+                        x.__locals__ = locals
+                    }
                     if (types._symbol_Q(x) && locals.get(x.value)) {
                         return types._symbol(locals.get(x.value))
                     }
                     return x
                 }, ast)
+                for (var i = 0; i < walked[1].length; i+=2) {
+                    env.set(walked[1][i], EVAL(walked[1][i + 1], env));
+                }
+                ast = walked
                 console.log(walked)
                 return walked
             case "recur":
@@ -220,12 +227,12 @@ function _EVAL(ast, env) {
                 // if so, copy its locals into the loop_env
                 if (hasLet(loopAST)) {
                     for (const key in let_env.data) {
-                        if (Object.hasOwnProperty.call(let_env.data, key)) {
-                            loop_env.set(types._symbol(key), let_env.data[key])
+                        if (Object.hasOwnProperty.call(env.data, key)) {
+                            env.set(types._symbol(key), env.data[key])
                         }
                     }
                 }
-                const recurAST = eval_ast(ast.slice(1), loop_env)
+                const recurAST = eval_ast(ast.slice(1), env)
                 for (var i = 0; i < loopVars.length; i += 1) {
                     loop_env.set(loopVars[i], recurAST[i]);
                 }
