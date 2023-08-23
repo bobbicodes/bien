@@ -199,17 +199,18 @@ function _EVAL(ast, env) {
                 env = let_env;
                 break;
             case "loop":
+                console.log("looping", PRINT(ast))
                 let bindingsMap = new Map()
                 for (let i = 0; i < a1.length; i += 2) {
                     bindingsMap.set(a1[i].value, EVAL(a1[i + 1], env))
                 }
                 // walk code AST and replace locals with binding values
-                // if we reach a vector with a recur in the 1st position,
+                // if we reach a form with a recur in the 1st position,
                 // store the AST representing the return point,
                 // and the bindings map
                 const walked = postwalk(x => {
                     if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
-                        x.loopAST = ast
+                        x.loopAST = ast.slice(2)
                         x.bindings = bindingsMap
                     }
                     if (bindingsMap.get(x.value)) {
@@ -220,14 +221,36 @@ function _EVAL(ast, env) {
                 }, ast)
                 // wrap loop body in implicit `do`
                 var loopAST = [types._symbol('do')].concat(walked.slice(2))
-                // attach bindings map and loop body as metadata
-                loopAST.bindings = bindingsMap
-                loopAST.ast = ast
                 ast = loopAST
+                console.log("outputting loop", PRINT(ast))
                 break
             case "recur":
-                console.log("[recur] AST:", ast)
-                // 
+                console.log("recur AST:", PRINT(ast))
+                console.log("loop AST:", PRINT(ast.loopAST[0]))
+                // update bindings map with evaluated recur forms
+                const bindings = Array.from(ast.bindings.keys())
+                for (let i = 0; i < bindings.length; i++) {
+                    console.log("rebinding local", bindings[i], "to", PRINT(EVAL(ast.slice(1)[i], env)))
+                    ast.bindings.set(bindings[i], EVAL(ast.slice(1)[i], env))
+                }
+                console.log("new bindings map:", PRINT(ast.bindings))
+                // do what we did with loop, replacing the local values
+                console.log("replacing locals in", PRINT(ast.loopAST[0]))
+                var recurWalk = postwalk(x => {
+                    if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
+                        x.loopAST = ast
+                        x.bindings = ast.bindings
+                    }
+                    // replace locals with values from updated binding map
+                    if (ast.bindings.get(x.value)) {
+                        console.log("rebinding", x.value, "to", ast.bindings.get(x.value))
+                        return ast.bindings.get(x.value)
+                    } else {
+                        return x
+                    }
+                }, ast.loopAST[0])
+                ast = recurWalk
+                console.log("outputting recur", PRINT(ast))
                 return ast
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
