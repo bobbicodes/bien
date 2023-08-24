@@ -114,24 +114,6 @@ export function postwalk(f, form) {
     return walk(x => postwalk(f, x), f, form)
 }
 
-function hasLet(ast) {
-    let lets = []
-    postwalk(x => {
-        if (x.value == types._symbol("let*")) {
-            lets.push(true)
-            return true
-        } else {
-            return x
-        }
-        return x
-    }, ast)
-    if (lets.length > 0) {
-        return true
-    } else {
-        return false
-    }
-}
-
 function _EVAL(ast, env) {
     while (true) {
         //console.log(ast)
@@ -199,32 +181,31 @@ function _EVAL(ast, env) {
                 env = let_env;
                 break;
             case "loop":
-                loopVars = []
-                loop_env = new Env(env)
-                loopAST = ast.slice(2)
-                for (var i = 0; i < a1.length; i += 2) {
-                    loop_env.set(a1[i], EVAL(a1[i + 1], loop_env))
-                    loopVars.push(a1[i])
+                // build map from bindings vector
+                let bindings = new Map()
+                for (let i = 0; i < a1.length; i+=2) {
+                    bindings.set(a1[i].value, EVAL(a1[i+1], env))
                 }
-                ast = a2;
-                env = loop_env;
-                break;
-            case "recur":
-                // check if the loop body has a let expr
-                // if so, copy its locals into the loop_env
-                if (hasLet(loopAST)) {
-                    for (const key in let_env.data) {
-                        if (Object.hasOwnProperty.call(let_env.data, key)) {
-                            loop_env.set(types._symbol(key), let_env.data[key])
-                        }
+                // Walk loop and attach body to recur form as metadata
+                // If symbol is key in bindings, replace with its value
+                // also attach the bindings map
+                const walked = postwalk(x => {
+                    if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
+                        x.loopAST = ast.slice(2)
+                        x.bindings = bindings
                     }
-                }
-                const recurAST = eval_ast(ast.slice(1), loop_env)
-                for (var i = 0; i < loopVars.length; i += 1) {
-                    loop_env.set(loopVars[i], recurAST[i]);
-                }
-                ast = loopAST[0]
-                break;
+                    if (types._symbol_Q(x) && bindings.get(x.value)) {
+                        return bindings.get(x.value)
+                    } else {
+                        return x
+                    }
+                }, ast)
+                // wrap loop body in `do` and pass forward
+                ast = [types._symbol('do')].concat(walked.slice(2))
+                break
+            case "recur":
+                console.log(ast, PRINT(ast))
+                return ast
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
                 env.set(a1, res);
