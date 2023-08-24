@@ -13,4 +13,4 @@ function PRINT(exp) {
     return exp;
 }
 
-export const evalString = function (str) { return PRINT(EVAL(READ(str), repl_env)); };
+export const evalString = function (str) { return PRINT(EVAL(READ(str), {})); };
