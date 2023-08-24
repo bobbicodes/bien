@@ -1,5 +1,5 @@
 import { read_str } from './reader.js'
-import { _pr_str} from './printer.js'
+import { _pr_str } from './printer.js'
 import { Env } from './env.js'
 import * as types from './types.js'
 import * as core from './core.js'
@@ -116,7 +116,7 @@ export function postwalk(f, form) {
 
 function _EVAL(ast, env) {
     while (true) {
-        //console.log(ast)
+        //console.log("EVAL:", ast)
         //console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);
@@ -183,15 +183,14 @@ function _EVAL(ast, env) {
             case "loop":
                 // build map from bindings vector
                 let bindings = new Map()
-                for (let i = 0; i < a1.length; i+=2) {
-                    bindings.set(a1[i].value, EVAL(a1[i+1], env))
+                for (let i = 0; i < a1.length; i += 2) {
+                    bindings.set(a1[i].value, EVAL(a1[i + 1], env))
                 }
-                // Walk loop and attach body to recur form as metadata
+                // Walk loop and attach body and bindings map to recur form as metadata
                 // If symbol is key in bindings, replace with its value
-                // also attach the bindings map
                 const walked = postwalk(x => {
                     if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
-                        x.loopAST = ast.slice(2)
+                        x.loopAST = [types._symbol('do')].concat(ast.slice(2))
                         x.bindings = bindings
                     }
                     if (types._symbol_Q(x) && bindings.get(x.value)) {
@@ -200,12 +199,35 @@ function _EVAL(ast, env) {
                         return x
                     }
                 }, ast)
-                // wrap loop body in `do` and pass forward
+                // wrap loop body in `do` and set as AST
                 ast = [types._symbol('do')].concat(walked.slice(2))
                 break
             case "recur":
                 console.log(ast, PRINT(ast))
-                return ast
+                console.log("loopAST:", PRINT(ast.loopAST))
+                // update bindings map with evaluated recur forms
+                let recurForms = ast.slice(1)
+                console.log("recurForms:", recurForms)
+                for (const [key, value] of ast.bindings) {
+                    console.log("re-binding", key, "to", PRINT(EVAL(recurForms[0], env)))
+                    ast.bindings.set(key, EVAL(recurForms[0], env))
+                    recurForms = recurForms.slice(1)
+                }
+                // replace symbols in loopAST with new binding values
+                const recurWalk = postwalk(x => {
+                    if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
+                        console.log("attaching updated bindings:", ast.bindings)
+                        x.bindings = ast.bindings
+                    }
+                    if (types._symbol_Q(x) && ast.bindings.get(x.value)) {
+                        return ast.bindings.get(x.value)
+                    } else {
+                        return x
+                    }
+                }, ast.loopAST)
+                console.log("recurWalk:", recurWalk, PRINT(recurWalk))
+                ast = recurWalk
+                break
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
                 env.set(a1, res);

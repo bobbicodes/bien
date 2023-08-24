@@ -7,26 +7,9 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(defn loop1 [coll]
-  (loop [s coll res []]
-    (if (empty? s) res
-      (recur (rest s) (conj res (first s))))))
-
-(loop [s [[1 2] [3 4]] res []]
+  doc: `(loop [s [[1 2] [3 4]] res []]
   (if (empty? s) res
-    (recur (rest s) (conj res (first s)))))
-
-(loop [])
-
-(defn loop2 [colls]
-  (loop [s colls res []]
-    (if (empty? s) res
-      (recur (rest s) (conj res (loop1 (first s)))))))
-
-(let [s [[1 2] [3 4]] res []]
-  (if (empty? s) res
-    (let [s (rest s) res (conj res (first s))]
-      ...)))`,
+    (recur (rest s) (conj res (first s)))))`,
   extensions: [basicSetup, clojure()]
 })
 
