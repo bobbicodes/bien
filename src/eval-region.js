@@ -67,7 +67,7 @@ const updateEditor = (view, text, pos) => {
     const end = doc.length
     view.dispatch({
         changes: {from: 0, to: end, insert: text},
-        selection: {anchor: pos, head: pos}
+        selection: {anchor: testPosBeforeEval, head: testPosBeforeEval}
     })
 }
 
@@ -151,9 +151,9 @@ for (let i = 0; i < alphabet.length; i++) {
 
 export const evalExtension = 
      Prec.highest(keymap.of(
-        [{key: "Shift-Enter", run: evalCell},
+        [{key: "Alt-Enter", run: evalCell},
          {key: "Mod-Enter", run: evalAtCursor},
-         {key: "Alt-Enter", run: evalTopLevel},
+         {key: "Shift-Enter", run: evalTopLevel},
          {key: "Escape", run: clearEval},
          {key: "ArrowLeft", run: clearEval},
          {key: "ArrowRight", run: clearEval},
