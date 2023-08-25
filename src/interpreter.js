@@ -1,7 +1,7 @@
+import { read_str } from './reader'
+
 // read
-function READ(str) {
-    return str;
-}
+const READ = str => read_str(str)
 
 // eval
 function EVAL(ast, env) {
