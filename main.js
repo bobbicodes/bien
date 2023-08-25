@@ -13,9 +13,9 @@ let view = new EditorView({
   parent: document.querySelector('#app')
 })
 
-let topLevelText = "Alt+Enter = Eval top-level form"
-let keyBindings = "<strong>Key bindings:</strong>,Shift+Enter = Eval cell," +
-  topLevelText + ",Ctrl/Cmd+Enter = Eval at cursor";
+let topLevelText = "Shift+Enter = Eval top-level form"
+let keyBindings = "<strong>Key bindings:</strong>,Alt+Enter = Eval cell," +
+  topLevelText + ",Ctrl/Cmd+Enter= Eval at cursor";
 keyBindings = keyBindings.split(',');
 for (let i = 0; i < keyBindings.length; i++)
   keyBindings[i] = "" + keyBindings[i] + "<br>";
