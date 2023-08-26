@@ -200,7 +200,7 @@ function apply(f) {
 
 
 // Metadata functions
-function with_meta(obj, m) {
+export function with_meta(obj, m) {
     var new_obj = types._clone(obj);
     new_obj.__meta__ = m;
     return new_obj;
