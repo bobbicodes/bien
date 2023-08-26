@@ -1,5 +1,5 @@
 import { read_str } from './reader.js'
-import { _pr_str} from './printer.js'
+import { _pr_str } from './printer.js'
 import { Env } from './env.js'
 import * as types from './types.js'
 import * as core from './core.js'
@@ -75,14 +75,6 @@ export function clearTests() {
 }
 
 export var deftests = []
-var arglist
-var fnBody
-var isMultiArity
-var loopVars = []
-// We need to store the ast so we can
-// pass it to recur later
-var loopAST = []
-var loop_env = new Env(repl_env)
 
 function walk(inner, outer, form) {
     //console.log("Walking form:", form)
@@ -199,32 +191,27 @@ function _EVAL(ast, env) {
                 env = let_env;
                 break;
             case "loop":
-                loopVars = []
-                loop_env = new Env(env)
-                loopAST = ast.slice(2)
+                var loop_body = [types._symbol('do')].concat(ast.slice(2))
+                var loop_env = new Env(env);
+                var loopLocals = []
                 for (var i = 0; i < a1.length; i += 2) {
-                    loop_env.set(a1[i], EVAL(a1[i + 1], loop_env))
-                    loopVars.push(a1[i])
+                    loop_env.set(a1[i], EVAL(a1[i + 1], loop_env));
+                    loopLocals.push(a1[i], EVAL(a1[i + 1], loop_env))
                 }
-                ast = a2;
-                env = loop_env;
-                break;
+                ast = loop_body
+                env = loop_env
+                break
             case "recur":
-                // check if the loop body has a let expr
-                // if so, copy its locals into the loop_env
-                if (hasLet(loopAST)) {
-                    for (const key in let_env.data) {
-                        if (Object.hasOwnProperty.call(let_env.data, key)) {
-                            loop_env.set(types._symbol(key), let_env.data[key])
-                        }
-                    }
+                loopLocals.__isvector__ = true;
+                // duplicate each recur form
+                var recurForms = ast.slice(1).flatMap(i => [i, i])
+                for (let i = 1; i < recurForms.length; i += 2) {
+                    let f = EVAL(recurForms[i], loop_env)
+                    f.__isvector__ = true;
+                    loopLocals[i] = f
                 }
-                const recurAST = eval_ast(ast.slice(1), loop_env)
-                for (var i = 0; i < loopVars.length; i += 1) {
-                    loop_env.set(loopVars[i], recurAST[i]);
-                }
-                ast = loopAST[0]
-                break;
+                ast = [types._symbol('loop')].concat([loopLocals, loop_body])
+                break
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
                 env.set(a1, res);
