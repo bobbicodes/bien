@@ -9,14 +9,17 @@ import { evalString, deftests, clearTests } from "./src/interpreter"
 let editorState = EditorState.create({
   doc: `(defn loop1 [coll]
   (loop [s coll res1 []]
+    (do (println "loop1 coll:" coll " res:" res1)
     (if (empty? s) res1
-      (recur (rest s) (conj res1 (first s))))))
+      (recur (rest s) (conj res1 (first s)))))))
 
 (defn loop2 [colls]
   (loop [s colls res2 []]
+    (do (println "loop2 colls:" colls " res:" res2)
     (if (empty? s) res2
-      (recur (rest s) (conj res2 (loop1 (first s)))))))
+      (recur (rest s) (conj res2 (loop1 (first s))))))))
 
+(loop1 [1 2])
 (loop2 [[1 2] [3 4]])`,
   extensions: [basicSetup, clojure()]
 })

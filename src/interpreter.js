@@ -75,19 +75,6 @@ export function clearTests() {
 }
 
 export var deftests = []
-var arglist
-var fnBody
-var isMultiArity
-
-// We need to store the loop ast, bindings and env
-// so we can pass it to recur when we get to it.
-// The current strategy fails in the case that one loop
-// calls into another in its body.
-// My next idea is to, instead of replacing it,
-// we append it to a stack or something.
-var loopBodies = []
-var loopBindings = []
-var loopEnvs = []
 
 function walk(inner, outer, form) {
     //console.log("Walking form:", form)
@@ -204,41 +191,31 @@ function _EVAL(ast, env) {
                 env = let_env;
                 break;
             case "loop":
-                var loopEnv = new Env(env)
-                var loopBody = [types._symbol('do')].concat(ast.slice(2))
+                var loop_body = [types._symbol('do')].concat(ast.slice(2))
+                console.log("loop_body:", PRINT(loop_body))
+                var loop_env = new Env(env);
+                var loopLocals = []
                 for (var i = 0; i < a1.length; i += 2) {
-                    loopEnv.set(a1[i], EVAL(a1[i + 1], loopEnv))
+                    console.log("binding", a1[i].value, "to", PRINT(EVAL(a1[i + 1], loop_env)))
+                    loop_env.set(a1[i], EVAL(a1[i + 1], loop_env));
+                    loopLocals.push(a1[i], EVAL(a1[i + 1], loop_env))
                 }
-                loopBindings.push(a1)
-                loopEnvs.push(loopEnv)
-                loopBodies.push(loopBody)
-                // Tag the recur form with metadata so the correct
-                // loop body, bindings & env can be identified
-                const loop_body = postwalk(x => {
-                    if (types._symbol_Q(x[0]) && x[0].value === 'recur') {
-                        x.__number__ = loopBodies.length-1
-                     }
-                     return x
-                 }, loopBody)
                 ast = loop_body
-                env = loopEnv
+                env = loop_env
                 break
             case "recur":
-                console.log("loop AST num:", ast.__number__, PRINT(ast), ast)
-                console.log("raw recurForms:", PRINT(ast.slice(1)))
-                const recurForms = eval_ast(ast.slice(1), loopEnvs[ast.__number__])
-                console.log("evaled recurForms:", PRINT(recurForms))
-                console.log("setting bindings", PRINT(loopBindings[ast.__number__]))
-                var locals = []
-                for (let i = 0; i < loopBindings[ast.__number__].length; i+=2) {
-                    locals.push(loopBindings[ast.__number__][i])
+                console.log("calling recur on", PRINT(ast))
+                loopLocals.__isvector__ = true;
+                // duplicate each recur form
+                var recurForms = ast.slice(1).flatMap(i => [i,i])
+                for (let i = 1; i < recurForms.length; i+=2) {
+                    let f = EVAL(recurForms[i], loop_env)
+                    f.__isvector__ = true;
+                    loopLocals[i] = f
                 }
-                for (var i = 0; i < locals.length; i++) {
-                    loopEnvs[ast.__number__].set(locals[i], recurForms[i]);
-                    console.log("re-binding", locals[i].value, "to", PRINT(recurForms[i]))
-                }
-                ast = loopBodies[ast.__number__]
-                console.log("exiting recur. AST:", PRINT(ast))
+                console.log("loopLocals:", PRINT(loopLocals))
+                ast = [types._symbol('loop')].concat([loopLocals, loop_body])
+                console.log("loopAST:", PRINT(ast))
                 break
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
