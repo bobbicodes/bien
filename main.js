@@ -179,7 +179,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("complex_numbers")
-//loadExercise("happy")
+//testSolution("complex_numbers")
+loadExercise("mymap")
 //testExercisesUntilFail()
 //testExercises()
