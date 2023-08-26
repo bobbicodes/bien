@@ -192,11 +192,9 @@ function _EVAL(ast, env) {
                 break;
             case "loop":
                 var loop_body = [types._symbol('do')].concat(ast.slice(2))
-                console.log("loop_body:", PRINT(loop_body))
                 var loop_env = new Env(env);
                 var loopLocals = []
                 for (var i = 0; i < a1.length; i += 2) {
-                    console.log("binding", a1[i].value, "to", PRINT(EVAL(a1[i + 1], loop_env)))
                     loop_env.set(a1[i], EVAL(a1[i + 1], loop_env));
                     loopLocals.push(a1[i], EVAL(a1[i + 1], loop_env))
                 }
@@ -204,18 +202,15 @@ function _EVAL(ast, env) {
                 env = loop_env
                 break
             case "recur":
-                console.log("calling recur on", PRINT(ast))
                 loopLocals.__isvector__ = true;
                 // duplicate each recur form
-                var recurForms = ast.slice(1).flatMap(i => [i,i])
-                for (let i = 1; i < recurForms.length; i+=2) {
+                var recurForms = ast.slice(1).flatMap(i => [i, i])
+                for (let i = 1; i < recurForms.length; i += 2) {
                     let f = EVAL(recurForms[i], loop_env)
                     f.__isvector__ = true;
                     loopLocals[i] = f
                 }
-                console.log("loopLocals:", PRINT(loopLocals))
                 ast = [types._symbol('loop')].concat([loopLocals, loop_body])
-                console.log("loopAST:", PRINT(ast))
                 break
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
