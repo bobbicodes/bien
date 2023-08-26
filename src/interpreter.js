@@ -207,7 +207,9 @@ function _EVAL(ast, env) {
                 var recurForms = ast.slice(1).flatMap(i => [i, i])
                 for (let i = 1; i < recurForms.length; i += 2) {
                     let f = EVAL(recurForms[i], loop_env)
-                    f.__isvector__ = true;
+                    if (types._list_Q(f)) {
+                        f.__isvector__ = true;
+                    }
                     loopLocals[i] = f
                 }
                 ast = [types._symbol('loop')].concat([loopLocals, loop_body])

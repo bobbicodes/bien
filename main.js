@@ -179,7 +179,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("sieve")
+testSolution("myrange")
 //loadExercise("happy")
 //testExercisesUntilFail()
 //testExercises()
