@@ -183,6 +183,7 @@ function _EVAL(ast, env) {
                 env.set(a1, res);
                 return res
             case "let*":
+            case "let":
                 var let_env = new Env(env);
                 for (var i = 0; i < a1.length; i += 2) {
                     let_env.set(a1[i], EVAL(a1[i + 1], let_env));
