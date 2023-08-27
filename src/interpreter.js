@@ -195,22 +195,24 @@ function _EVAL(ast, env) {
                 var loop_body = [types._symbol('do')].concat(ast.slice(2))
                 var loop_env = new Env(env);
                 var loopLocals = []
+                //console.log("bindings:", PRINT(a1))
                 for (var i = 0; i < a1.length; i += 2) {
-                    loop_env.set(a1[i], EVAL(a1[i + 1], loop_env));
+                    //console.log("[loop] evaluating", PRINT(a1[i + 1]))
+                    //console.log("[loop] binding", a1[i].value, "to", PRINT(EVAL(a1[i + 1], loop_env)))
                     loopLocals.push(a1[i], EVAL(a1[i + 1], loop_env))
+                }
+                for (let i = 0; i < loopLocals.length; i+=2) {
+                    loop_env.set(a1[i], loopLocals[i+1])
                 }
                 ast = loop_body
                 env = loop_env
                 break
             case "recur":
                 loopLocals.__isvector__ = true;
-                // duplicate each recur form
                 var recurForms = ast.slice(1).flatMap(i => [i, i])
                 for (let i = 1; i < recurForms.length; i += 2) {
-                    let f = EVAL(recurForms[i], loop_env)
-                    if (types._list_Q(f)) {
-                        f.__isvector__ = true;
-                    }
+                    //console.log("recur form:", PRINT(recurForms[i]))
+                    let f = recurForms[i]
                     loopLocals[i] = f
                 }
                 ast = [types._symbol('loop')].concat([loopLocals, loop_body])
@@ -265,7 +267,7 @@ function _EVAL(ast, env) {
                 lambda.lambda = true
                 return lambda
             default:
-                //console.log("calling", ast)
+                //console.log("calling", PRINT(ast))
                 for (let i = 0; i < ast.slice(1).length; i++) {
                     //console.log(ast.slice(1)[i])
                 }

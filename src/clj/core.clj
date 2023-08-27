@@ -2,8 +2,8 @@
 
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
-    `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl))) 
-             ~{:name (str name) :doc (first fdecl)}))
+    `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl)))
+                  ~{:name (str name) :doc (first fdecl)}))
     `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
                   ~{:name (str name)}))))
 
@@ -82,13 +82,13 @@
 
 (defn memoize [f]
   (let* [mem (atom {})]
-    (fn [& args]
-      (let* [key (str args)]
-        (if (contains? @mem key)
-          (get @mem key)
-          (let* [ret (apply f args)]
-            (do (swap! mem assoc key ret)
-                ret)))))))
+        (fn [& args]
+          (let* [key (str args)]
+                (if (contains? @mem key)
+                  (get @mem key)
+                  (let* [ret (apply f args)]
+                        (do (swap! mem assoc key ret)
+                            ret)))))))
 
 (defn partial [pfn & args]
   (fn [& args-inner]
@@ -117,16 +117,16 @@
       (if (= 1 (count xs))
         (first xs)
         (let* [condvar (gensym)]
-          `(let* [~condvar ~(first xs)]
-             (if ~condvar ~condvar (or ~@(rest xs))))))))
+              `(let* [~condvar ~(first xs)]
+                     (if ~condvar ~condvar (or ~@(rest xs))))))))
 
 (defmacro and [& xs]
   (cond (empty? xs)      true
         (= 1 (count xs)) (first xs)
         true
         (let* [condvar (gensym)]
-          `(let* [~condvar ~(first xs)]
-             (if ~condvar (and ~@(rest xs)) ~condvar)))))
+              `(let* [~condvar ~(first xs)]
+                     (if ~condvar (and ~@(rest xs)) ~condvar)))))
 
 (defn ffirst [x] (first (first x)))
 
@@ -136,10 +136,10 @@
   (if (set? pred)
     (if (empty? xs)
       nil
-      (or 
+      (or
        (when (contains? pred (first xs))
          (first xs))
-         (some pred (rest xs))))
+       (some pred (rest xs))))
     (if (empty? xs)
       nil
       (or (pred (first xs))
@@ -188,9 +188,9 @@
 
 (defn mod [num div]
   (let* [m (rem num div)]
-    (if (or (zero? m) (= (pos? num) (pos? div)))
-      m
-      (+ m div))))
+        (if (or (zero? m) (= (pos? num) (pos? div)))
+          m
+          (+ m div))))
 
 (defn take-while [pred coll]
   (loop [s (seq coll) res []]
@@ -239,7 +239,7 @@
   (reduce
    (fn [ret x]
      (let* [k (f x)]
-       (assoc ret k (conj (get ret k []) x))))
+           (assoc ret k (conj (get ret k []) x))))
    {} coll))
 
 (defn fromCharCode [int]
@@ -332,12 +332,12 @@
   (if-not else
     `(if-let ~bindings ~then nil)
     (let* [form (get bindings 0) tst (get bindings 1)
-          temp# (gensym)]
-      `(let* [temp# ~tst]
-         (if temp#
-           (let* [~form temp#]
-             ~then)
-           ~else)))))
+           temp# (gensym)]
+          `(let* [temp# ~tst]
+                 (if temp#
+                   (let* [~form temp#]
+                         ~then)
+                   ~else)))))
 
 (defn frequencies [coll]
   (reduce (fn [counts x]
@@ -348,41 +348,41 @@
 
 (defn str/capitalize [s]
   (let* [s (str s)]
-    (if (< (count s) 2)
-      (upper-case s)
-      (str (upper-case (subs s 0 1))
-           (upper-case (subs s 1))))))
+        (if (< (count s) 2)
+          (upper-case s)
+          (str (upper-case (subs s 0 1))
+               (upper-case (subs s 1))))))
 
 (defn reduce-kv [m f init]
   (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
 
 (defmacro when-let [bindings & body]
   (let* [form (get bindings 0) tst (get bindings 1)
-        temp# (gensym)]
-    `(let* [temp# ~tst]
-       (when temp#
-         (let* [~form temp#]
-           ~@body)))))
+         temp# (gensym)]
+        `(let* [temp# ~tst]
+               (when temp#
+                 (let* [~form temp#]
+                       ~@body)))))
 
 (defmacro when-first [bindings & body]
   (let* [x   (first bindings)
-        xs  (last bindings)
-        xs# (gensym)]
-    `(when-let [xs# (seq ~xs)]
-       (let* [~x (first xs#)]
-         ~@body))))
+         xs  (last bindings)
+         xs# (gensym)]
+        `(when-let [xs# (seq ~xs)]
+           (let* [~x (first xs#)]
+                 ~@body))))
 
 (defn Integer/parseInt [s r]
   (when (re-seq #"\\d" s)
     (if-not r (js-eval (str "parseInt(" s ")"))
-          (js-eval (str "parseInt(" s ", " r ")")))))
+            (js-eval (str "parseInt(" s ", " r ")")))))
 
 (defmacro as-> [expr name & forms]
   `(let* [~name ~expr
-         ~@(interleave (repeat (count forms) name) (butlast forms))]
-     ~(if (empty? forms)
-        name
-        (last forms))))
+          ~@(interleave (repeat (count forms) name) (butlast forms))]
+         ~(if (empty? forms)
+            name
+            (last forms))))
 
 (defn distinct? [x y & more]
   (if-not more
@@ -391,11 +391,11 @@
       (not (= x y)))
     (if (not= x y)
       (loop [s (set [x y]) xs more]
-            (if xs
-              (if (contains? s (first xs))
-                false
-                (recur (conj s (first xs)) (next xs)))
-              true))
+        (if xs
+          (if (contains? s (first xs))
+            false
+            (recur (conj s (first xs)) (next xs)))
+          true))
       false)))
 
 (defn parseInt [s r]
@@ -405,50 +405,50 @@
   (js-eval (str "Math.floor(" x ")")))
 
 (defn get-in [m ks]
-   (reduce #(get % %2) m ks))
+  (reduce #(get % %2) m ks))
 
 (defmacro for [seq-exprs body-expr]
   (let* [body-expr* body-expr
-        iter# (gensym)
-        to-groups (fn [seq-exprs]
-                    (reduce (fn [groups kv]
-                              (if (keyword? (first kv))
-                                (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
-                                (conj groups [(first kv) (last kv)])))
-                            [] (partition 2 seq-exprs)))
-        emit-bind (defn emit-bind [bindings]
-                    (let* [giter (gensym "iter__")
-                          gxs (gensym "s__")
-                          iterys# (gensym "iterys__")
-                          fs#     (gensym "fs__")
-                          do-mod (defn do-mod [mod]
-                                   (cond
-                                     (= (ffirst mod) :let) `(let* ~(second (first mod)) ~(do-mod (next mod)))
-                                     (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
-                                     (= (ffirst mod) :when) `(if ~(second (first mod))
-                                                    ~(do-mod (next mod))
-                                                    (recur (rest ~gxs)))
-                                     (keyword?  (ffirst mod)) (throw (str "Invalid 'for' keyword " (ffirst mod)))
-                                     (next bindings)
-                                     `(let* [~iterys# ~(emit-bind (next bindings))
-                                            ~fs# (seq (~iterys# ~(second (first (next bindings)))))]
-                                        (if ~fs#
-                                          (concat ~fs# (~giter (rest ~gxs)))
-                                          (recur (rest ~gxs))))
-                                     :else `(cons ~body-expr (~giter (rest ~gxs)))))]
-                      (if (next bindings)
-                        `(defn ~giter [~gxs]
-                           (loop [~gxs ~gxs]
-                             (when-first [~(ffirst bindings) ~gxs]
-                               ~(do-mod (subvec (first bindings) 2)))))
-                          `(defn ~giter [~gxs]
-                              (loop [~gxs ~gxs]
-                                (when-let [~gxs (seq ~gxs)]
-                                  (let* [~(ffirst bindings) (first ~gxs)]
-                                      ~(do-mod (subvec (first bindings) 2)))))))))]
-    `(let* [~iter# ~(emit-bind (to-groups seq-exprs))]
-       (remove nil?
-               (~iter# ~(second seq-exprs))))))
+         iter# (gensym)
+         to-groups (fn [seq-exprs]
+                     (reduce (fn [groups kv]
+                               (if (keyword? (first kv))
+                                 (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
+                                 (conj groups [(first kv) (last kv)])))
+                             [] (partition 2 seq-exprs)))
+         emit-bind (defn emit-bind [bindings]
+                     (let* [giter (gensym "iter__")
+                            gxs (gensym "s__")
+                            iterys# (gensym "iterys__")
+                            fs#     (gensym "fs__")
+                            do-mod (defn do-mod [mod]
+                                     (cond
+                                       (= (ffirst mod) :let) `(let* ~(second (first mod)) ~(do-mod (next mod)))
+                                       (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
+                                       (= (ffirst mod) :when) `(if ~(second (first mod))
+                                                                 ~(do-mod (next mod))
+                                                                 (recur (rest ~gxs)))
+                                       (keyword?  (ffirst mod)) (throw (str "Invalid 'for' keyword " (ffirst mod)))
+                                       (next bindings)
+                                       `(let* [~iterys# ~(emit-bind (next bindings))
+                                               ~fs# (seq (~iterys# ~(second (first (next bindings)))))]
+                                              (if ~fs#
+                                                (concat ~fs# (~giter (rest ~gxs)))
+                                                (recur (rest ~gxs))))
+                                       :else `(cons ~body-expr (~giter (rest ~gxs)))))]
+                           (if (next bindings)
+                             `(defn ~giter [~gxs]
+                                (loop [~gxs ~gxs]
+                                  (when-first [~(ffirst bindings) ~gxs]
+                                    ~(do-mod (subvec (first bindings) 2)))))
+                             `(defn ~giter [~gxs]
+                                (loop [~gxs ~gxs]
+                                  (when-let [~gxs (seq ~gxs)]
+                                    (let* [~(ffirst bindings) (first ~gxs)]
+                                          ~(do-mod (subvec (first bindings) 2)))))))))]
+        `(let* [~iter# ~(emit-bind (to-groups seq-exprs))]
+               (remove nil?
+                       (~iter# ~(second seq-exprs))))))
 
 (defn key [e]
   (first e))
@@ -479,90 +479,90 @@
 
 (defn pvec [bvec b val]
   (let* [gvec (gensym "vec__")
-        gseq (gensym "seq__")
-        gfirst (gensym "first__")
-        has-rest (has-rest? b)]
-    (loop [ret (let* [ret (conj bvec gvec val)]
-                 (if has-rest
-                   (conj ret gseq (list seq gvec))
-                   ret))
-           n 0
-           bs b
-           seen-rest? false]
-      (if (seq bs)
-        (let* [firstb (first bs)]
-          (cond
-            (= firstb '&) (recur (pb ret (second bs) gseq)
-                                 n
-                                 (nnext bs)
-                                 true)
-            (= firstb :as) (pb ret (second bs) gvec)
-            :else (if seen-rest?
-                    (throw "Unsupported binding form, only :as can follow & parameter")
-                    (recur (pb (if has-rest
-                                 (conj ret
-                                       gfirst `(~first ~gseq)
-                                       gseq `(~next ~gseq))
-                                 ret)
-                               firstb
-                               (if has-rest
-                                 gfirst
-                                 (list 'nth gvec n nil)))
-                           (inc n)
-                           (next bs)
-                           seen-rest?))))
-        ret))))
+         gseq (gensym "seq__")
+         gfirst (gensym "first__")
+         has-rest (has-rest? b)]
+        (loop [ret (let* [ret (conj bvec gvec val)]
+                         (if has-rest
+                           (conj ret gseq (list seq gvec))
+                           ret))
+               n 0
+               bs b
+               seen-rest? false]
+          (if (seq bs)
+            (let* [firstb (first bs)]
+                  (cond
+                    (= firstb '&) (recur (pb ret (second bs) gseq)
+                                         n
+                                         (nnext bs)
+                                         true)
+                    (= firstb :as) (pb ret (second bs) gvec)
+                    :else (if seen-rest?
+                            (throw "Unsupported binding form, only :as can follow & parameter")
+                            (recur (pb (if has-rest
+                                         (conj ret
+                                               gfirst `(~first ~gseq)
+                                               gseq `(~next ~gseq))
+                                         ret)
+                                       firstb
+                                       (if has-rest
+                                         gfirst
+                                         (list 'nth gvec n nil)))
+                                   (inc n)
+                                   (next bs)
+                                   seen-rest?))))
+            ret))))
 
 (defn pmap [bvec b v]
   (let* [gmap (gensym "map__")
-        defaults (:or b)]
-    (loop [ret (-> bvec (conj gmap) (conj v)
-                   (conj gmap) (conj (list 'if (list seq? gmap)
-                                           `(seq-to-map-for-destructuring ~gmap)
-                                           gmap))
-                   ((fn [ret]
-                      (if (:as b)
-                        (conj ret (:as b) gmap)
-                        ret))))
-           bes (let* [transforms
-                     (reduce
-                      (fn [transforms mk]
-                        (if (keyword? mk)
-                          (let* [mkns (namespace mk)
-                                mkn (name mk)]
-                            (cond (= mkn "keys") (assoc transforms mk #(keyword (or mkns (namespace %)) (name %)))
-                                  (= mkn "syms") (assoc transforms mk #(list `quote (symbol (or mkns (namespace %)) (name %))))
-                                  (= mkn "strs") (assoc transforms mk str)
-                                  :else transforms))
-                          transforms))
-                      {}
-                      (keys b))]
-                 (reduce
-                  (fn [bes entry]
-                    (reduce #(assoc %1 %2 ((val entry) %2))
-                            (dissoc bes (key entry))
-                            ((key entry) bes)))
-                  (dissoc b :as :or)
-                  transforms))]
-      (if (seq bes)
-        (let* [bb (key (first bes))
-              bk (val (first bes))
-              local (if #?(:clj  (instance? clojure.lang.Named bb)
-                           :cljs (implements? INamed bb))
-                      (with-meta (symbol nil (name bb)) (meta bb))
-                      bb)
-              bv (if (contains? defaults local)
-                   (list `get gmap bk (defaults local))
-                   (list `get gmap bk))]
-          (recur
-           (if (or (keyword? bb) (symbol? bb))
-             (-> ret (conj local bv))
-             (pb ret bb bv))
-           (next bes)))
-        ret))))
+         defaults (:or b)]
+        (loop [ret (-> bvec (conj gmap) (conj v)
+                       (conj gmap) (conj (list 'if (list seq? gmap)
+                                               `(seq-to-map-for-destructuring ~gmap)
+                                               gmap))
+                       ((fn [ret]
+                          (if (:as b)
+                            (conj ret (:as b) gmap)
+                            ret))))
+               bes (let* [transforms
+                          (reduce
+                           (fn [transforms mk]
+                             (if (keyword? mk)
+                               (let* [mkns (namespace mk)
+                                      mkn (name mk)]
+                                     (cond (= mkn "keys") (assoc transforms mk #(keyword (or mkns (namespace %)) (name %)))
+                                           (= mkn "syms") (assoc transforms mk #(list `quote (symbol (or mkns (namespace %)) (name %))))
+                                           (= mkn "strs") (assoc transforms mk str)
+                                           :else transforms))
+                               transforms))
+                           {}
+                           (keys b))]
+                         (reduce
+                          (fn [bes entry]
+                            (reduce #(assoc %1 %2 ((val entry) %2))
+                                    (dissoc bes (key entry))
+                                    ((key entry) bes)))
+                          (dissoc b :as :or)
+                          transforms))]
+          (if (seq bes)
+            (let* [bb (key (first bes))
+                   bk (val (first bes))
+                   local (if #?(:clj  (instance? clojure.lang.Named bb)
+                                :cljs (implements? INamed bb))
+                           (with-meta (symbol nil (name bb)) (meta bb))
+                           bb)
+                   bv (if (contains? defaults local)
+                        (list `get gmap bk (defaults local))
+                        (list `get gmap bk))]
+                  (recur
+                   (if (or (keyword? bb) (symbol? bb))
+                     (-> ret (conj local bv))
+                     (pb ret bb bv))
+                   (next bes)))
+            ret))))
 
 (defn namespace [x]
-  (first (str/split (str x) "/")) )
+  (first (str/split (str x) "/")))
 
 (defn name [x]
   (if (keyword? x)
@@ -570,23 +570,22 @@
     (str x)))
 
 (defn pb [bvec b v]
-    (cond
-      (symbol? b) (-> bvec (conj (if (namespace b)
-                                   (symbol (name b)) b)) (conj v))
-      (keyword? b) (-> bvec (conj (symbol (name b))) (conj v))
-      (vector? b) (pvec bvec b v)
-      (map? b) (pmap bvec b v)
-      :else (throw (str "Unsupported binding form: " b))))
+  (cond
+    (symbol? b) (-> bvec (conj (if (namespace b)
+                                 (symbol (name b)) b)) (conj v))
+    (keyword? b) (-> bvec (conj (symbol (name b))) (conj v))
+    (vector? b) (pvec bvec b v)
+    (map? b) (pmap bvec b v)
+    :else (throw (str "Unsupported binding form: " b))))
 
 (defn destructure [bindings]
   (let* [bents (partition 2 bindings)
-        process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
-    (if (every? symbol? (map first bents))
-      bindings
-      (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
-        (throw (str "Unsupported binding key: " (ffirst kwbs)))
-        (do (println bents)
-          (reduce process-entry [] bents))))))
+         process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
+        (if (every? symbol? (map first bents))
+          bindings
+          (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
+            (throw (str "Unsupported binding key: " (ffirst kwbs)))
+            (reduce process-entry [] bents)))))
 
 #_(defmacro let [bindings & body]
-  `(let* ~(destructure bindings) ~@body))
+    `(let* ~(destructure bindings) ~@body))
