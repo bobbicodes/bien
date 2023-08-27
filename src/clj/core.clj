@@ -595,3 +595,64 @@
 
 #_(defmacro let [bindings & body]
     `(let* ~(destructure bindings) ~@body))
+
+(defmacro condp [pred expr & clauses]
+  (let [gpred (gensym "pred__")
+        gexpr (gensym "expr__")
+        emit (defn emit [pred expr args]
+               (let [vec__6119 (split-at (if (= :>> (second args)) 3 2) args) 
+                     vec__6122 (nth vec__6119 0 nil)
+                     a (nth vec__6122 0 nil)
+                     b (nth vec__6122 1 nil)
+                     c (nth vec__6122 2 nil)
+                     clause vec__6122 more (nth vec__6119 1 nil)
+                     n (count clause)]
+                 (cond
+                   (= 0 n) `(throw (str "No matching clause: " ~expr))
+                   (= 1 n) a
+                   (= 2 n) `(if (~pred ~a ~expr)
+                              ~b
+                              ~(emit pred expr more))
+                   :else `(if-let [p# (~pred ~a ~expr)]
+                            (~c p#)
+                            ~(emit pred expr more)))))]
+    `(let [~gpred ~pred
+           ~gexpr ~expr]
+       ~(emit gpred gexpr clauses))))
+
+#_(defmacro case [e & clauses]
+  (let [ge (with-meta (gensym) {:tag Object})
+        default (if (odd? (count clauses))
+                  (last clauses)
+                  `(throw (IllegalArgumentException. (str "No matching clause: " ~ge))))]
+    (if (> 2 (count clauses))
+      `(let [~ge ~e] ~default)
+      (let [pairs (partition 2 clauses)
+            assoc-test (fn assoc-test [m test expr]
+                         (if (contains? m test)
+                           (throw (IllegalArgumentException. (str "Duplicate case test constant: " test)))
+                           (assoc m test expr)))
+            pairs (reduce1
+                   (fn [m [test expr]]
+                     (if (seq? test)
+                       (reduce1 #(assoc-test %1 %2 expr) m test)
+                       (assoc-test m test expr)))
+                   {} pairs)
+            tests (keys pairs)
+            thens (vals pairs)
+            mode (cond
+                   (every? #(and (integer? %) (<= Integer/MIN_VALUE % Integer/MAX_VALUE)) tests)
+                   :ints
+                   (every? keyword? tests)
+                   :identity
+                   :else :hashes)]
+        (condp = mode
+          :ints
+          (let [[shift mask imap switch-type] (prep-ints tests thens)]
+            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :int)))
+          :hashes
+          (let [[shift mask imap switch-type skip-check] (prep-hashes ge default tests thens)]
+            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-equiv ~skip-check)))
+          :identity
+          (let [[shift mask imap switch-type skip-check] (prep-hashes ge default tests thens)]
+            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))

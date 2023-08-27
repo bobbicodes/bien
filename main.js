@@ -170,5 +170,5 @@ function testExercisesUntilFail() {
 //testSolution(randExercise())
 //testSolution("ps")
 //loadExercise("gigasecond")
-//testExercisesUntilFail()
-testExercises()
+testExercisesUntilFail()
+//testExercises()
