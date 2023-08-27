@@ -329,7 +329,7 @@
              (conj res (first s1) (first s2))))))
 
 (defn interpose [sep coll]
-   (drop 1 (interleave (repeat (count coll) sep) coll)))
+  (drop 1 (interleave (repeat (count coll) sep) coll)))
 
 (defn into [to from]
   (reduce conj to from))
@@ -594,13 +594,13 @@
             (reduce process-entry [] bents)))))
 
 (defmacro let [bindings & body]
-    `(let* ~(destructure bindings) ~@body))
+  `(let* ~(destructure bindings) ~@body))
 
 (defmacro condp [pred expr & clauses]
   (let [gpred (gensym "pred__")
         gexpr (gensym "expr__")
         emit (defn emit [pred expr args]
-               (let [vec__6119 (split-at (if (= :>> (second args)) 3 2) args) 
+               (let [vec__6119 (split-at (if (= :>> (second args)) 3 2) args)
                      vec__6122 (nth vec__6119 0 nil)
                      a (nth vec__6122 0 nil)
                      b (nth vec__6122 1 nil)
@@ -621,7 +621,7 @@
        ~(emit gpred gexpr clauses))))
 
 (defn Math/log [n]
-  (js-eval (str "Math.log(" n ")") ))
+  (js-eval (str "Math.log(" n ")")))
 
 (def Integer/MIN_VALUE
   (js-eval "Number.MIN_VALUE"))
@@ -634,6 +634,20 @@
 
 (defn bit-shift-right [x n]
   (js-eval (str x " >> " n)))
+
+(defn bit-test [x n]
+  (js-eval (str "((" x " >> " n ") % 2 != 0)")))
+
+(defn bit-set [x n]
+  (js-eval (str x " | 1 << " n)))
+
+(defn bit-clear [x n]
+  (js-eval (str x " & ~(1 << " n ")")))
+
+(defn bit-flip [x n]
+  (if (bit-test x n)
+    (bit-clear x n)
+    (bit-set x n)))
 
 (def max-mask-bits 13)
 
@@ -670,49 +684,49 @@
                   (last clauses)
                   `(throw (str "No matching clause: " ~ge)))]
     (if (> 2 (count clauses))
-       `(let [~ge ~e] ~default)
-       (let [pairs (partition 2 clauses)
-             assoc-test (defn assoc-test [m test expr]
-                          (if (contains? m test)
-                            (throw (str "Duplicate case test constant: " test))
-                            (assoc m test expr)))
-             pairs (reduce
-                    (fn [m test-expr]
-                      (if (sequential? (first test-expr))
-                        (reduce #(assoc-test %1 %2 (last test-expr)) m (first test-expr))
-                        (assoc-test m (first test-expr) (last test-expr))))
-                    {} pairs)
-             tests (keys pairs)
-             thens (vals pairs)
-             mode (cond
-                    (every? #(and (integer? %) (<= Integer/MIN_VALUE % Integer/MAX_VALUE)) tests)
-                    :ints
-                    (every? keyword? tests)
-                    :identity
-                    :else :hashes)]
-         (condp = mode
-           :ints
-           (let [vec__2 (prep-ints tests thens)
-                 shift (nth vec__2 0 nil)
-                 mask (nth vec__2 1 nil)
-                 imap (nth vec__2 2 nil)
-                 switch-type (nth vec__2 3 nil)]
-             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :int)))
-           :hashes
-           (let [vec__19 (prep-hashes ge default tests thens)
-                 shift (nth vec__19 0 nil)
-                 mask (nth vec__19 1 nil)
-                 imap (nth vec__19 2 nil)
-                 switch-type (nth vec__19 3 nil)
-                 skip-check (nth vec__19 4 nil)]
-             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-equiv ~skip-check)))
-           :identity
-           (let [vec__28 (prep-hashes ge default tests thens)
-                 shift (nth vec__28 0 nil)
-                 mask (nth vec__28 1 nil)
-                 imap (nth vec__28 2 nil)
-                 switch-type (nth vec__28 3 nil)
-                 skip-check (nth vec__28 4 nil)]
-             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
+      `(let [~ge ~e] ~default)
+      (let [pairs (partition 2 clauses)
+            assoc-test (defn assoc-test [m test expr]
+                         (if (contains? m test)
+                           (throw (str "Duplicate case test constant: " test))
+                           (assoc m test expr)))
+            pairs (reduce
+                   (fn [m test-expr]
+                     (if (sequential? (first test-expr))
+                       (reduce #(assoc-test %1 %2 (last test-expr)) m (first test-expr))
+                       (assoc-test m (first test-expr) (last test-expr))))
+                   {} pairs)
+            tests (keys pairs)
+            thens (vals pairs)
+            mode (cond
+                   (every? #(and (integer? %) (<= Integer/MIN_VALUE % Integer/MAX_VALUE)) tests)
+                   :ints
+                   (every? keyword? tests)
+                   :identity
+                   :else :hashes)]
+        (condp = mode
+          :ints
+          (let [vec__2 (prep-ints tests thens)
+                shift (nth vec__2 0 nil)
+                mask (nth vec__2 1 nil)
+                imap (nth vec__2 2 nil)
+                switch-type (nth vec__2 3 nil)]
+            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :int)))
+          :hashes
+          (let [vec__19 (prep-hashes ge default tests thens)
+                shift (nth vec__19 0 nil)
+                mask (nth vec__19 1 nil)
+                imap (nth vec__19 2 nil)
+                switch-type (nth vec__19 3 nil)
+                skip-check (nth vec__19 4 nil)]
+            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-equiv ~skip-check)))
+          :identity
+          (let [vec__28 (prep-hashes ge default tests thens)
+                shift (nth vec__28 0 nil)
+                mask (nth vec__28 1 nil)
+                imap (nth vec__28 2 nil)
+                switch-type (nth vec__28 3 nil)
+                skip-check (nth vec__28 4 nil)]
+            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
 
 #_()
