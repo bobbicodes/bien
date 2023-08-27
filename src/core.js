@@ -5,6 +5,13 @@ import * as types from './types.js'
 // Errors/Exceptions
 function mal_throw(exc) { throw new Error(exc); }
 
+function thrown_Q(x) {
+    try {
+        var exp = x
+    } catch (error) {
+        return true
+    }
+}
 
 // String functions
 function pr_str() {
@@ -632,6 +639,7 @@ export var ns = {
     '=': types.allEqual,
     '==': doubleEquals,
     'throw': mal_throw,
+    'thrown?': thrown_Q,
     'nil?': types._nil_Q,
     'true?': types._true_Q,
     'is': _is,

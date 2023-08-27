@@ -168,7 +168,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("two_fer")
-//loadExercise("mymap")
+testSolution("largest_series_product")
+//loadExercise("largest_series_product")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()
