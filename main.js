@@ -168,7 +168,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("etl")
+//testSolution("ps")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

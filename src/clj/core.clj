@@ -7,6 +7,9 @@
     `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
                   ~{:name (str name)}))))
 
+(defn defn- [name & fdecl]
+  (defn [name & fdecl]))
+
 (defn not [a] (if a false true))
 (defn not= [a b] (not (= a b)))
 (defn dec [a] (- a 1))
@@ -324,6 +327,9 @@
       (recur (rest s1)
              (rest s2)
              (conj res (first s1) (first s2))))))
+
+(defn interpose [sep coll]
+   (drop 1 (interleave (repeat (count coll) sep) coll)))
 
 (defn into [to from]
   (reduce conj to from))
