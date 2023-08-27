@@ -168,7 +168,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("largest_series_product")
-//loadExercise("largest_series_product")
+testSolution("etl")
+//loadExercise("gigasecond")
 //testExercisesUntilFail()
 //testExercises()
