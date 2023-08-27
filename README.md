@@ -1,8 +1,6 @@
-# lisp-tutorial
+# bien
 
-In this tutorial we will be building a programming language and learning environment based on [MAL](https://github.com/kanaka/mal) (Make-a-Lisp). It is a teaching language inspired by Clojure that has been implemented in over 90 languages. We will be building it in JavaScript, mainly because it easily runs in the browser, and we will be taking advantage of that by using a custom Codemirror editor to evaluate forms instead of having to type expressions into a REPL prompt. It will be slightly more complicated to begin with, but will pay for itself by facilitating a more convenient and full-featured workflow.
-
-To follow along, generate your own instance of the programming environment by forking the [web-editor-template](https://github.com/bobbicodes/web-editor-template).
+An interactive programming environment based on Lisp
 
 ## Running
 
