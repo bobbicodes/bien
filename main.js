@@ -7,9 +7,10 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(loop [s (seq [[3 2 1 0] [6 5 4] [9 8 7]]) res []]
-  (if (empty? s) res
-      (recur (rest s) (conj res (reverse (first s))))))`,
+  doc: `(let [mystr "hello"]
+  (case mystr
+    "" 0
+    "hello" (count mystr)))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -168,7 +169,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("ps")
+//testSolution("lt")
 //loadExercise("gigasecond")
-testExercisesUntilFail()
-//testExercises()
+//testExercisesUntilFail()
+testExercises()

@@ -523,7 +523,7 @@
   (let* [gmap (gensym "map__")
          defaults (:or b)]
         (loop [ret (-> bvec (conj gmap) (conj v)
-                       (conj gmap) (conj (list 'if (list seq? gmap)
+                       (conj gmap) (conj (list 'if (list sequential? gmap)
                                                `(seq-to-map-for-destructuring ~gmap)
                                                gmap))
                        ((fn [ret]
@@ -593,7 +593,7 @@
             (throw (str "Unsupported binding key: " (ffirst kwbs)))
             (reduce process-entry [] bents)))))
 
-#_(defmacro let [bindings & body]
+(defmacro let [bindings & body]
     `(let* ~(destructure bindings) ~@body))
 
 (defmacro condp [pred expr & clauses]
@@ -620,39 +620,99 @@
            ~gexpr ~expr]
        ~(emit gpred gexpr clauses))))
 
-#_(defmacro case [e & clauses]
-  (let [ge (with-meta (gensym) {:tag Object})
+(defn Math/log [n]
+  (js-eval (str "Math.log(" n ")") ))
+
+(def Integer/MIN_VALUE
+  (js-eval "Number.MIN_VALUE"))
+
+(def Integer/MAX_VALUE
+  (js-eval "Number.MAX_VALUE"))
+
+(defn bit-shift-left [x n]
+  (js-eval (str x " << " n)))
+
+(defn bit-shift-right [x n]
+  (js-eval (str x " >> " n)))
+
+(def max-mask-bits 13)
+
+(def max-switch-table-size (bit-shift-left 1 max-mask-bits))
+
+(defn fits-table? [ints]
+  (< (- (apply max (seq ints)) (apply min (seq ints))) max-switch-table-size))
+
+(defn case-map [case-f test-f tests thens]
+  (sort (into {}
+              (zipmap (map case-f tests)
+                      (map vector
+                           (map test-f tests)
+                           thens)))))
+
+(defn shift-mask [shift mask x]
+  (-> x (bit-shift-right shift) (bit-and mask)))
+
+(defn prep-ints
+  [tests thens]
+  (if (fits-table? tests)
+    ; compact case ints, no shift-mask
+    [0 0 (case-map int int tests thens) :compact]
+    (let [[shift mask] (or (maybe-min-hash (map int tests)) [0 0])]
+      (if (zero? mask)
+        ; sparse case ints, no shift-mask
+        [0 0 (case-map int int tests thens) :sparse]
+        ; compact case ints, with shift-mask
+        [shift mask (case-map #(shift-mask shift mask (int %)) int tests thens) :compact]))))
+
+(defmacro case [e & clauses]
+  (let [ge (gensym)
         default (if (odd? (count clauses))
                   (last clauses)
-                  `(throw (IllegalArgumentException. (str "No matching clause: " ~ge))))]
+                  `(throw (str "No matching clause: " ~ge)))]
     (if (> 2 (count clauses))
-      `(let [~ge ~e] ~default)
-      (let [pairs (partition 2 clauses)
-            assoc-test (fn assoc-test [m test expr]
-                         (if (contains? m test)
-                           (throw (IllegalArgumentException. (str "Duplicate case test constant: " test)))
-                           (assoc m test expr)))
-            pairs (reduce1
-                   (fn [m [test expr]]
-                     (if (seq? test)
-                       (reduce1 #(assoc-test %1 %2 expr) m test)
-                       (assoc-test m test expr)))
-                   {} pairs)
-            tests (keys pairs)
-            thens (vals pairs)
-            mode (cond
-                   (every? #(and (integer? %) (<= Integer/MIN_VALUE % Integer/MAX_VALUE)) tests)
-                   :ints
-                   (every? keyword? tests)
-                   :identity
-                   :else :hashes)]
-        (condp = mode
-          :ints
-          (let [[shift mask imap switch-type] (prep-ints tests thens)]
-            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :int)))
-          :hashes
-          (let [[shift mask imap switch-type skip-check] (prep-hashes ge default tests thens)]
-            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-equiv ~skip-check)))
-          :identity
-          (let [[shift mask imap switch-type skip-check] (prep-hashes ge default tests thens)]
-            `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
+       `(let [~ge ~e] ~default)
+       (let [pairs (partition 2 clauses)
+             assoc-test (defn assoc-test [m test expr]
+                          (if (contains? m test)
+                            (throw (str "Duplicate case test constant: " test))
+                            (assoc m test expr)))
+             pairs (reduce
+                    (fn [m test-expr]
+                      (if (sequential? (first test-expr))
+                        (reduce #(assoc-test %1 %2 (last test-expr)) m (first test-expr))
+                        (assoc-test m (first test-expr) (last test-expr))))
+                    {} pairs)
+             tests (keys pairs)
+             thens (vals pairs)
+             mode (cond
+                    (every? #(and (integer? %) (<= Integer/MIN_VALUE % Integer/MAX_VALUE)) tests)
+                    :ints
+                    (every? keyword? tests)
+                    :identity
+                    :else :hashes)]
+         (condp = mode
+           :ints
+           (let [vec__2 (prep-ints tests thens)
+                 shift (nth vec__2 0 nil)
+                 mask (nth vec__2 1 nil)
+                 imap (nth vec__2 2 nil)
+                 switch-type (nth vec__2 3 nil)]
+             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :int)))
+           :hashes
+           (let [vec__19 (prep-hashes ge default tests thens)
+                 shift (nth vec__19 0 nil)
+                 mask (nth vec__19 1 nil)
+                 imap (nth vec__19 2 nil)
+                 switch-type (nth vec__19 3 nil)
+                 skip-check (nth vec__19 4 nil)]
+             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-equiv ~skip-check)))
+           :identity
+           (let [vec__28 (prep-hashes ge default tests thens)
+                 shift (nth vec__28 0 nil)
+                 mask (nth vec__28 1 nil)
+                 imap (nth vec__28 2 nil)
+                 switch-type (nth vec__28 3 nil)
+                 skip-check (nth vec__28 4 nil)]
+             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
+
+#_()
