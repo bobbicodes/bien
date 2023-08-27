@@ -169,7 +169,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("lt")
+//testSolution("allergies")
 //loadExercise("gigasecond")
-//testExercisesUntilFail()
-testExercises()
+testExercisesUntilFail()
+//testExercises()
