@@ -1,4 +1,5 @@
 import { Fraction } from 'fraction.js'
+import { PRINT } from './interpreter.js'
 
 export function _obj_type(obj) {
     //console.log("obj_type:", typeof obj)
@@ -167,13 +168,28 @@ export function _regex_Q(obj) {
 
 // Functions
 export function _function(Eval, Env, ast, env, params, fnName) {
+    console.log("[_function] defining fn:", fnName)
     var fn = function () {
+        console.log("arguments:", PRINT(Array.from(arguments)))
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
     fn.__ast__ = ast;
     fn.__name__ = fnName
     fn.__gen_env__ = function (args) { return new Env(env, params, args); };
+    fn._ismacro_ = false;
+    return fn;
+}
+
+export function multifn(Eval, Env, bodies, env) {
+    console.log("[multifn] bodies:", PRINT(bodies))
+    var fn = function () {
+        return bodies
+        //return Eval(ast, new Env(env, params, arguments));
+    }
+    fn.__meta__ = null;
+    fn.__ast__ = bodies[0][1];
+    fn.__gen_env__ = function (args) { return new Env(env, bodies[0][0], args)}
     fn._ismacro_ = false;
     return fn;
 }

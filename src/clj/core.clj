@@ -666,7 +666,7 @@
 (defn shift-mask [shift mask x]
   (-> x (bit-shift-right shift) (bit-and mask)))
 
-(defn prep-ints
+#_(defn prep-ints
   [tests thens]
   (if (fits-table? tests)
     ; compact case ints, no shift-mask
@@ -678,7 +678,7 @@
         ; compact case ints, with shift-mask
         [shift mask (case-map #(shift-mask shift mask (int %)) int tests thens) :compact]))))
 
-(defmacro case [e & clauses]
+#_(defmacro case [e & clauses]
   (let [ge (gensym)
         default (if (odd? (count clauses))
                   (last clauses)
@@ -728,5 +728,3 @@
                 switch-type (nth vec__28 3 nil)
                 skip-check (nth vec__28 4 nil)]
             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
-
-#_()

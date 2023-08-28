@@ -7,10 +7,33 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(let [mystr "hello"]
-  (case mystr
-    "" 0
-    "hello" (count mystr)))`,
+  doc: `(defn a
+  ([]
+  (fn
+    ([] "no args")
+    ([n] (str "one arg: " n))))
+  ([n]
+   (fn
+    ([] "no args")
+    ([n] (str "one arg: " n)))))
+
+((a))
+((a) "hi")
+
+((fn [n] (str "hello " n)) "kitty")
+
+(fn ([] "hi"))
+((fn ([] "hi")))
+
+(defn hi [] "hi")
+
+(def hi 
+  (with-meta 
+    (fn [] (do "hi")) 
+    {:name "hi"}))
+
+(macroexpand
+  (defn hi [] "hi"))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -171,5 +194,5 @@ function testExercisesUntilFail() {
 //testSolution(randExercise())
 //testSolution("allergies")
 //loadExercise("gigasecond")
-testExercisesUntilFail()
+//testExercisesUntilFail()
 //testExercises()
