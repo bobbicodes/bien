@@ -398,3 +398,16 @@
        z1 [4 5 6]
        z2 [7 8 9]]
   [x y z])
+
+(defn juxt
+  ([f g]
+   (fn
+     ([] [(f) (g)])
+     ([x] [(f x) (g x)])
+     ([x y] [(f x y) (g x y)])
+     ([x y z] [(f x y z) (g x y z)])
+     ([x y z & args] [(apply f x y z args) (apply g x y z args)]))))
+
+((juxt :a :b) {:a 1 :b 2 :c 3 :d 4})
+
+((juxt take drop) 3 [1 2 3 4 5 6])
