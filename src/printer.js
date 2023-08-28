@@ -48,7 +48,11 @@ export function _pr_str(obj, print_readably) {
         case 'nil':
             return "nil";
         case 'function':
-            return "#function[" + obj.__meta__.get(_keyword("name")) + "]"
+            if (obj.__meta__) {
+                return "#function[" + obj.__meta__.get(_keyword("name")) + "]"
+            } else {
+                return "#function[]"
+            }
         case 'regex':
             const re_str = obj.toString()
             return "#\"" + re_str.substring(1, re_str.length - 2) + "\""

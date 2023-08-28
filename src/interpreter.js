@@ -262,10 +262,7 @@ function _EVAL(ast, env) {
                 }
                 break;
             case "fn":
-                //console.log("defining fn", ast)
-                var lambda = types._function(EVAL, Env, a2, env, a1, a0);
-                lambda.lambda = true
-                return lambda
+                return types._function(EVAL, Env, a2, env, a1);
             default:
                 //console.log("calling", PRINT(ast))
                 for (let i = 0; i < ast.slice(1).length; i++) {
