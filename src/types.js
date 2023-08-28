@@ -188,6 +188,7 @@ export function multifn(Eval, Env, bodies, env) {
             new Env(env, bodies[arguments.length][0], arguments));
     }
     fn.__meta__ = null;
+    fn.__multifn__ = true
     fn.__ast__ = bodies;
     fn.__gen_env__ = function (args) {
         return new Env(env, bodies[args.length][0], args)

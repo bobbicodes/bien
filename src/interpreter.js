@@ -267,8 +267,12 @@ function _EVAL(ast, env) {
                 return lambda
             default:
                 var el = eval_ast(ast, env), f = el[0];
-                var arity = el.slice(1).length
-                if (f.__ast__) {
+                console.log("f:", f, PRINT(ast), env)
+                if (f.__multifn__) {
+                    var arity = el.slice(1).length
+                    ast = f.__ast__[arity][1]
+                    env = f.__gen_env__(el.slice(1));
+                } else if (f.__ast__) {
                     ast = f.__ast__;
                     console.log("calling lambda:", PRINT(ast), " with ", arity, " args")
                     env = f.__gen_env__(el.slice(1));
