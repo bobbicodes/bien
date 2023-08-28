@@ -167,13 +167,12 @@ export function _regex_Q(obj) {
 }
 
 // Functions
-export function _function(Eval, Env, ast, env, params, fnName) {
+export function _function(Eval, Env, ast, env, params) {
     var fn = function () {
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
     fn.__ast__ = ast;
-    fn.__name__ = fnName
     fn.__gen_env__ = function (args) { return new Env(env, params, args); };
     fn._ismacro_ = false;
     return fn;
