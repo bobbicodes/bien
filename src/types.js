@@ -170,7 +170,7 @@ export function _regex_Q(obj) {
 export function _function(Eval, Env, ast, env, params, fnName) {
     console.log("[_function] defining fn:", fnName)
     var fn = function () {
-        console.log("arguments:", PRINT(Array.from(arguments)))
+        console.log("[_function] arguments:", PRINT(Array.from(arguments)))
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
@@ -184,13 +184,16 @@ export function _function(Eval, Env, ast, env, params, fnName) {
 export function multifn(Eval, Env, bodies, env) {
     console.log("[multifn] bodies:", PRINT(bodies))
     var fn = function () {
-        return bodies
-        //return Eval(ast, new Env(env, params, arguments));
+        return Eval(bodies[arguments.length][1], 
+            new Env(env, bodies[arguments.length][0], arguments));
     }
     fn.__meta__ = null;
-    fn.__ast__ = bodies[0][1];
-    fn.__gen_env__ = function (args) { return new Env(env, bodies[0][0], args)}
+    fn.__ast__ = bodies;
+    fn.__gen_env__ = function (args) {
+        return new Env(env, bodies[args.length][0], args)
+    }
     fn._ismacro_ = false;
+    console.log("[multifn] fn has ", bodies.length, " arity bodies")
     return fn;
 }
 

@@ -258,7 +258,7 @@ function _EVAL(ast, env) {
                 }
                 break;
             case "fn":
-                console.log("[fn] defining fn", PRINT(ast))
+                console.log("[eval fn] defining fn", PRINT(ast))
                 if (types._list_Q(a1)) {
                     return types.multifn(EVAL, Env, ast.slice(1), env);
                 }
@@ -267,9 +267,10 @@ function _EVAL(ast, env) {
                 return lambda
             default:
                 var el = eval_ast(ast, env), f = el[0];
+                var arity = el.slice(1).length
                 if (f.__ast__) {
                     ast = f.__ast__;
-                    console.log("calling lambda:", PRINT(ast), " with ", el.slice(1).length, " args")
+                    console.log("calling lambda:", PRINT(ast), " with ", arity, " args")
                     env = f.__gen_env__(el.slice(1));
                 } else {
                     var res = f.apply(f, el.slice(1));

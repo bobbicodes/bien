@@ -20,20 +20,11 @@ let editorState = EditorState.create({
 ((a))
 ((a) "hi")
 
-((fn [n] (str "hello " n)) "kitty")
+((fn ([] "hi")
+     ([n] (str "hi " n))))
 
-(fn ([] "hi"))
-((fn ([] "hi")))
-
-(defn hi [] "hi")
-
-(def hi 
-  (with-meta 
-    (fn [] (do "hi")) 
-    {:name "hi"}))
-
-(macroexpand
-  (defn hi [] "hi"))`,
+((fn ([] "hi")
+     ([n] (str "hi " n))) "kitty")`,
   extensions: [basicSetup, clojure()]
 })
 
