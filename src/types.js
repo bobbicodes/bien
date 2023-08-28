@@ -168,9 +168,7 @@ export function _regex_Q(obj) {
 
 // Functions
 export function _function(Eval, Env, ast, env, params, fnName) {
-    console.log("[_function] defining fn:", fnName)
     var fn = function () {
-        console.log("[_function] arguments:", PRINT(Array.from(arguments)))
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
@@ -182,7 +180,6 @@ export function _function(Eval, Env, ast, env, params, fnName) {
 }
 
 export function multifn(Eval, Env, bodies, env) {
-    console.log("[multifn] bodies:", PRINT(bodies))
     var fn = function () {
         return Eval(bodies[arguments.length][1], 
             new Env(env, bodies[arguments.length][0], arguments));
@@ -194,7 +191,6 @@ export function multifn(Eval, Env, bodies, env) {
         return new Env(env, bodies[args.length][0], args)
     }
     fn._ismacro_ = false;
-    console.log("[multifn] fn has ", bodies.length, " arity bodies")
     return fn;
 }
 
@@ -242,7 +238,6 @@ export function _hash_map_Q(hm) {
 }
 
 export function _assoc_BANG(hm) {
-    //console.log("assoc:", hm)
     if (arguments.length % 2 !== 1) {
         throw new Error("Odd number of assoc arguments");
     }
@@ -251,8 +246,6 @@ export function _assoc_BANG(hm) {
             vtoken = arguments[i + 1];
         hm.set(ktoken, vtoken)
     }
-    //console.log("returning hm", hm)
-    //console.log("_hash_map_Q", _hash_map_Q(hm))
     return hm;
 }
 export function _dissoc_BANG(hm) {
