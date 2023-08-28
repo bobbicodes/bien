@@ -7,7 +7,24 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(def hi (fn [] "hi"))`,
+  doc: `(defn a
+  ([]
+  (fn
+    ([] "no args")
+    ([n] (str "one arg: " n))))
+  ([n]
+   (fn
+    ([] "no args")
+    ([n] (str "one arg: " n)))))
+
+((a))
+((a) "hi")
+
+((fn ([] "hi")
+     ([n] (str "hi " n))))
+
+((fn ([] "hi")
+     ([n] (str "hi " n))) "kitty")`,
   extensions: [basicSetup, clojure()]
 })
 

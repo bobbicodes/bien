@@ -1,4 +1,5 @@
 import { Fraction } from 'fraction.js'
+import { PRINT } from './interpreter.js'
 
 export function _obj_type(obj) {
     //console.log("obj_type:", typeof obj)
@@ -177,6 +178,21 @@ export function _function(Eval, Env, ast, env, params) {
     return fn;
 }
 
+export function multifn(Eval, Env, bodies, env) {
+    var fn = function () {
+        return Eval(bodies[arguments.length][1], 
+            new Env(env, bodies[arguments.length][0], arguments));
+    }
+    fn.__meta__ = null;
+    fn.__multifn__ = true
+    fn.__ast__ = bodies;
+    fn.__gen_env__ = function (args) {
+        return new Env(env, bodies[args.length][0], args)
+    }
+    fn._ismacro_ = false;
+    return fn;
+}
+
 export function _function_Q(obj) { return typeof obj == "function"; }
 Function.prototype.clone = function () {
     var that = this;
@@ -221,7 +237,6 @@ export function _hash_map_Q(hm) {
 }
 
 export function _assoc_BANG(hm) {
-    //console.log("assoc:", hm)
     if (arguments.length % 2 !== 1) {
         throw new Error("Odd number of assoc arguments");
     }
@@ -230,8 +245,6 @@ export function _assoc_BANG(hm) {
             vtoken = arguments[i + 1];
         hm.set(ktoken, vtoken)
     }
-    //console.log("returning hm", hm)
-    //console.log("_hash_map_Q", _hash_map_Q(hm))
     return hm;
 }
 export function _dissoc_BANG(hm) {

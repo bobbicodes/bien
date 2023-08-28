@@ -51,7 +51,7 @@ export function _pr_str(obj, print_readably) {
             if (obj.__meta__) {
                 return "#function[" + obj.__meta__.get(_keyword("name")) + "]"
             } else {
-                return "#function[]"
+                return "#function[fn]"
             }
         case 'regex':
             const re_str = obj.toString()

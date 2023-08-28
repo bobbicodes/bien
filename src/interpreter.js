@@ -195,10 +195,7 @@ function _EVAL(ast, env) {
                 var loop_body = [types._symbol('do')].concat(ast.slice(2))
                 var loop_env = new Env(env);
                 var loopLocals = []
-                //console.log("bindings:", PRINT(a1))
                 for (var i = 0; i < a1.length; i += 2) {
-                    //console.log("[loop] evaluating", PRINT(a1[i + 1]))
-                    //console.log("[loop] binding", a1[i].value, "to", PRINT(EVAL(a1[i + 1], loop_env)))
                     loopLocals.push(a1[i], EVAL(a1[i + 1], loop_env))
                 }
                 for (let i = 0; i < loopLocals.length; i+=2) {
@@ -211,7 +208,6 @@ function _EVAL(ast, env) {
                 loopLocals.__isvector__ = true;
                 var recurForms = ast.slice(1).flatMap(i => [i, i])
                 for (let i = 1; i < recurForms.length; i += 2) {
-                    //console.log("recur form:", PRINT(recurForms[i]))
                     let f = recurForms[i]
                     loopLocals[i] = f
                 }
@@ -262,21 +258,24 @@ function _EVAL(ast, env) {
                 }
                 break;
             case "fn":
-                return types._function(EVAL, Env, a2, env, a1);
+                //console.log("[eval fn] defining fn", PRINT(ast))
+                if (types._list_Q(a1)) {
+                    return types.multifn(EVAL, Env, ast.slice(1), env);
+                }
+                var lambda = types._function(EVAL, Env, a2, env, a1, a0);
+                lambda.lambda = true
+                return lambda
             default:
-                //console.log("calling", PRINT(ast))
-                for (let i = 0; i < ast.slice(1).length; i++) {
-                    //console.log(ast.slice(1)[i])
-                }
                 var el = eval_ast(ast, env), f = el[0];
-                if (f.lambda) {
-                    //console.log("fn is a lambda", f.__ast__)
-                }
-                if (f.__ast__) {
-                    //console.log("lambda AST:", f.__ast__)
-                    ast = f.__ast__;
+                //console.log("f:", f, PRINT(ast), env)
+                if (f.__multifn__) {
+                    var arity = el.slice(1).length
+                    ast = f.__ast__[arity][1]
                     env = f.__gen_env__(el.slice(1));
-                    //console.log("lambda env:", env)
+                } else if (f.__ast__) {
+                    ast = f.__ast__;
+                    //console.log("calling lambda:", PRINT(ast), " with ", arity, " args")
+                    env = f.__gen_env__(el.slice(1));
                 } else {
                     var res = f.apply(f, el.slice(1));
                     return res
@@ -291,7 +290,7 @@ function EVAL(ast, env) {
 }
 
 // print
-function PRINT(exp) {
+export function PRINT(exp) {
     //console.log("PRINT:", exp)
     return _pr_str(exp, true);
 }
