@@ -8,23 +8,12 @@ import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
   doc: `(defn a
-  ([] (fn ([] "outer: 0 args, inner: 0 args")
-          ([n] (str "outer: 0 args, inner: 1 arg: " n))))
-  ([n] (fn ([] "outer: 1 arg, inner: 0 args")
-           ([n] (str "outer: 1 arg, inner: 1 arg: " n)))))
-
-(macroexpand
-(defn a
-  ([] (fn ([] "outer: 0 args, inner: 0 args")
-          ([n] (str "outer: 0 args, inner: 1 arg: " n))))
-  ([n] (fn ([] "outer: 1 arg, inner: 0 args")
-           ([n] (str "outer: 1 arg, inner: 1 arg: " n))))))
-
-((a))
-((a) "hi")
-
-((a 1))
-((a 1) "hi")`,
+  ([a & bs] (str "variadic: " a " and " bs))
+  ([a b] (str "binary: " a " and " b))
+  ([n] (str "unary: " n))
+  ([] "nullary"))
+  
+(a)`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -186,4 +175,4 @@ function testExercisesUntilFail() {
 //testSolution("space_age")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

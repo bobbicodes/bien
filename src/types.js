@@ -1,5 +1,5 @@
 import { Fraction } from 'fraction.js'
-import { PRINT } from './interpreter.js'
+import { PRINT, READ } from './interpreter.js'
 
 export function _obj_type(obj) {
     //console.log("obj_type:", typeof obj)
@@ -178,10 +178,32 @@ export function _function(Eval, Env, ast, env, params) {
     return fn;
 }
 
+function isVariadic(bodies) {
+    for (let i = 0; i < bodies.length; i++) {
+        // I don't know how to recognize symbols by value,
+        // so it's either this or loop through them all
+        if (bodies[i].toString().includes('&')) {
+            return true
+        }
+    }
+    return false
+}
+
 export function multifn(Eval, Env, bodies, env) {
     var fn = function () {
-        return Eval(bodies[arguments.length][1], 
-            new Env(env, bodies[arguments.length][0], arguments));
+        var arity = arguments.length
+        // This is a bit tricky. We have to first check if there is a
+        // variadic overload, and if so, first check for a matching fixed arity,
+        // and if not, use the variadic body.
+        var variadic = isVariadic(bodies)
+        var body
+        for (let i = 0; i < bodies.length; i++) {
+            if (bodies[i][0].length === arity) {
+                body = bodies[i][0]
+            }
+        }
+        return Eval(bodies[arity][1], 
+            new Env(env, bodies[arity][0], arguments));
     }
     fn.__meta__ = null;
     fn.__multifn__ = true

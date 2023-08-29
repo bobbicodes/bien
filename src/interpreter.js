@@ -6,7 +6,7 @@ import * as core from './core.js'
 import core_clj from './clj/core.clj?raw'
 
 // read
-function READ(str) {
+export function READ(str) {
     return read_str(str);
 }
 
