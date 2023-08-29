@@ -8,23 +8,23 @@ import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
   doc: `(defn a
-  ([]
-  (fn
-    ([] "no args")
-    ([n] (str "one arg: " n))))
-  ([n]
-   (fn
-    ([] "no args")
-    ([n] (str "one arg: " n)))))
+  ([] (fn ([] "outer: 0 args, inner: 0 args")
+          ([n] (str "outer: 0 args, inner: 1 arg: " n))))
+  ([n] (fn ([] "outer: 1 arg, inner: 0 args")
+           ([n] (str "outer: 1 arg, inner: 1 arg: " n)))))
+
+(macroexpand
+(defn a
+  ([] (fn ([] "outer: 0 args, inner: 0 args")
+          ([n] (str "outer: 0 args, inner: 1 arg: " n))))
+  ([n] (fn ([] "outer: 1 arg, inner: 0 args")
+           ([n] (str "outer: 1 arg, inner: 1 arg: " n))))))
 
 ((a))
 ((a) "hi")
 
-((fn ([] "hi")
-     ([n] (str "hi " n))))
-
-((fn ([] "hi")
-     ([n] (str "hi " n))) "kitty")`,
+((a 1))
+((a 1) "hi")`,
   extensions: [basicSetup, clojure()]
 })
 

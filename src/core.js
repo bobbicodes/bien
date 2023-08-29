@@ -1,6 +1,7 @@
 import { read_str } from './reader.js';
 import { _pr_str, _println } from './printer.js'
 import * as types from './types.js'
+import { repl_env } from './interpreter.js';
 
 // Errors/Exceptions
 function mal_throw(exc) { throw new Error(exc); }
@@ -633,8 +634,15 @@ function doubleEquals() {
     return nums.every(v => v === nums[0])
 }
 
+// function to print env for debugging
+
+function printEnv() {
+    console.log(repl_env)
+}
+
 // types.ns is namespace of type functions
 export var ns = {
+    'env': printEnv,
     'type': types._obj_type,
     '=': types.allEqual,
     '==': doubleEquals,
