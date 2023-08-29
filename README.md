@@ -1,6 +1,6 @@
 # bien
 
-An interactive programming environment based on Lisp
+A browser-based interactive Lisp environment for learning Clojure
 
 ## Status
 
@@ -21,6 +21,8 @@ I'd estimate that the goal is around 50% complete *by quantity*, though the unim
 2. No protocols. Chris Houser (Chouser) has created a [sketch](https://gist.github.com/Chouser/6081ea66d144d13e56fc) of this feature which is included in the [MAL project](https://github.com/kanaka/mal/blob/master/impls/lib/protocols.mal), but I have not added them yet. The honest truth is, I never use them in my own code. Perhaps I should? Clojurescript is built using heavy use of protocols, and it would be a smart thing for me make better use of that codebase. We'll see, time will tell.
 
 3. Limited destructuring. Specifically, I've implemented sequential destructuring and hooked it up to `let`, but it hasn't been thoroughly tested yet so it might even cause problems. If this is the case, simply use the `let*` which is the special form built into the interpreter which does not use destructuring. Associative destructuring is still not working.
+
+4. Namespaces. This is currently out of scope of the project, which is for learning to code, not writing production software. Therefore a module system is not a high priority since "programs" are never expected to grow to the point where they would be necessary. However, there are many functions which have slashes in their name, either to prevent name collisions or to support interop patterns, such as `str/join`, `Character/digit`, etc. That said, I have prototyped a feature for requiring additional libraries and it seems to work nicely. See [exercism-express](https://github.com/bobbicodes/exercism-express), the precursor for this project in which I created an implementation of zippers.
 
 I plan to update this section regularly with detailed descriptions of various features as I make progress.
 
