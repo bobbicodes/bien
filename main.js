@@ -183,7 +183,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("allergies")
+//testSolution("space_age")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()
