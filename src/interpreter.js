@@ -261,16 +261,14 @@ function _EVAL(ast, env) {
                 //console.log("[eval fn] defining fn", PRINT(ast))
                 if (types._list_Q(a1)) {
                     return types.multifn(EVAL, Env, ast.slice(1), env);
+                } else {
+                    return types._function(EVAL, Env, a2, env, a1, a0);
                 }
-                var lambda = types._function(EVAL, Env, a2, env, a1, a0);
-                lambda.lambda = true
-                return lambda
             default:
                 var el = eval_ast(ast, env), f = el[0];
                 //console.log("f:", f, PRINT(ast), env)
                 if (f.__multifn__) {
-                    var arity = el.slice(1).length
-                    ast = f.__ast__[arity][1]
+                    ast = f.__ast__(el.slice(1))
                     env = f.__gen_env__(el.slice(1));
                 } else if (f.__ast__) {
                     ast = f.__ast__;

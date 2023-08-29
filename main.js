@@ -7,13 +7,23 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(defn a
+  doc: `(defn hi [] "hi")
+(hi)
+
+((fn ([] "hi")))
+
+(defn a
   ([a & bs] (str "variadic: " a " and " bs))
+  ([a b c] (str "trinary: " a b c))
   ([a b] (str "binary: " a " and " b))
   ([n] (str "unary: " n))
   ([] "nullary"))
-  
-(a)`,
+
+(a)
+(a 1)
+(a 1 2)
+(a 1 2 3)
+(a 1 2 3 4)`,
   extensions: [basicSetup, clojure()]
 })
 

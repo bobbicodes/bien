@@ -169,6 +169,7 @@ export function _regex_Q(obj) {
 // Functions
 export function _function(Eval, Env, ast, env, params) {
     var fn = function () {
+        //console.log("eval lambda:", PRINT(ast))
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;
@@ -178,38 +179,42 @@ export function _function(Eval, Env, ast, env, params) {
     return fn;
 }
 
-function isVariadic(bodies) {
+function findVariadic(bodies) {
     for (let i = 0; i < bodies.length; i++) {
         // I don't know how to recognize symbols by value,
         // so it's either this or loop through them all
-        if (bodies[i].toString().includes('&')) {
-            return true
+        if (bodies[i][0].toString().includes('&')) {
+            return bodies[i]
         }
     }
-    return false
+}
+
+function findFixedArity(arity, bodies) {
+    for (let i = 0; i < bodies.length; i++) {
+        if (bodies[i][0].length === arity && !bodies[i][0].toString().includes('&')) {
+            return bodies[i]
+        }
+    }
 }
 
 export function multifn(Eval, Env, bodies, env) {
     var fn = function () {
         var arity = arguments.length
-        // This is a bit tricky. We have to first check if there is a
-        // variadic overload, and if so, first check for a matching fixed arity,
-        // and if not, use the variadic body.
-        var variadic = isVariadic(bodies)
-        var body
-        for (let i = 0; i < bodies.length; i++) {
-            if (bodies[i][0].length === arity) {
-                body = bodies[i][0]
-            }
-        }
-        return Eval(bodies[arity][1], 
-            new Env(env, bodies[arity][0], arguments));
+        var body = findFixedArity(arity, bodies) || findVariadic(bodies)
+        return Eval(body[1], 
+            new Env(env, body[0], arguments));
     }
     fn.__meta__ = null;
     fn.__multifn__ = true
-    fn.__ast__ = bodies;
+    fn.__ast__ = function(args) {
+        var arity = args.length
+        var ast = findFixedArity(arity, bodies) || findVariadic(bodies)
+        return ast[1]
+    }
     fn.__gen_env__ = function (args) {
-        return new Env(env, bodies[args.length][0], args)
+        var arity = args.length
+        var body = findFixedArity(arity, bodies) || findVariadic(bodies)
+        return new Env(env, body[0], args)
     }
     fn._ismacro_ = false;
     return fn;
