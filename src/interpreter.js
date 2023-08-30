@@ -158,7 +158,7 @@ function _EVAL(ast, env) {
         }
         switch (a0.value) {
             case "ns":
-            case "discard":
+            case "discard-form":
                 return null
             case "dispatch":
                 //console.log("eval dispatch")

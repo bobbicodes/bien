@@ -281,14 +281,11 @@
   (not (zero? (mod n 2))))
 
 (defn complement [f]
-  (fn [x y & zs]
-    (if zs
-      (not (apply f x y zs))
-      (if y
-        (not (f x y))
-        (if x
-          (not (f x))
-          (not (f)))))))
+  (fn
+    ([] (not (f)))
+    ([x] (not (f x)))
+    ([x y] (not (f x y)))
+    ([x y & zs] (not (apply f x y zs)))))
 
 (defn mapcat [f & colls]
   (apply concat (apply map f colls)))

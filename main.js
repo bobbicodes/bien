@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("nucleotide_count")
+testSolution("strain")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

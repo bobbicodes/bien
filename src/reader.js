@@ -108,7 +108,7 @@ function read_form(reader) {
         //console.log("reading dispatch")
             return [types._symbol('dispatch'), read_form(reader)];
         case '#_': reader.next();
-            return [types._symbol('discard'), read_form(reader)];
+            return [types._symbol('discard-form'), read_form(reader)];
         // list
         case ')': throw new Error("unexpected ')'");
         case '(': return read_list(reader);
