@@ -297,7 +297,8 @@
 (defn map1 [f coll]
   (loop [s (seq coll) res []]
     (if (empty? s) res
-        (recur (rest s) (conj res (f (first s)))))))
+        (recur (rest s) 
+               (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
 
 (defn map2 [f c1 c2]
   (loop [s1 (seq c1) s2 (seq c2) res []]
