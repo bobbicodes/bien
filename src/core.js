@@ -737,7 +737,7 @@ export var ns = {
     'drop': drop,
     'empty?': empty_Q,
     'count': count,
-    'apply': apply,
+    'apply*': apply,
     //'map': map,
     'repeat': repeat,
     'str/join': _join,

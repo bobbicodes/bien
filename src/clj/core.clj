@@ -59,9 +59,55 @@
     `(if (not ~test) ~then ~else)
     `(if-not ~test ~then nil)))
 
-(defn juxt [& f]
-  (fn [& a]
-    (map #(apply % a) f)))
+(defn apply [f coll]
+  (if (keyword? f)
+    (get coll f)
+    (apply* f coll)))
+
+(defn spread [arglist]
+  (cond
+    (nil? arglist) nil
+    (nil? (next arglist)) (seq (first arglist))
+    :else (cons (first arglist) (spread (next arglist)))))
+
+(defn list*
+  ([args] (seq args))
+  ([a args] (cons a args))
+  ([a b args] (cons a (cons b args)))
+  ([a b c args] (cons a (cons b (cons c args))))
+  ([a b c d & more]
+   (cons a (cons b (cons c (cons d (spread more)))))))
+
+(defn juxt
+  ([f]
+   (fn
+     ([] [(f)])
+     ([x] [(f x)])
+     ([x y] [(f x y)])
+     ([x y z] [(f x y z)])
+     ([x y z & args] [(apply f x y z args)])))
+  ([f g]
+   (fn
+     ([] [(f) (g)])
+     ([x] [(f x) (g x)])
+     ([x y] [(f x y) (g x y)])
+     ([x y z] [(f x y z) (g x y z)])
+     ([x y z & args] [(apply f x y z args) (apply g x y z args)])))
+  ([f g h]
+   (fn
+     ([] [(f) (g) (h)])
+     ([x] [(f x) (g x) (h x)])
+     ([x y] [(f x y) (g x y) (h x y)])
+     ([x y z] [(f x y z) (g x y z) (h x y z)])
+     ([x y z & args] [(apply f x y z args) (apply g x y z args) (apply h x y z args)])))
+  ([f g h & fs]
+   (let [fs (list* f g h fs)]
+     (fn
+       ([] (reduce #(conj %1 (%2)) [] fs))
+       ([x] (reduce #(conj %1 (%2 x)) [] fs))
+       ([x y] (reduce #(conj %1 (%2 x y)) [] fs))
+       ([x y z] (reduce #(conj %1 (%2 x y z)) [] fs))
+       ([x y z & args] (reduce #(conj %1 (apply %2 x y z args)) [] fs))))))
 
 (defn .toUpperCase [s]
   (. (str "'" s "'" ".toUpperCase")))
