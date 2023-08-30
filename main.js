@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("hexadecimal")
+//testSolution("nucleotide_count")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
 testExercises()
