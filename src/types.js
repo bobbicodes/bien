@@ -169,7 +169,6 @@ export function _regex_Q(obj) {
 // Functions
 export function _function(Eval, Env, ast, env, params) {
     var fn = function () {
-        //console.log("eval lambda:", PRINT(ast))
         return Eval(ast, new Env(env, params, arguments));
     };
     fn.__meta__ = null;

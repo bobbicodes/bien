@@ -297,6 +297,9 @@
 (defn split-at [n coll]
   [(take n coll) (drop n coll)])
 
+(defn str/split-lines [s]
+  (str/split s #"\r?\n"))
+
 (defn partition-all [n step coll]
   (if-not coll
     (partition-all n n step)
@@ -491,7 +494,7 @@
   (reduce #(get % %2) m ks))
 
 (defmacro for [seq-exprs body-expr]
-  (let* [body-expr* body-expr
+  (let [body-expr* body-expr
          iter# (gensym)
          to-groups (fn [seq-exprs]
                      (reduce (fn [groups kv]
@@ -500,20 +503,20 @@
                                  (conj groups [(first kv) (last kv)])))
                              [] (partition 2 seq-exprs)))
          emit-bind (defn emit-bind [bindings]
-                     (let* [giter (gensym "iter__")
+                     (let [giter (gensym "iter__")
                             gxs (gensym "s__")
                             iterys# (gensym "iterys__")
                             fs#     (gensym "fs__")
                             do-mod (defn do-mod [mod]
                                      (cond
-                                       (= (ffirst mod) :let) `(let* ~(second (first mod)) ~(do-mod (next mod)))
+                                       (= (ffirst mod) :let) `(let ~(second (first mod)) ~(do-mod (next mod)))
                                        (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
                                        (= (ffirst mod) :when) `(if ~(second (first mod))
                                                                  ~(do-mod (next mod))
                                                                  (recur (rest ~gxs)))
                                        (keyword?  (ffirst mod)) (throw (str "Invalid 'for' keyword " (ffirst mod)))
                                        (next bindings)
-                                       `(let* [~iterys# ~(emit-bind (next bindings))
+                                       `(let [~iterys# ~(emit-bind (next bindings))
                                                ~fs# (seq (~iterys# ~(second (first (next bindings)))))]
                                               (if ~fs#
                                                 (concat ~fs# (~giter (rest ~gxs)))
@@ -527,9 +530,9 @@
                              `(defn ~giter [~gxs]
                                 (loop [~gxs ~gxs]
                                   (when-let [~gxs (seq ~gxs)]
-                                    (let* [~(ffirst bindings) (first ~gxs)]
+                                    (let [~(ffirst bindings) (first ~gxs)]
                                           ~(do-mod (subvec (first bindings) 2)))))))))]
-        `(let* [~iter# ~(emit-bind (to-groups seq-exprs))]
+        `(let [~iter# ~(emit-bind (to-groups seq-exprs))]
                (remove nil?
                        (~iter# ~(second seq-exprs))))))
 
@@ -561,11 +564,11 @@
   (js-eval (str "'" b "'" ".includes(" "'" "&" "'" ")")))
 
 (defn pvec [bvec b val]
-  (let* [gvec (gensym "vec__")
+  (let [gvec (gensym "vec__")
          gseq (gensym "seq__")
          gfirst (gensym "first__")
          has-rest (has-rest? b)]
-        (loop [ret (let* [ret (conj bvec gvec val)]
+        (loop [ret (let [ret (conj bvec gvec val)]
                          (if has-rest
                            (conj ret gseq (list seq gvec))
                            ret))
@@ -573,7 +576,7 @@
                bs b
                seen-rest? false]
           (if (seq bs)
-            (let* [firstb (first bs)]
+            (let [firstb (first bs)]
                   (cond
                     (= firstb '&) (recur (pb ret (second bs) gseq)
                                          n

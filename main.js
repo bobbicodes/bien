@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("deinterleave")
+//testSolution("ttt")
 //loadExercise("gigasecond")
 testExercisesUntilFail()
 //testExercises()

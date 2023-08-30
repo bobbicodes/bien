@@ -158,6 +158,9 @@ export function count(s) {
 
 function conj(lst) {
     //console.log(lst)
+    if (types._iterate_Q(lst)) {
+        return "TODO: implement iterate on conj"
+    }
     if (types._list_Q(lst)) {
         return Array.prototype.slice.call(arguments, 1).reverse().concat(lst);
     } else if (types._vector_Q(lst)) {

@@ -275,7 +275,7 @@ function _EVAL(ast, env) {
                     //console.log("calling lambda:", PRINT(ast), " with ", arity, " args")
                     env = f.__gen_env__(el.slice(1));
                 } else {
-                    if (types._keyword_Q(f)) {
+                    if (types._keyword_Q(f) || types._vector_Q(f) || types._hash_map_Q(f)) {
                         return EVAL([f].concat(el.slice(1)), env)
                     }
                     var res = f.apply(f, el.slice(1));
