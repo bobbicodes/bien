@@ -22,7 +22,8 @@ function pr_str() {
 }
 
 function str() {
-    return Array.prototype.map.call(arguments, function (exp) {
+    const args = Array.from(arguments).filter(v => v !== null);
+    return Array.prototype.map.call(args, function (exp) {
         return _pr_str(exp, false);
     }).join("");
 }

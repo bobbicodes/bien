@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("space_age")
+testSolution("say")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
 //testExercises()
