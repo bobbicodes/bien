@@ -69,6 +69,7 @@ function loadExercise(slug) {
 }
 
 function testSolution(slug) {
+  tests
   loadExercise(slug)
   const k = slug.replaceAll("-", "_")
   const src = solutions[k].trim()

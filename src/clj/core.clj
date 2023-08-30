@@ -335,6 +335,9 @@
 (defn split-at [n coll]
   [(take n coll) (drop n coll)])
 
+(defn split-with [pred coll]
+  [(take-while pred coll) (drop-while pred coll)])
+
 (defn str/split-lines [s]
   (str/split s #"\r?\n"))
 
