@@ -126,7 +126,7 @@ export const evalTopLevel = (view) => {
     const codeBeforeFormEnd = codeBeforeEval.slice(0, posAtFormEnd)
     const codeAfterFormEnd = codeBeforeEval.slice(posAtFormEnd, codeBeforeEval.length)
     evalResult = tryEval(topLevelString(view.state))
-    const codeWithResult = codeBeforeFormEnd + " => " + evalResult + " " + codeAfterFormEnd
+    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + evalResult + " " + codeAfterFormEnd
     updateEditor(view, codeWithResult, posBeforeEval)
     return true
 }
