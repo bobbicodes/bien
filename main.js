@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("protein_translation")
+//testSolution("hexadecimal")
 //loadExercise("gigasecond")
 //testExercisesUntilFail()
 testExercises()

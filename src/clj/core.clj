@@ -13,8 +13,18 @@
       `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
                     ~{:name (str name)})))))
 
-(defn defn- [name & fdecl]
-  (defn [name & fdecl]))
+(defmacro defn- [name & fdecl]
+  (if (string? (first fdecl))
+    (if (list? (second fdecl))
+      `(def ~name (with-meta (fn ~@(rest fdecl))
+                    ~{:name (str name) :doc (first fdecl)}))
+      `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl)))
+                    ~{:name (str name) :doc (first fdecl)})))
+    (if (list? (first fdecl))
+      `(def ~name (with-meta (fn ~@fdecl)
+                    ~{:name (str name)}))
+      `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
+                    ~{:name (str name)})))))
 
 (defn not [a] (if a false true))
 (defn not= [a b] (not (= a b)))
