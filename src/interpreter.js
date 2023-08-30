@@ -76,7 +76,7 @@ export function clearTests() {
 
 export var deftests = []
 
-function walk(inner, outer, form) {
+export function walk(inner, outer, form) {
     //console.log("Walking form:", form)
     if (types._list_Q(form)) {
         return outer(form.map(inner))

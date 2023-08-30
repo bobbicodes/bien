@@ -178,6 +178,34 @@
         (pred (first xs)) (every? pred (rest xs))
         true              false))
 
+(defn postwalk [f form]
+  (walk (partial postwalk f) f form))
+
+(defn prewalk [f form]
+  (walk (partial prewalk f) identity (f form)))
+
+(defn postwalk-replace [smap form]
+  (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
+
+(defn apply-template [argv expr values]
+  (postwalk-replace (zipmap argv values) expr))
+
+(defmacro do-template [argv expr & values]
+  (let [c (count argv)]
+    `(do ~@(map (fn [a] (apply-template argv expr a))
+                (partition c values)))))
+
+(defmacro are [argv expr & args]
+  (if (or
+       ;; (are [] true) is meaningless but ok
+       (and (empty? argv) (empty? args))
+       ;; Catch wrong number of args
+       (and (pos? (count argv))
+            (pos? (count args))
+            (zero? (mod (count args) (count argv)))))
+    `(do-template ~argv (is ~expr) ~@args)
+    (throw "The number of args doesn't match are's argv.")))
+
 (defn not-every? [pred xs]
   (not (every? pred xs)))
 

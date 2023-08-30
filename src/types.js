@@ -161,6 +161,9 @@ export function _keyword_Q(obj) {
     return typeof obj === 'string' && obj[0] === '\u029e';
 }
 
+export function _mapEntry_Q(obj) {
+    return Object.hasOwn(obj, '__mapEntry__') && obj.__mapEntry__ === true
+}
 
 export function _regex_Q(obj) {
     return obj instanceof RegExp

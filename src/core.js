@@ -1,7 +1,7 @@
 import { read_str } from './reader.js';
 import { _pr_str, _println } from './printer.js'
 import * as types from './types.js'
-import { repl_env } from './interpreter.js';
+import { repl_env, walk } from './interpreter.js';
 
 // Errors/Exceptions
 function mal_throw(exc) { throw new Error(exc); }
@@ -667,6 +667,7 @@ export var ns = {
     'set?': types._set_Q,
     'keyword': types._keyword,
     'keyword?': types._keyword_Q,
+    'map-entry?': types._mapEntry_Q,
     'fn?': types._fn_Q,
     'macro?': types._macro_Q,
     'char': char,
@@ -730,6 +731,7 @@ export var ns = {
     //'mod': mod,
     'rem': mod,
     'iterate': iterate,
+    'walk': walk,
 
     'sequential?': types._sequential_Q,
     'cons': cons,
