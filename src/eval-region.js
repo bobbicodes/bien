@@ -82,7 +82,7 @@ export function tryEval(s) {
 }
 
 export const clearEval = (view) => {
-    posBeforeEval = view.state.selection.main.head
+    //posBeforeEval = view.state.selection.main.head
     testPosBeforeEval = view.state.selection.main.head
     //console.log("Clearing previous evaluation result")
     const parent = view.dom.parentElement.id

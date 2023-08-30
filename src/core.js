@@ -407,6 +407,9 @@ function subtract() {
 }
 
 function product() {
+    if (arguments.length === 0) {
+        return 1
+    }
     var res = Array.from(arguments).reduce((acc, a) => acc * a, 1);
     if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
         res = types._ratio(res)

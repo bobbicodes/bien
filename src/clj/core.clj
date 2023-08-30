@@ -38,10 +38,12 @@
 (defn nnext [s]
   (next (next s)))
 
-(defn reduce [f init xs]
-  (if (empty? xs)
-    init
-    (reduce f (f init (first xs)) (rest xs))))
+(defn reduce
+  ([f xs] (reduce f (first xs) (rest xs)))
+  ([f init xs]
+   (if (empty? xs)
+     init
+     (reduce f (f init (first xs)) (rest xs)))))
 
 (defn reductions [f init xs]
   (loop [s xs acc init res [init]]
@@ -59,10 +61,19 @@
     `(if (not ~test) ~then ~else)
     `(if-not ~test ~then nil)))
 
-(defn apply [f coll]
-  (if (keyword? f)
-    (get coll f)
-    (apply* f coll)))
+(defn apply
+  ([f args]
+   (if (keyword? f)
+     (get args f)
+     (apply* f args)))
+  ([f x args]
+   (apply f (list* x args)))
+  ([f x y args]
+   (apply f (list* x y args)))
+  ([f x y z args]
+   (apply f (list* x y z args)))
+  ([f a b c d & args]
+   (apply f (cons a (cons b (cons c (cons d (spread args))))))))
 
 (defn spread [arglist]
   (cond
@@ -108,6 +119,19 @@
        ([x y] (reduce #(conj %1 (%2 x y)) [] fs))
        ([x y z] (reduce #(conj %1 (%2 x y z)) [] fs))
        ([x y z & args] (reduce #(conj %1 (apply %2 x y z args)) [] fs))))))
+
+(defn comp
+  ([] identity)
+  ([f] f)
+  ([f g]
+   (fn
+     ([] (f (g)))
+     ([x] (f (g x)))
+     ([x y] (f (g x y)))
+     ([x y z] (f (g x y z)))
+     ([x y z & args] (f (apply g x y z args)))))
+  ([f g & fs]
+   (reduce comp (list* f g fs))))
 
 (defn .toUpperCase [s]
   (. (str "'" s "'" ".toUpperCase")))
