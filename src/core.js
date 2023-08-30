@@ -97,8 +97,8 @@ function contains_Q(coll, key) {
     if (key in coll) { return true; } else { return false; }
 }
 
-function keys(hm) { return Object.keys(hm); }
-function vals(hm) { return Object.keys(hm).map(function (k) { return hm[k]; }); }
+function keys(hm) { return Array.from(hm.keys()) }
+function vals(hm) { return Array.from(hm.values()) }
 
 
 // Sequence functions
