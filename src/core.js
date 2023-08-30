@@ -119,6 +119,12 @@ function vec(lst) {
 }
 
 export function nth(lst, idx, notfound) {
+    if (types._iterate_Q(lst)) {
+        for (let i = 0; i < idx; i++) {
+            lst.next()
+        }
+        return lst.realized[idx]
+    }
     if (idx < lst.length) { return lst[idx]; }
     else { return notfound }
 }

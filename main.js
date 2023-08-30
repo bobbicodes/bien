@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("strain")
-//loadExercise("gigasecond")
+//testSolution("nth_prime")
+//loadExercise("nth_prime")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

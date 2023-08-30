@@ -528,6 +528,9 @@
 (defn Math/floor [x]
   (js-eval (str "Math.floor(" x ")")))
 
+(defn Math/ceil [x]
+  (js-eval (str "Math.ceil(" x ")")))
+
 (defn get-in [m ks]
   (reduce #(get % %2) m ks))
 
