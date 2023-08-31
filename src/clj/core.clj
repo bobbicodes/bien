@@ -87,6 +87,13 @@
                    (reduce merge-entry (or m1 {}) (seq m2)))]
       (reduce merge2 maps))))
 
+(defn str/escape [s cmap]
+  (loop [index  0
+         buffer ""]
+    (if (= (count s) index) buffer
+        (recur (inc index) 
+               (str buffer (get cmap (nth s index) (nth s index)))))))
+
 (defn apply
   ([f args]
    (if (keyword? f)
