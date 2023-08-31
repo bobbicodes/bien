@@ -13,6 +13,8 @@ export function _pr_str(obj, print_readably) {
     switch (ot) {
         case 'lazy-range':
             return "(0 1 2 3 4 5 6 7 8 9 10 ...)";
+        case 'lazy-iterable':
+            return _pr_str([...obj], _r)
         case 'iterate':
             return "#iterate[" + obj.f + "]";
         case 'cycle':
