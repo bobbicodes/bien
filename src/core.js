@@ -373,7 +373,33 @@ function char(int) {
     return String.fromCharCode(int)
 }
 
-function filter(f, lst) {
+function seqable_QMARK_(x) {
+    // String is iterable but doesn't allow `m in s`
+    return typeof x === 'string' || x === null || x === undefined || Symbol.iterator in x;
+}
+
+function iterable(x) {
+    // nil puns to empty iterable, support passing nil to first/rest/reduce, etc.
+    if (x === null || x === undefined) {
+        return [];
+    }
+    if (seqable_QMARK_(x)) {
+        return x;
+    }
+    return Object.entries(x);
+}
+
+function filter(pred, coll) {
+    return lazy(function* () {
+        for (const x of iterable(coll)) {
+            if (pred(x)) {
+                yield x;
+            }
+        }
+    });
+}
+
+/* function filter(f, lst) {
     if (types._iterate_Q(lst)) {
         return "TODO: filter iterate object"
     }
@@ -384,7 +410,7 @@ function filter(f, lst) {
         return seq(lst).filter(function (el) { return f.has(el); });
     }
     return seq(lst).filter(function (el) { return f(el); })
-}
+} */
 
 function min() {
     return Math.min.apply(null, arguments);
@@ -679,6 +705,20 @@ function doubleEquals() {
 
 function printEnv() {
     console.log(repl_env)
+}
+
+class LazyIterable {
+    constructor(gen) {
+        this.name = 'LazyIterable'
+        this.gen = gen;
+    }
+    [Symbol.iterator]() {
+        return this.gen();
+    }
+}
+
+export function lazy(f) {
+    return new LazyIterable(f);
 }
 
 // types.ns is namespace of type functions

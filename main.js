@@ -7,15 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(def entries [{:month 1 :val 12}
-    {:month 2 :val 3}
-    {:month 3 :val 32}])
-
-(apply max (map
-  :val
-  entries))
-
-((juxt :a :b) {:a 1 :b 2 :c 3 :d 4})`,
+  doc: `(filter even? (range 10))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -177,4 +169,4 @@ function testExercisesUntilFail() {
 //testSolution("wordy")
 //loadExercise("nth_prime")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()
