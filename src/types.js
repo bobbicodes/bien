@@ -2,7 +2,7 @@ import { Fraction } from 'fraction.js'
 import { PRINT, READ } from './interpreter.js'
 
 export function _obj_type(obj) {
-    console.log("obj:", obj)
+    //console.log("obj:", obj)
     //console.log("obj_type:", typeof obj)
     if (_symbol_Q(obj)) { return 'symbol'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
@@ -70,12 +70,15 @@ export function _lazy_range_Q(x) {
     return false
 }
 
-export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
+export function _sequential_Q(lst) {
+    return _list_Q(lst) || _vector_Q(lst) || _lazy_iterable_Q(lst)
+}
 
 
 export function _equal_Q(a, b) {
     var ota = _obj_type(a), otb = _obj_type(b);
     if (!(ota === otb || (_sequential_Q(a) && _sequential_Q(b)))) {
+        console.log("not sequential")
         return false;
     }
     switch (ota) {
@@ -83,10 +86,14 @@ export function _equal_Q(a, b) {
         case 'list':
         case 'vector':
         case 'set':
-            //console.log("comparing", ota, "and", otb)
+        case 'lazy-iterable':
+            a = Array.from(a)
+            b = Array.from(b)
             if (a.length !== b.length) { return false; }
             for (var i = 0; i < a.length; i++) {
-                if (!_equal_Q(a[i], b[i])) { return false; }
+                if (!_equal_Q(a[i], b[i])) {
+                    return false
+                }
             }
             return true;
         case 'hash-map':
@@ -102,6 +109,9 @@ export function _equal_Q(a, b) {
 
 export function allEqual() {
     const args = Array.from(arguments)
+    if (args.length === 2) {
+        return _equal_Q(args[0], args[1])
+    }
     return args.every(v => _equal_Q(v, args[0]))
 }
 

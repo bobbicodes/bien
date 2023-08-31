@@ -7,7 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(filter even? (range 10))`,
+  doc: `(= '(6 7) (filter #(> % 5) '(3 4 5 6 7)))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("wordy")
+//testSolution("filter")
 //loadExercise("nth_prime")
 //testExercisesUntilFail()
 //testExercises()
