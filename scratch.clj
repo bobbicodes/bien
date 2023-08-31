@@ -362,3 +362,37 @@
                             [] (partition 2 seq-exprs)))]
    `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
      (iter# ~(second seq-exprs)))))
+
+(macroexpand '(->> (concat across down)
+                   (mapcat #(str/split % #"#"))
+                   (some #(re-matches (re-pattern %) word))))
+
+(def word "the")
+(def board ["_ # _ _ e"])
+(def across (map #(str/escape % {" " "", \_ \.}) board))
+(def down (apply map str across))
+(concat across down)
+
+(first (concat across down))
+
+((fn [s] (str/split s #"#"))
+ (first (concat across down)))
+
+(mapcat (fn [s] (str/split s #"#")) (concat across down))
+(map (fn [s] (str/split s #"#")) (concat across down))
+
+(defn cw [word board]
+  (let [across (map #(str/escape % {" " "", \_ \.}) board)
+        down (apply map str across)]
+    (string? (->> (concat across down)
+                  (mapcat #(str/split % #"#"))
+                  (some #(re-matches (re-pattern %) word))))))
+
+
+(->> (concat across down)
+     (mapcat (fn [s] (str/split s #"#")))
+     (some (fn [re] (re-matches (re-pattern re) word))))
+
+(cw "the" ["_ # _ _ e"])
+
+(some (fn* [%1] (re-matches (re-pattern %1) word)) (mapcat (fn* [%1] (str/split %1 #"#")) (concat across down)))

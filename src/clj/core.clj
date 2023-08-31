@@ -824,6 +824,11 @@
 (defn fits-table? [ints]
   (< (- (apply max (seq ints)) (apply min (seq ints))) max-switch-table-size))
 
+;; I'm flabbergasted at how much more involved `case` is compared to `cond` and `condp`.
+;; And this isn't even close to all of it - because here it ends with a call to `case*`,
+;; the very last part of the Clojure compiler. I don't understand why we need bitwise
+;; operations for a control flow structure...
+
 (defn case-map [case-f test-f tests thens]
   (sort (into {}
               (zipmap (map case-f tests)
@@ -896,3 +901,89 @@
                 switch-type (nth vec__28 3 nil)
                 skip-check (nth vec__28 4 nil)]
             `(let [~ge ~e] (case* ~ge ~shift ~mask ~default ~imap ~switch-type :hash-identity ~skip-check))))))))
+
+;; I never use protocols, but this might come in handy if I (or someone else) want(s) to
+
+(defn find-type [obj]
+  (cond
+    (symbol?  obj) :mal/symbol
+    (keyword? obj) :mal/keyword
+    (atom?    obj) :mal/atom
+    (nil?     obj) :mal/nil
+    (true?    obj) :mal/boolean
+    (false?   obj) :mal/boolean
+    (number?  obj) :mal/number
+    (string?  obj) :mal/string
+    (macro?   obj) :mal/macro
+    true
+    (let [metadata (meta obj)
+          type     (when (map? metadata) (get metadata :type))]
+      (cond
+        (keyword? type) type
+        (list?   obj)   :mal/list
+        (vector? obj)   :mal/vector
+        (map?    obj)   :mal/map
+        (fn?     obj)   :mal/function
+        true            (throw "unknown MAL value in protocols")))))
+
+;; A protocol (abstract class, interface..) is represented by a symbol.
+;; It describes methods (abstract functions, contracts, signals..).
+;; Each method is described by a sequence of two elements.
+;; First, a symbol setting the name of the method.
+;; Second, a vector setting its formal parameters.
+;; The first parameter is required, plays a special role.
+;; It is usually named `this` (`self`..).
+;; For example,
+;;   (defprotocol protocol
+;;     (method1 [this])
+;;     (method2 [this argument]))
+;; can be thought as:
+;;   (def method1 (fn [this]) ..)
+;;   (def method2 (fn [this argument]) ..)
+;;   (def protocol ..)
+;; The return value is the new protocol.
+;; A protocol is an atom mapping a type extending the protocol to
+;; another map from method names as keywords to implementations.
+(defmacro defprotocol [proto-name & methods]
+    (let [drop2 (fn [args]
+                  (if (= 2 (count args))
+                    ()
+                    (cons (first args) (drop2 (rest args)))))
+          rewrite (fn [method]
+                    (let [name     (first method)
+                          args     (nth method 1)
+                          argc     (count args)
+                          varargs? (when (<= 2 argc) (= '& (nth args (- argc 2))))
+                          dispatch `(get (get @~proto-name
+                                              (find-type ~(first args)))
+                                         ~(keyword (str name)))
+                          body     (if varargs?
+                                     `(apply ~dispatch ~@(drop2 args) ~(nth args (- argc 1)))
+                                     (cons dispatch args))]
+                      (list 'def name (list 'fn args body))))]
+      `(do
+         ~@(map rewrite methods)
+         (def ~proto-name (atom {})))))
+
+;; A type (concrete class..) extends (is a subclass of, implements..)
+;; a protocol when it provides implementations for the required methods.
+;;   (extend type protocol {
+;;     :method1 (fn [this] ..)
+;;     :method2 (fn [this arg1 arg2])})
+;; Additional protocol/methods pairs are equivalent to successive
+;; calls with the same type.
+;; The return value is `nil`.
+(defn extend [type proto methods & more]
+  (do (swap! proto assoc type methods)
+      (when (first more)
+        (apply extend type more))))
+
+;; An object satisfies a protocol when its type extends the protocol,
+;; that is if the required methods can be applied to the object.
+;; If `(satisfies protocol obj)` with the protocol below
+;; then `(method1 obj)` and `(method2 obj 1 2)`
+;; dispatch to the concrete implementation provided by the exact type.
+;; Should the type evolve, the calling code needs not change.
+(defn satisfies? [protocol obj]
+  (contains? @protocol (find-type obj)))
+

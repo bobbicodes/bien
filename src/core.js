@@ -84,7 +84,7 @@ function get(coll, key, notfound) {
         return coll[key]
     }
     if (coll != null) {
-        
+
         return coll.get(key) || notfound
     } else {
         return null;
@@ -164,7 +164,6 @@ export function count(s) {
 }
 
 function conj(lst) {
-    //console.log(lst)
     if (types._iterate_Q(lst)) {
         return "TODO: implement iterate on conj"
     }
@@ -189,6 +188,10 @@ function conj(lst) {
         }
         return hm
     }
+}
+
+function re_pattern(s) {
+    return new RegExp(s, 'g')
 }
 
 function split(s, re) {
@@ -322,7 +325,6 @@ function resolve_js(str) {
     if (str.match(/\./)) {
         var re = /^(.*)\.[^\.]*$/,
             match = re.exec(str);
-        //console.log("match:", match[1])
         return [eval(match[1]), eval(str)];
     } else {
         return [GLOBAL, eval(str)];
@@ -408,6 +410,17 @@ function reSeq(re, s) {
     return firsts
 }
 
+function re_matches(re, s) {
+    let matches = re.exec(s);
+    if (matches && s === matches[0]) {
+        if (matches.length === 1) {
+            return matches[0];
+        } else {
+            return matches;
+        }
+    }
+}
+
 function sum() {
     var res = Array.from(arguments).reduce((acc, a) => acc + a, 0);
     if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
@@ -465,7 +478,7 @@ function take(n, coll) {
         const mod = n % coll.coll.length
         let res = []
         for (let i = 0; i < cycles; i++) {
-            res = res.concat(coll.coll)            
+            res = res.concat(coll.coll)
         }
         if (mod != 0) {
             res = res.concat(coll.coll.slice(0, mod))
@@ -531,8 +544,8 @@ class Iterate {
         this.realized = [x];
     }
     next() {
-        this.realized.push(this.f(this.realized[this.realized.length-1]))
-        return this.realized; 
+        this.realized.push(this.f(this.realized[this.realized.length - 1]))
+        return this.realized;
     }
 }
 
@@ -703,6 +716,7 @@ export var ns = {
     'str/trim': _trim,
     'cycle': cycle,
     'str/split': split,
+    're-pattern': re_pattern,
 
     'pr-str': pr_str,
     'str': str,
@@ -734,6 +748,7 @@ export var ns = {
     'Character/isLetter': isLetter,
     'subs': _substring,
     'subvec': _subvec,
+    're-matches': re_matches,
 
     'list': types._list,
     'list?': types._list_Q,
@@ -770,6 +785,7 @@ export var ns = {
     'apply*': apply,
     //'map': map,
     'repeat': repeat,
+    'join': _join,
     'str/join': _join,
     'str/replace': _replace,
 
