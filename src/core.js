@@ -212,6 +212,8 @@ export function seq(obj) {
         return obj.size > 0 ? [...obj.entries()] : null;
     } else if (types._set_Q(obj)) {
         return Array.from(obj)
+    } else if (types._lazy_iterable_Q(obj)) {
+        return Array.from(obj)
     }
     else if (obj === null) {
         return null;
@@ -222,7 +224,7 @@ export function seq(obj) {
 
 
 function apply(f) {
-    var args = Array.prototype.slice.call(arguments, 1);
+    var args = seq(Array.prototype.slice.call(arguments, 1))
     return f.apply(f, args.slice(0, args.length - 1).concat(args[args.length - 1]));
 }
 

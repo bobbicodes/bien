@@ -78,7 +78,6 @@ export function _sequential_Q(lst) {
 export function _equal_Q(a, b) {
     var ota = _obj_type(a), otb = _obj_type(b);
     if (!(ota === otb || (_sequential_Q(a) && _sequential_Q(b)))) {
-        console.log("not sequential")
         return false;
     }
     switch (ota) {
