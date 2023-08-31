@@ -71,6 +71,22 @@
     `(if (not ~test) ~then ~else)
     `(if-not ~test ~then nil)))
 
+(defn sorted-map [& keyvals]
+  (into
+   (with-meta {} {:sorted-map true})
+   (sort (partition 2 keyvals))))
+
+(defn merge-with [f & maps]
+  (when (some identity maps)
+    (let [merge-entry (fn [m e]
+                        (let [k (key e) v (val e)]
+                          (if (contains? m k)
+                            (assoc m k (f (get m k) v))
+                            (assoc m k v))))
+          merge2 (fn [m1 m2]
+                   (reduce merge-entry (or m1 {}) (seq m2)))]
+      (reduce merge2 maps))))
+
 (defn apply
   ([f args]
    (if (keyword? f)
@@ -300,6 +316,10 @@
                   (mapcat (fn [x] (tree-seq branch? children x))
                           (children node))))))
 
+(defn flatten [x]
+  (filter (complement sequential?)
+          (rest (tree-seq sequential? seq x))))
+
 (defn mod [num div]
   (let* [m (rem num div)]
         (if (or (zero? m) (= (pos? num) (pos? div)))
@@ -522,6 +542,9 @@
           true))
       false)))
 
+(defn distinct [coll]
+  (into (empty coll) (set coll)))
+
 (defn parseInt [s r]
   (Integer/parseInt s r))
 
@@ -533,6 +556,18 @@
 
 (defn get-in [m ks]
   (reduce #(get % %2) m ks))
+
+(defn update
+  ([m k f]
+   (assoc m k (f (get m k))))
+  ([m k f x]
+   (assoc m k (f (get m k) x)))
+  ([m k f x y]
+   (assoc m k (f (get m k) x y)))
+  ([m k f x y z]
+   (assoc m k (f (get m k) x y z)))
+  ([m k f x y z & more]
+   (assoc m k (apply f (get m k) x y z more))))
 
 (defmacro for [seq-exprs body-expr]
   (let [body-expr* body-expr

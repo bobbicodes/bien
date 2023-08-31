@@ -76,7 +76,7 @@ function dissoc(src_hm) {
     return types._dissoc_BANG.apply(null, args);
 }
 
-function get(coll, key) {
+function get(coll, key, notfound) {
     if (types._vector_Q(coll)) {
         return coll[key]
     }
@@ -84,7 +84,8 @@ function get(coll, key) {
         return coll[key]
     }
     if (coll != null) {
-        return coll.get(key);
+        
+        return coll.get(key) || notfound
     } else {
         return null;
     }
@@ -299,6 +300,14 @@ function _difference(setA, setB) {
         _difference.delete(elem);
     }
     return _difference;
+}
+
+function _disj(set) {
+    var args = Array.from(arguments).slice(1)
+    for (let i = 0; i < args.length; i++) {
+        set.delete(args[i])
+    }
+    return set
 }
 
 function _is(a) {
@@ -553,6 +562,9 @@ function sort(x) {
     if (types._list_Q(x)) {
         return x.sort()
     }
+    if (types._hash_map_Q(x)) {
+        return new Map(Array.from(x).sort())
+    }
     if (types._set_Q(x)) {
         return new Set(Array.from(x).sort())
     } else {
@@ -777,6 +789,7 @@ export var ns = {
     '.': js_method_call,
 
     'set': toSet,
+    'disj': _disj,
     'set/union': _union,
     'set/intersection': _intersection,
     'set/symmetric-difference': symmetricDifference,
