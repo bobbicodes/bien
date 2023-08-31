@@ -110,6 +110,9 @@ export function _clone(obj) {
         case 'function':
             new_obj = obj.clone();
             break;
+        case 'set':
+            new_obj = new Set(obj);
+            break;
         default:
             throw new Error("clone of non-collection: " + _obj_type(obj));
     }
@@ -203,12 +206,12 @@ export function multifn(Eval, Env, bodies, env) {
     var fn = function () {
         var arity = arguments.length
         var body = findFixedArity(arity, bodies) || findVariadic(bodies)
-        return Eval(body[1], 
+        return Eval(body[1],
             new Env(env, body[0], arguments));
     }
     fn.__meta__ = null;
     fn.__multifn__ = true
-    fn.__ast__ = function(args) {
+    fn.__ast__ = function (args) {
         var arity = args.length
         var ast = findFixedArity(arity, bodies) || findVariadic(bodies)
         return ast[1]

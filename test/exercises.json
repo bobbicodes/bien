@@ -72,7 +72,7 @@
   "nth_element" : "(defn nth-element [s n]\r\n  (last (take (inc n) s)))",
   "truth" : "(def truth (= true true))",
   "last" : "(defn my-last [s]\r\n  (if (next s)\r\n    (my-last (next s))\r\n    (first s)))",
-  "spaz_out" : "(defn spaz-out [f x]\r\n  (reductions #(%2 %1) x [] (repeat 100 f)))",
+  "spaz_out" : "(defn spaz-out [f x]\r\n  (reductions (fn [a b] (b a)) x (repeat 100 f)))",
   "mycomp" : "(defn mycomp\r\n  ([] identity)\r\n  ([f] f)\r\n  ([f g]\r\n   (fn\r\n     ([] (f (g)))\r\n     ([x] (f (g x)))\r\n     ([x y] (f (g x y)))\r\n     ([x y z] (f (g x y z)))\r\n     ([x y z & args] (f (apply g x y z args)))))\r\n  ([f g & fs]\r\n   (reduce comp (list* f g fs))))",
   "k" : "(defn k [i s]\r\n  (set\r\n   (if (= i 0)\r\n     [#{}]\r\n     (mapcat #(for [p (k (- i 1) %2)] (conj p %))\r\n             s (next (iterate next s))))))",
   "myreductions" : "(defn my-reductions [f init xs]\r\n  (loop [s xs acc init res [init]]\r\n    (if (empty? s)\r\n      res\r\n      (recur (rest s)\r\n              (f acc (first s))\r\n             (conj res (f acc (first s)))))))",

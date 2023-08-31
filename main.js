@@ -174,7 +174,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("grade_school")
+//testSolution("spaz_out")
 //loadExercise("nth_prime")
-//testExercisesUntilFail()
-testExercises()
+testExercisesUntilFail()
+//testExercises()

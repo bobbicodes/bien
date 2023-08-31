@@ -76,6 +76,11 @@
    (with-meta {} {:sorted-map true})
    (sort (partition 2 keyvals))))
 
+(defn sorted-set [& keys]
+  (into
+   (with-meta #{} {:sorted-set true})
+   (sort keys)))
+
 (defn merge-with [f & maps]
   (when (some identity maps)
     (let [merge-entry (fn [m e]
