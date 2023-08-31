@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("filter")
+testSolution("hamming")
 //loadExercise("nth_prime")
 //testExercisesUntilFail()
 //testExercises()

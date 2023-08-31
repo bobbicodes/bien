@@ -159,6 +159,9 @@ function empty_Q(lst) {
 export function count(s) {
     if (Array.isArray(s)) { return s.length; }
     if (types._set_Q(s)) { return s.size; }
+    if (types._lazy_iterable_Q(s)) {
+        return Array.from(s).length
+    }
     else if (s === null) { return 0; }
     else { return Object.keys(s).length; }
 }
