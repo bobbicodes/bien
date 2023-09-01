@@ -516,6 +516,11 @@
           (str (upper-case (subs s 0 1))
                (lower-case (subs s 1))))))
 
+(defn keep [s]
+  (remove nil? s))
+
+(defn not-empty [coll] (when (seq coll) coll))
+
 (defn reduce-kv [m f init]
   (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
 
