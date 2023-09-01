@@ -455,12 +455,19 @@
         (recur (rest s1) (rest s2) (rest s3)
                (conj res (f (first s1) (first s2) (first s3)))))))
 
+(defn map4 [f c1 c2 c3 c4]
+  (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
+    (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) res
+        (recur (rest s1) (rest s2) (rest s3) (rest s4)
+               (conj res (f (first s1) (first s2) (first s3) (first s4)))))))
+
 (defn map [f & colls]
   (cond
     (empty? (first colls)) '()
     (= 1 (count colls)) (map1 f (first colls))
     (= 2 (count colls)) (map2 f (first colls) (second colls))
     (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
+    (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
     :else (throw (str "Map not implemented on " (count colls) " colls"))))
 
 (defn drop-last [n coll]

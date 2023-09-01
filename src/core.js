@@ -119,6 +119,22 @@ function vec(lst) {
     }
 }
 
+function re_matches(re, s) {
+    let matches = re.exec(s);
+    if (matches && s === matches[0]) {
+        if (matches.length === 1) {
+            return matches[0];
+        } else {
+            return matches;
+        }
+    }
+}
+
+function re_find(re, s) {
+    return re_matches(re, s)[0]
+}
+
+
 export function nth(lst, idx, notfound) {
     if (types._iterate_Q(lst)) {
         for (let i = 0; i < idx; i++) {
@@ -157,6 +173,7 @@ function empty_Q(lst) {
 }
 
 export function count(s) {
+    if (types._hash_map_Q(s)) { return s.size; }
     if (Array.isArray(s)) { return s.length; }
     if (types._set_Q(s)) { return s.size; }
     else if (s === null) { return 0; }
@@ -201,6 +218,8 @@ function split(s, re) {
 export function seq(obj) {
     if (types._list_Q(obj)) {
         return obj.length > 0 ? obj : null;
+    } else if (types._iterate_Q(obj)) {
+        return obj.realized
     } else if (types._vector_Q(obj)) {
         return obj.length > 0 ? Array.prototype.slice.call(obj, 0) : null;
     } else if (types._string_Q(obj)) {
@@ -408,17 +427,6 @@ function reSeq(re, s) {
         return null
     }
     return firsts
-}
-
-function re_matches(re, s) {
-    let matches = re.exec(s);
-    if (matches && s === matches[0]) {
-        if (matches.length === 1) {
-            return matches[0];
-        } else {
-            return matches;
-        }
-    }
 }
 
 function sum() {
@@ -702,6 +710,8 @@ export var ns = {
     'keyword': types._keyword,
     'keyword?': types._keyword_Q,
     'map-entry?': types._mapEntry_Q,
+    're-matches': re_matches,
+    're-find': re_find,
     'fn?': types._fn_Q,
     'macro?': types._macro_Q,
     'char': char,
@@ -748,7 +758,6 @@ export var ns = {
     'Character/isLetter': isLetter,
     'subs': _substring,
     'subvec': _subvec,
-    're-matches': re_matches,
 
     'list': types._list,
     'list?': types._list_Q,
