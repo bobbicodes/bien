@@ -2,6 +2,7 @@ import { Fraction } from 'fraction.js'
 import { PRINT, READ } from './interpreter.js'
 
 export function _obj_type(obj) {
+    //console.log("obj:", obj)
     //console.log("obj_type:", typeof obj)
     if (_symbol_Q(obj)) { return 'symbol'; }
     else if (_hash_map_Q(obj)) { return 'hash-map'; }
@@ -10,6 +11,7 @@ export function _obj_type(obj) {
     else if (_ratio_Q(obj)) { return 'ratio'; }
     else if (_lazy_range_Q(obj)) { return 'lazy-range'; }
     else if (_iterate_Q(obj)) { return 'iterate'; }
+    else if (_lazy_iterable_Q(obj)) { return 'lazy-iterable'; }
     else if (_cycle_Q(obj)) { return 'cycle'; }
     else if (_function_Q(obj)) { return 'function'; }
     else if (_set_Q(obj)) { return 'set'; }
@@ -26,6 +28,16 @@ export function _obj_type(obj) {
             default: throw new Error("Unknown type '" + typeof (obj) + "'");
         }
     }
+}
+
+export function _lazy_iterable_Q(x) {
+    if (x === null) {
+        return false
+    }
+    if (typeof (x) === "object") {
+        return Object.hasOwn(x, 'name') && x.name === 'LazyIterable'
+    }
+    return false
 }
 
 export function _iterate_Q(x) {
@@ -58,7 +70,9 @@ export function _lazy_range_Q(x) {
     return false
 }
 
-export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
+export function _sequential_Q(lst) {
+    return _list_Q(lst) || _vector_Q(lst) || _lazy_iterable_Q(lst)
+}
 
 
 export function _equal_Q(a, b) {
@@ -71,10 +85,14 @@ export function _equal_Q(a, b) {
         case 'list':
         case 'vector':
         case 'set':
-            //console.log("comparing", ota, "and", otb)
+        case 'lazy-iterable':
+            a = Array.from(a)
+            b = Array.from(b)
             if (a.length !== b.length) { return false; }
             for (var i = 0; i < a.length; i++) {
-                if (!_equal_Q(a[i], b[i])) { return false; }
+                if (!_equal_Q(a[i], b[i])) {
+                    return false
+                }
             }
             return true;
         case 'hash-map':
@@ -90,6 +108,9 @@ export function _equal_Q(a, b) {
 
 export function allEqual() {
     const args = Array.from(arguments)
+    if (args.length === 2) {
+        return _equal_Q(args[0], args[1])
+    }
     return args.every(v => _equal_Q(v, args[0]))
 }
 
