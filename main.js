@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("hamming")
+//testSolution("primes")
 //loadExercise("ps")
-testExercisesUntilFail()
-//testExercises()
+//testExercisesUntilFail()
+testExercises()

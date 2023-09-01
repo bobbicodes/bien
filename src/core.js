@@ -494,7 +494,7 @@ function divide() {
     return res
 }
 
-function take(n, coll) {
+/* function take(n, coll) {
     if (types._lazy_range_Q(coll)) {
         return range(0, n)
     }
@@ -517,6 +517,20 @@ function take(n, coll) {
         return res
     }
     return coll.slice(0, n)
+} */
+
+function take(n, coll) {
+    return lazy(function* () {
+        let i = n - 1;
+        for (const x of iterable(coll)) {
+            if (i-- >= 0) {
+                yield x;
+            }
+            if (i < 0) {
+                return;
+            }
+        }
+    });
 }
 
 function drop(n, coll) {
