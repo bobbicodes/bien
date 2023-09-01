@@ -156,6 +156,10 @@ function _EVAL(ast, env) {
         if (types._vector_Q(a0)) {
             return EVAL([types._symbol("get"), a0, a1], env)
         }
+        // sets check membership
+        if (types._set_Q(a0)) {
+            return EVAL([types._symbol("contains?"), a0, a1], env)
+        }
         switch (a0.value) {
             case "ns":
             case "discard-form":
@@ -275,7 +279,7 @@ function _EVAL(ast, env) {
                     //console.log("calling lambda:", PRINT(ast), " with ", arity, " args")
                     env = f.__gen_env__(el.slice(1));
                 } else {
-                    if (types._keyword_Q(f) || types._vector_Q(f) || types._hash_map_Q(f)) {
+                    if (types._set_Q(f) || types._keyword_Q(f) || types._vector_Q(f) || types._hash_map_Q(f)) {
                         return EVAL([f].concat(el.slice(1)), env)
                     }
                     var res = f.apply(f, el.slice(1));
