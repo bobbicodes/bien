@@ -514,7 +514,7 @@
         (if (< (count s) 2)
           (upper-case s)
           (str (upper-case (subs s 0 1))
-               (upper-case (subs s 1))))))
+               (lower-case (subs s 1))))))
 
 (defn reduce-kv [m f init]
   (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))

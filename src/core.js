@@ -655,6 +655,9 @@ function _sqrt(n) {
 }
 
 function _substring(s, start, end) {
+    if (!end) {
+        return s.substring(start, s.length)
+    }
     return s.substring(start, end)
 }
 
