@@ -7,7 +7,13 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(= '(6 7) (filter #(> % 5) '(3 4 5 6 7)))`,
+  doc: `(defn fib
+  ([]
+   (fib 1 1))
+  ([a b]
+   (lazy-seq (cons a (fib b (+ a b))))))
+
+(take 5 (fib))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -167,6 +173,6 @@ function testExercisesUntilFail() {
 
 //testSolution(randExercise())
 //testSolution("primes")
-//loadExercise("ps")
-//testExercisesUntilFail()
-testExercises()
+//loadExercise("robot_simulator")
+testExercisesUntilFail()
+//testExercises()

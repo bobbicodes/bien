@@ -520,6 +520,12 @@ function divide() {
 } */
 
 function take(n, coll) {
+    if (types._iterate_Q(coll)) {
+        for (let i = 0; i < n; i++) {
+            coll.next()
+        }
+        return coll.realized.slice(0, -1)
+    }
     return lazy(function* () {
         let i = n - 1;
         for (const x of iterable(coll)) {
@@ -598,15 +604,10 @@ function iterate(f, x) {
     return new Iterate(f, x)
 }
 
-class Cycle {
-    constructor(coll) {
-        this.name = 'Cycle'
-        this.coll = coll
-    }
-}
-
 function cycle(coll) {
-    return new Cycle(coll)
+    return lazy(function* () {
+        while (true) yield* coll;
+    });
 }
 
 function mod(x, y) {
@@ -738,6 +739,16 @@ class LazyIterable {
 
 export function lazy(f) {
     return new LazyIterable(f);
+}
+
+class LazySeq {
+    constructor(f) {
+        this.name = 'LazySeq'
+        this.f = f;
+    }
+    *[Symbol.iterator]() {
+        yield* this.f();
+    }
 }
 
 // types.ns is namespace of type functions
