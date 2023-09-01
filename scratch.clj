@@ -472,3 +472,62 @@
 (lt [15 15 15 15 15])
 
 (range 0)
+
+(defn row-num [cols] (dec (count cols)))
+(defn col-num [cols]
+  (loop [acc -1 cur (apply max cols)]
+    (if (= 0 cur) acc
+        (recur (inc acc) (quot cur 2)))))
+
+(defn is-mine [r c cols]
+  (if (or (nil? r) (nil? c) (> c (col-num cols)) (> r (row-num cols))) false
+      (let [validate-v (bit-shift-left 1 (- (col-num cols) c))
+            candidate-v (nth cols r)]
+        (> (bit-and validate-v candidate-v) 0))))
+
+(defn line-from [r c fr fc cols]
+  (if (is-mine r c cols)
+    (loop [acc [] next-col (fc c) next-row (fr r) l 2]
+      (if (or (> next-col (col-num cols)) (> next-row (row-num cols)) (not (is-mine next-row next-col cols)))
+        acc
+        (recur (concat acc [{:r1 r :c1 c :r2 next-row :c2 next-col :l l :fr fr :fc fc}])
+               (fc next-col)
+               (fr next-row)
+               (inc l))))
+    []))
+
+(defn mix-cols [col1 col2]
+  (mapcat (fn [e] (map (fn [e1] [e e1]) col1)) col2))
+
+(defn all-line-from [r c cols]
+  (concat (line-from r c inc inc cols)
+          (line-from r c inc identity cols)
+          (line-from r c identity inc cols) 
+          (line-from r c inc dec cols)))
+
+(defn size1 [a b c]
+  (let [mxl (max a b c) mnl (min a b c)]
+    (/ (* (inc mxl) mnl) 2)))
+
+(defn validate-tr [l1 l2]
+  (and (= (l1 :r2) (l2 :r2)) (= (l1 :c2) (l2 :c2))
+       (not (and (= (l1 :fr) (l2 :fr)) (= (l1 :fc) (l2 :fc))))))
+
+(defn triangle-from-line [line cols]
+  (let [lines1 (all-line-from (line :r1) (line :c1) cols)
+        lines2 (all-line-from (line :r2) (line :c2) cols)
+        line-combines (mix-cols lines1 lines2)
+        validate-combines (filter #(validate-tr (first %) (second %)) line-combines)]
+    (map #(size1 (line :l) ((first %) :l) ((second %) :l)) validate-combines)))
+
+(defn all-lines [cols]
+  (flatten (let [points (mix-cols (range (inc (row-num cols))) (range (inc (col-num cols))))]
+             (mapcat #(apply all-line-from %) points))))
+
+(defn all-size [cols]
+  (flatten (map #(triangle-from-line (all-lines cols) %) cols)))
+
+(defn lt [cols]
+  (if (empty? (all-size cols)) nil (apply max (all-size cols))))
+
+(lt [15 15 15 15 15])

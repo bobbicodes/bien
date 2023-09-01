@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("lt")
+testSolution("pig_latin")
 //loadExercise("robot_simulator")
 //testExercisesUntilFail()
 //testExercises()

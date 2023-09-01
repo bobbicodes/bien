@@ -1,4 +1,5 @@
-(ns core {:clj-kondo/ignore true})
+(ns core {:clj-kondo/ignore true} 
+  (:require [clojure.string :as str]))
 
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
@@ -843,6 +844,9 @@
 
 (defn bit-and [x y]
   (js-eval (str x " & " y)))
+
+(defn str/starts-with? [s substr]
+  (js-eval (str "'" s "'" ".startsWith ('" substr "')")))
 
 (def max-mask-bits 13)
 
