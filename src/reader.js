@@ -24,7 +24,8 @@ function read_atom(reader) {
     //console.log("read_atom:", token);
     if (token.match(/^-?[0-9]+$/)) {
         return parseInt(token, 10)        // integer
-    } else if (token.match(/(?:|-?[1-9][0-9]*|0)\/[1-9][0-9]*/g)) {
+    } else if (token.match(/(\d*?)[\s-]*(\d+)\s*\/\s*(\d+)/g)) {
+        console.log("ratio")
         return types._ratio(token.split('/'))
     } else if (token[0] === "\\") {
         return token[1]

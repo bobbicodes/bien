@@ -396,3 +396,19 @@
 (cw "the" ["_ # _ _ e"])
 
 (some (fn* [%1] (re-matches (re-pattern %1) word)) (mapcat (fn* [%1] (str/split %1 #"#")) (concat across down)))
+
+(defn valid? [s]
+  (let [pairs {")" "(" "]" "[" "}" "{"}
+        opening (set (vals pairs))
+        closing (set (keys pairs))]
+    (loop [stack [] s s]
+      (cond (empty? s) (empty? stack)
+            (contains? opening (first s)) (recur (conj stack (first s)) (rest s))
+            (contains? closing (first s)) (if (= (peek stack) (get pairs (first s)))
+                                            (recur (pop stack) (rest s))
+                                            false)
+            :else (recur stack (rest s))))))
+
+(valid? "(((185 + 223.85) * 15) - 543)/2")
+
+"(((185 + 223.85) * 15) - 543)/2"
