@@ -24,7 +24,7 @@
   "my_merge_with" : "(defn my-merge-with [f & ms]\r\n  (reduce (fn [am m]\r\n            (into am (for [[k v] m]\r\n                       (if (contains? am k)\r\n                         [k (f (am k) v)]\r\n                         [k v]))))\r\n          ms))",
   "deinterleave" : "(defn deinterleave [coll n]\r\n  (apply map list (partition n coll)))",
   "my_trampoline" : "(defn my-trampoline [f & x]\r\n  (if (fn? f)\r\n    (my-trampoline (apply f x))\r\n    f))",
-  "pascal" : "#_(defn pascal [n]\r\n  (if (= n 1)\r\n     [1]\r\n     (map #(apply + %)\r\n          (partition 2 1 (concat [0] (pascal (- n 1)) [0])))))",
+  "pascal" : "(defn pascal [n]\r\n  (if (= n 1)\r\n     [1]\r\n     (map #(apply + %)\r\n          (partition 2 1 (concat [0] (pascal (- n 1)) [0])))))",
   "cw" : "(defn cw [word board]\r\n  (let [across (map #(str/escape % {\" \" \"\", \\_ \\.}) board)\r\n        down (apply map str across)]   ;; transpose the board so down becomes across\r\n    (string? (->> (concat across down)\r\n                  (mapcat #(str/split % #\"#\"))\r\n                  (some #(re-matches (re-pattern %) word))))))",
   "pack" : "(defn pack [s]\r\n   (loop [s (rest s) prev (first s) res [] subseq [(first s)]]\r\n     (if (seq s)\r\n       (let [f (first s)]\r\n         (if (= f prev)\r\n           (recur (rest s) f res (conj subseq f))\r\n           (recur (rest s) f (conj res (seq subseq)) [f])))\r\n       (conj res (seq subseq)))))",
   "powerset" : "(defn powerset [s]\r\n  (reduce #(into % (for [subset %] (conj subset %2))) #{#{}} s))",

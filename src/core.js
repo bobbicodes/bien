@@ -213,7 +213,7 @@ export function seq(obj) {
     } else if (types._set_Q(obj)) {
         return Array.from(obj)
     } else if (types._lazy_iterable_Q(obj)) {
-        return Array.from(obj)
+        return Array.from(obj).length > 0 ? Array.from(obj) : null;
     }
     else if (obj === null) {
         return null;
