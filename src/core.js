@@ -105,10 +105,14 @@ function vals(hm) { return Array.from(hm.values()) }
 // Sequence functions
 export function cons(a, b) { return [a].concat(b); }
 
-function concat(lst) {
-    lst = lst || [];
-    return lst.concat.apply(lst, Array.prototype.slice.call(arguments, 1));
+function _concat(...colls) {
+    return lazy(function* () {
+        for (const coll of colls) {
+            yield* iterable(coll);
+        }
+    });
 }
+
 function vec(lst) {
     if (types._list_Q(lst)) {
         var v = Array.prototype.slice.call(lst, 0);
@@ -278,6 +282,17 @@ function _union(setA, setB) {
         _union.add(elem);
     }
     return _union;
+}
+
+function _into(...args) {
+    switch (args.length) {
+        case 0:
+            return [];
+        case 1:
+            return args[0];
+        default:
+            return conj(args[0] ?? [], ...iterable(args[1]));
+    }
 }
 
 function _intersection(setA, setB) {
@@ -751,6 +766,12 @@ class LazySeq {
     }
 }
 
+function _apply(f, ...args) {
+    const xs = args.slice(0, args.length - 1);
+    const coll = args[args.length - 1];
+    return f(...xs, ...coll);
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
@@ -766,6 +787,7 @@ export var ns = {
     'ratio?': types._ratio_Q,
     'number?': types._number_Q,
     'string?': types._string_Q,
+    'into': _into,
     'symbol': types._symbol,
     'symbol?': types._symbol_Q,
     'set?': types._set_Q,
@@ -841,7 +863,7 @@ export var ns = {
 
     'sequential?': types._sequential_Q,
     'cons': cons,
-    'concat': concat,
+    'concat': _concat,
     'vec': vec,
     'nth': nth,
     'first': first,
@@ -852,7 +874,7 @@ export var ns = {
     'drop': drop,
     'empty?': empty_Q,
     'count': count,
-    'apply*': apply,
+    'apply': _apply,
     //'map': map,
     'repeat': repeat,
     'join': _join,

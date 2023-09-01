@@ -99,7 +99,7 @@
         (recur (inc index) 
                (str buffer (get cmap (nth s index) (nth s index)))))))
 
-(defn apply
+#_(defn apply
   ([f args]
    (if (keyword? f)
      (get args f)
@@ -481,7 +481,7 @@
 (defn interpose [sep coll]
   (drop 1 (interleave (repeat (count coll) sep) coll)))
 
-(defn into [to from]
+#_(defn into [to from]
   (reduce conj to from))
 
 (defmacro if-let [bindings then else & oldform]
