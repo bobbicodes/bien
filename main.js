@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("run_length_encoding")
+testSolution("lt")
 //loadExercise("robot_simulator")
 //testExercisesUntilFail()
 //testExercises()

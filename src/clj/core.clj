@@ -841,6 +841,9 @@
     (bit-clear x n)
     (bit-set x n)))
 
+(defn bit-and [x y]
+  (js-eval (str x " & " y)))
+
 (def max-mask-bits 13)
 
 (def max-switch-table-size (bit-shift-left 1 max-mask-bits))

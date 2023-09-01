@@ -531,6 +531,9 @@ function range(start, end, step) {
         return ans
     }
     if (!end) {
+        if (start === 0) {
+            return []
+        }
         return range(0, start)
     }
     var ans = [];
