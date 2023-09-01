@@ -103,7 +103,7 @@
   ([f args]
    (if (keyword? f)
      (get args f)
-     (apply* f (seq args))))
+     (apply* f args)))
   ([f x args]
    (apply f (list* x args)))
   ([f x y args]

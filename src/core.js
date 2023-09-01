@@ -159,9 +159,6 @@ function empty_Q(lst) {
 export function count(s) {
     if (Array.isArray(s)) { return s.length; }
     if (types._set_Q(s)) { return s.size; }
-    if (types._lazy_iterable_Q(s)) {
-        return Array.from(s).length
-    }
     else if (s === null) { return 0; }
     else { return Object.keys(s).length; }
 }
@@ -212,8 +209,6 @@ export function seq(obj) {
         return obj.size > 0 ? [...obj.entries()] : null;
     } else if (types._set_Q(obj)) {
         return Array.from(obj)
-    } else if (types._lazy_iterable_Q(obj)) {
-        return Array.from(obj).length > 0 ? Array.from(obj) : null;
     }
     else if (obj === null) {
         return null;
@@ -224,7 +219,7 @@ export function seq(obj) {
 
 
 function apply(f) {
-    var args = seq(Array.prototype.slice.call(arguments, 1))
+    var args = Array.prototype.slice.call(arguments, 1);
     return f.apply(f, args.slice(0, args.length - 1).concat(args[args.length - 1]));
 }
 
@@ -378,33 +373,7 @@ function char(int) {
     return String.fromCharCode(int)
 }
 
-function seqable_QMARK_(x) {
-    // String is iterable but doesn't allow `m in s`
-    return typeof x === 'string' || x === null || x === undefined || Symbol.iterator in x;
-}
-
-function iterable(x) {
-    // nil puns to empty iterable, support passing nil to first/rest/reduce, etc.
-    if (x === null || x === undefined) {
-        return [];
-    }
-    if (seqable_QMARK_(x)) {
-        return x;
-    }
-    return Object.entries(x);
-}
-
-function filter(pred, coll) {
-    return lazy(function* () {
-        for (const x of iterable(coll)) {
-            if (pred(x)) {
-                yield x;
-            }
-        }
-    });
-}
-
-/* function filter(f, lst) {
+function filter(f, lst) {
     if (types._iterate_Q(lst)) {
         return "TODO: filter iterate object"
     }
@@ -415,7 +384,7 @@ function filter(pred, coll) {
         return seq(lst).filter(function (el) { return f.has(el); });
     }
     return seq(lst).filter(function (el) { return f(el); })
-} */
+}
 
 function min() {
     return Math.min.apply(null, arguments);
@@ -494,7 +463,7 @@ function divide() {
     return res
 }
 
-/* function take(n, coll) {
+function take(n, coll) {
     if (types._lazy_range_Q(coll)) {
         return range(0, n)
     }
@@ -517,26 +486,6 @@ function divide() {
         return res
     }
     return coll.slice(0, n)
-} */
-
-function take(n, coll) {
-    if (types._iterate_Q(coll)) {
-        for (let i = 0; i < n; i++) {
-            coll.next()
-        }
-        return coll.realized.slice(0, -1)
-    }
-    return lazy(function* () {
-        let i = n - 1;
-        for (const x of iterable(coll)) {
-            if (i-- >= 0) {
-                yield x;
-            }
-            if (i < 0) {
-                return;
-            }
-        }
-    });
 }
 
 function drop(n, coll) {
@@ -604,10 +553,15 @@ function iterate(f, x) {
     return new Iterate(f, x)
 }
 
+class Cycle {
+    constructor(coll) {
+        this.name = 'Cycle'
+        this.coll = coll
+    }
+}
+
 function cycle(coll) {
-    return lazy(function* () {
-        while (true) yield* coll;
-    });
+    return new Cycle(coll)
 }
 
 function mod(x, y) {
@@ -725,30 +679,6 @@ function doubleEquals() {
 
 function printEnv() {
     console.log(repl_env)
-}
-
-class LazyIterable {
-    constructor(gen) {
-        this.name = 'LazyIterable'
-        this.gen = gen;
-    }
-    [Symbol.iterator]() {
-        return this.gen();
-    }
-}
-
-export function lazy(f) {
-    return new LazyIterable(f);
-}
-
-class LazySeq {
-    constructor(f) {
-        this.name = 'LazySeq'
-        this.f = f;
-    }
-    *[Symbol.iterator]() {
-        yield* this.f();
-    }
 }
 
 // types.ns is namespace of type functions
