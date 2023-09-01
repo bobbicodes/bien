@@ -772,6 +772,34 @@ function _apply(f, ...args) {
     return f(...xs, ...coll);
 }
 
+function _map(f, ...colls) {
+    switch (colls.length) {
+        case 0:
+            throw new Error('map with 2 arguments is not supported yet');
+        case 1:
+            return lazy(function* () {
+                for (const x of iterable(colls[0])) {
+                    yield f(x);
+                }
+            });
+        default:
+            return lazy(function* () {
+                const iters = colls.map((coll) => es6_iterator(iterable(coll)));
+                while (true) {
+                    let args = [];
+                    for (const i of iters) {
+                        const nextVal = i.next();
+                        if (nextVal.done) {
+                            return;
+                        }
+                        args.push(nextVal.value);
+                    }
+                    yield f(...args);
+                }
+            });
+    }
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
@@ -809,6 +837,7 @@ export var ns = {
     'cycle': cycle,
     'str/split': split,
     're-pattern': re_pattern,
+    'map': _map,
 
     'pr-str': pr_str,
     'str': str,

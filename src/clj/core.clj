@@ -437,25 +437,25 @@
     (map? coll) {}
     (string? coll) ""))
 
-(defn map1 [f coll]
+#_(defn map1 [f coll]
   (loop [s (seq coll) res []]
     (if (empty? s) res
         (recur (rest s) 
                (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
 
-(defn map2 [f c1 c2]
+#_(defn map2 [f c1 c2]
   (loop [s1 (seq c1) s2 (seq c2) res []]
     (if (or (empty? s1) (empty? s2)) res
         (recur (rest s1) (rest s2)
                (conj res (f (first s1) (first s2)))))))
 
-(defn map3 [f c1 c2 c3]
+#_(defn map3 [f c1 c2 c3]
   (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
     (if (or (empty? s1) (empty? s2) (empty? s3)) res
         (recur (rest s1) (rest s2) (rest s3)
                (conj res (f (first s1) (first s2) (first s3)))))))
 
-(defn map [f & colls]
+#_(defn map [f & colls]
   (cond
     (empty? (first colls)) '()
     (= 1 (count colls)) (map1 f (first colls))

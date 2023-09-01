@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("flatten_array")
+//testSolution("map")
 //loadExercise("robot_simulator")
 //testExercisesUntilFail()
 testExercises()
