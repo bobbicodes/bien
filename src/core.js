@@ -1,7 +1,8 @@
 import { read_str } from './reader.js';
 import { _pr_str, _println } from './printer.js'
 import * as types from './types.js'
-import { repl_env, walk } from './interpreter.js';
+import { repl_env, walk, evalString } from './interpreter.js';
+import zip from './clj/zip.clj?raw'
 
 // Errors/Exceptions
 function mal_throw(exc) { throw new Error(exc); }
@@ -692,9 +693,23 @@ function printEnv() {
     console.log(repl_env)
 }
 
+function require(lib) {
+    switch (lib) {
+        case 'zip':
+            evalString("(do " + zip + ")")
+            break;
+        case 'set':
+            evalString("(do " + clj_set + ")")
+            break;
+        default:
+            break;
+    }
+}
+
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
+    'require': require,
     'type': types._obj_type,
     '=': types.allEqual,
     '==': doubleEquals,

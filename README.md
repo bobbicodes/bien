@@ -16,7 +16,13 @@ I'd estimate that the goal is around 50% complete *by quantity*, though the unim
 
 3. Destructuring. Currently only sequential destructuring works, and only in `let` forms.
 
-4. Namespaces. These are not a high priority because it is not meant for writing production software. However, there are many functions which have slashes in their name to support patterns such as `str/join`, `Character/digit`, etc. That said, I have prototyped a feature for requiring additional libraries and it seems to work nicely. See [exercism-express](https://github.com/bobbicodes/exercism-express), the precursor for this project in which I created an implementation of zippers.
+4. Namespaces. These are not a high priority because it is not meant for writing production software. However, there are many functions which have slashes in their name to support patterns such as `str/join`, `Character/digit`, etc. 
+
+[Zippers](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf) have been implemented, and are available as a library that can be loaded:
+
+```clojure
+(require "zip")
+```
 
 I plan to update this section regularly with detailed descriptions of various features as I make progress.
 

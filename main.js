@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("rotational_cipher")
+testSolution("zipper")
 //loadExercise("robot_simulator")
 //testExercisesUntilFail()
 //testExercises()
