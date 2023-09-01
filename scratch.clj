@@ -412,3 +412,50 @@
 (valid? "(((185 + 223.85) * 15) - 543)/2")
 
 "(((185 + 223.85) * 15) - 543)/2"
+
+(defn double [n]
+  (if (> n 4)
+    (+ n n -9)
+    (+ n n)))
+
+(def input "046 454 287")
+
+(->> input
+     (re-seq #"\d")
+     (map #(parse-long %))
+     reverse
+     (partition 2 2 [0])
+     #_(reduce (fn [sum a-b] (+ sum (first a-b) (double (last a-b)))) 0))
+
+(re-seq #"\d" input)
+(reverse (map #(parse-long %) (re-seq #"\d" input)))
+
+(partition 2 2 [0] '(7 8 2 4 5 4 6 4 0))
+
+(def n 2)
+(def step 2)
+(def pad [0])
+(def coll '(7 8 2 4 5 4 6 4 0))
+(def s coll)
+
+(= n (count (take n s)))
+
+(drop step s)
+
+
+(defn sum [input]
+  (->> input
+       (re-seq #"\d")
+       (map #(parse-long %))
+       reverse
+       (partition 2 2 [0])
+       (reduce (fn [sum a-b] (+ sum (first a-b) (double (last a-b)))) 0)))
+
+(sum input)
+
+(defn valid? [input]
+  (and (re-matches #"[\d\s]*" input)
+       (zero? (rem (sum input) 10))
+       (< 1 (count (re-seq #"\d" input)))))
+
+(valid? "046 454 287")

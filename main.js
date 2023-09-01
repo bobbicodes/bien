@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("matching_brackets")
+//testSolution("luhn")
 //loadExercise("robot_simulator")
-testExercisesUntilFail()
-//testExercises()
+//testExercisesUntilFail()
+testExercises()

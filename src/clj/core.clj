@@ -352,14 +352,22 @@
           (recur (rest s))
           s))))
 
-(defn partition [n step coll]
-  (if-not coll
-    (partition n n step)
-    (loop [s coll p []]
-      (if (= 0 (count s))
-        (filter #(= n (count %)) p)
-        (recur (drop step s)
-               (conj p (take n s)))))))
+(defn partition 
+  ([n coll]
+   (partition n n coll))
+  ([n step coll]
+     (loop [s coll p []]
+       (if (= 0 (count s))
+         (filter #(= n (count %)) p)
+         (recur (drop step s) (conj p (take n s))))))
+  ([n step pad coll]
+     (loop [s coll p []]
+           (if (= n (count (take n s)))
+             (recur (drop step s) (conj p (take n s)))
+             (conj p (concat (take n s) pad))))))
+
+(defn boolean [x]
+  (if x true false))
 
 (defn split-at [n coll]
   [(take n coll) (drop n coll)])
