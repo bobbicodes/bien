@@ -758,7 +758,7 @@ export var ns = {
     'upper-case': upperCase,
     'str/lower-case': lowerCase,
     'str/upper-case': upperCase,
-    'Character/isLetter': isLetter,
+    //'isletter': isLetter,
     'subs': _substring,
     'subvec': _subvec,
 

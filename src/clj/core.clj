@@ -404,20 +404,24 @@
 (defn Character/digit [s r]
   (Integer/parseInt (first s) r))
 
+(defn Character/isLetter [s]
+  (not= (upper-case s)
+        (lower-case s)))
+
 (defn Character/isUpperCase [x]
   (if (int? x)
-    (and (Character/isletter (fromCharCode x))
+    (and (Character/isLetter (fromCharCode x))
          (= (fromCharCode x)
             (upper-case (fromCharCode x))))
-    (and (Character/isletter x)
+    (and (Character/isLetter x)
          (= x (upper-case x)))))
 
 (defn Character/isLowerCase [x]
   (if (int? x)
-    (and (Character/isletter (fromCharCode x))
+    (and (Character/isLetter (fromCharCode x))
          (= (fromCharCode x)
             (lower-case (fromCharCode x))))
-    (and (Character/isletter x)
+    (and (Character/isLetter x)
          (= x (lower-case x)))))
 
 (defn zipmap [keys vals]
