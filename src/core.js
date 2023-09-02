@@ -477,8 +477,14 @@ function divide() {
     if (arguments[0] === 0) {
         return 0
     }
-    if (arguments.length === 2 && Number.isInteger(arguments[0]) && Number.isInteger(arguments[1]) && arguments[1] != 1) {
-        return types._ratio({n: arguments[0], d: arguments[1]})
+    if (arguments.length === 2 && Number.isInteger(arguments[0]) 
+          && Number.isInteger(arguments[1]) && arguments[1] != 1) {
+        var quotient = types._ratio({n: arguments[0], d: arguments[1]})
+        if (quotient.d === 1) {
+            return quotient.n
+        } else {
+            return quotient
+        }
     }
     var divisor = arguments[0]
     var res = Array.from(arguments).slice(1).reduce((acc, a) => acc / a, divisor);
