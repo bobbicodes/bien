@@ -83,8 +83,6 @@
                  foreclojure-tests)
          {:pretty true})))
 
-(map not= [1 2 3] ["a" "b" "c"])
-
 (defn destructure* [bindings]
   (let [bents (partition 2 bindings)
         pb (fn pb [bvec b v]
@@ -200,6 +198,15 @@
 (destructure* '[{name :name
                 location :location
                 description :description} client])
+
+(destructure* '[{:keys [:w :b]} coords])
+(destructure* '[{:keys [:w :b]}])
+
+(def client {:name "Super Co."
+             :location "Philadelphia"
+             :description "The worldwide leader in plastic tableware."})
+
+(seq? client)
 
 (defn update-ranges
   "Applies `f` to each range in `state` (see `changeByRange`)"

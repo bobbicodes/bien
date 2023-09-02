@@ -692,11 +692,17 @@
 (defn has-rest? [b]
   (js-eval (str "'" b "'" ".includes(" "'" "&" "'" ")")))
 
+(defn comment [& forms] nil)
+
+(comment
+  (defn has-rest? [b] (some #{'&} b))
+  )
+
 (defn pvec [bvec b val]
   (let [gvec (gensym "vec__")
-         gseq (gensym "seq__")
-         gfirst (gensym "first__")
-         has-rest (has-rest? b)]
+        gseq (gensym "seq__")
+        gfirst (gensym "first__")
+        has-rest (has-rest? b)]
         (loop [ret (let [ret (conj bvec gvec val)]
                          (if has-rest
                            (conj ret gseq (list seq gvec))
@@ -732,9 +738,7 @@
   (let* [gmap (gensym "map__")
          defaults (:or b)]
         (loop [ret (-> bvec (conj gmap) (conj v)
-                       (conj gmap) (conj (list 'if (list sequential? gmap)
-                                               `(seq-to-map-for-destructuring ~gmap)
-                                               gmap))
+                       (conj gmap) (conj gmap)
                        ((fn [ret]
                           (if (:as b)
                             (conj ret (:as b) gmap)
@@ -762,10 +766,7 @@
           (if (seq bes)
             (let* [bb (key (first bes))
                    bk (val (first bes))
-                   local (if #?(:clj  (instance? clojure.lang.Named bb)
-                                :cljs (implements? INamed bb))
-                           (with-meta (symbol nil (name bb)) (meta bb))
-                           bb)
+                   local bb
                    bv (if (contains? defaults local)
                         (list `get gmap bk (defaults local))
                         (list `get gmap bk))]
