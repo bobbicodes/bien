@@ -132,9 +132,27 @@ function re_matches(re, s) {
 }
 
 function re_find(re, s) {
-    return re_matches(re, s)[0]
+    let matches = re.exec(s);
+    if (matches) {
+        if (matches.length === 1) {
+            return matches[0];
+        } else {
+            return matches;
+        }
+    }
 }
 
+function re_seq(re, s) {
+    if (s === null) {
+        return null
+    }
+    const array = [...s.matchAll(re)];
+    const firsts = array.map(x => x[0])
+    if (firsts.length === 0) {
+        return null
+    }
+    return firsts
+}
 
 export function nth(lst, idx, notfound) {
     if (types._iterate_Q(lst)) {
@@ -418,18 +436,6 @@ function _pow(x, n) {
     return Math.pow(x, n)
 }
 
-function reSeq(re, s) {
-    if (s === null) {
-        return null
-    }
-    const array = [...s.matchAll(re)];
-    const firsts = array.map(x => x[0])
-    if (firsts.length === 0) {
-        return null
-    }
-    return firsts
-}
-
 function sum() {
     var res = Array.from(arguments).reduce((acc, a) => acc + a, 0);
     if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
@@ -634,6 +640,9 @@ function int_Q(x) {
 }
 
 function _join(separator, coll) {
+    if (!coll) {
+        return separator.join('')
+    }
     return coll.join(separator)
 }
 
@@ -789,7 +798,7 @@ export var ns = {
     'assoc': assoc,
     'dissoc': dissoc,
     'get': get,
-    're-seq': reSeq,
+    're-seq': re_seq,
     'contains?': contains_Q,
     'keys': keys,
     'vals': vals,

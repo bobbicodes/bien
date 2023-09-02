@@ -534,8 +534,13 @@
 
 (defn not-empty [coll] (when (seq coll) coll))
 
-(defn reduce-kv [m f init]
-  (reduce (fn [ret kv] (f ret (first kv) (last kv))) init m))
+(defn reduce-kv [f init coll]
+  (reduce (fn [ret kv] (f ret (first kv) (last kv))) init coll))
+
+(defn merge [& maps]
+  (loop [maps (mapcat seq maps) res {}]
+    (if-not (some identity maps) res
+            (recur (rest maps) (conj res (first maps))))))
 
 (defmacro when-let [bindings & body]
   (let* [form (get bindings 0) tst (get bindings 1)

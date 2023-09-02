@@ -363,171 +363,35 @@
    `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
      (iter# ~(second seq-exprs)))))
 
-(macroexpand '(->> (concat across down)
-                   (mapcat #(str/split % #"#"))
-                   (some #(re-matches (re-pattern %) word))))
 
-(def word "the")
-(def board ["_ # _ _ e"])
-(def across (map #(str/escape % {" " "", \_ \.}) board))
-(def down (apply map str across))
-(concat across down)
+(def  letter-values
+  {"AEIOULNRST" 1
+   "DG"         2
+   "BCMP"       3
+   "FHVWY"      4
+   "K"          5
+   "JX"         8
+   "QZ"        10})
 
-(first (concat across down))
+;; A map from letter (as string) to score
+(def  letter->score
+  (reduce-kv (fn [acc letters score]
+               (-> (map str letters)
+                   (zipmap (repeat score))
+                   (->> (merge acc))))
+             {} letter-values))
 
-((fn [s] (str/split s #"#"))
- (first (concat across down)))
+letter->score
 
-(mapcat (fn [s] (str/split s #"#")) (concat across down))
-(map (fn [s] (str/split s #"#")) (concat across down))
+;; Defaults to 0 for non-alphabetic input
+(defn score-letter [letter]
+  (get letter->score (.toUpperCase (str letter)) 0))
 
-(defn cw [word board]
-  (let [across (map #(str/escape % {" " "", \_ \.}) board)
-        down (apply map str across)]
-    (string? (->> (concat across down)
-                  (mapcat #(str/split % #"#"))
-                  (some #(re-matches (re-pattern %) word))))))
+(defn score-word [word]
+  (reduce (fn [score letter]
+            (+ score (score-letter letter)))
+          0 word))
 
+(score-letter "a")
 
-(->> (concat across down)
-     (mapcat (fn [s] (str/split s #"#")))
-     (some (fn [re] (re-matches (re-pattern re) word))))
-
-(cw "the" ["_ # _ _ e"])
-
-(some (fn* [%1] (re-matches (re-pattern %1) word)) (mapcat (fn* [%1] (str/split %1 #"#")) (concat across down)))
-
-(defn valid? [s]
-  (let [pairs {")" "(" "]" "[" "}" "{"}
-        opening (set (vals pairs))
-        closing (set (keys pairs))]
-    (loop [stack [] s s]
-      (cond (empty? s) (empty? stack)
-            (contains? opening (first s)) (recur (conj stack (first s)) (rest s))
-            (contains? closing (first s)) (if (= (peek stack) (get pairs (first s)))
-                                            (recur (pop stack) (rest s))
-                                            false)
-            :else (recur stack (rest s))))))
-
-(valid? "(((185 + 223.85) * 15) - 543)/2")
-
-"(((185 + 223.85) * 15) - 543)/2"
-
-(defn double [n]
-  (if (> n 4)
-    (+ n n -9)
-    (+ n n)))
-
-(def input "046 454 287")
-
-(->> input
-     (re-seq #"\d")
-     (map #(parse-long %))
-     reverse
-     (partition 2 2 [0])
-     #_(reduce (fn [sum a-b] (+ sum (first a-b) (double (last a-b)))) 0))
-
-
-(defn lt [cols]
-  (let [row-num (dec (count cols))
-        col-num
-        (loop [acc -1 cur (apply max cols)]
-          (if (= 0 cur) acc
-              (recur (inc acc) (quot cur 2))))
-        is-mine
-        (fn [r c]
-          (if (or (nil? r) (nil? c) (> c col-num) (> r row-num)) false
-              (let [validate-v (bit-shift-left 1 (- col-num c))
-                    candidate-v (nth cols r)]
-                (> (bit-and validate-v candidate-v) 0))))
-        line-from (fn [r c fr fc] (if (is-mine r c)
-                                    (loop [acc [] next-col (fc c) next-row (fr r) l 2]
-                                      (if (or (> next-col col-num) (> next-row row-num) (not (is-mine next-row next-col)))
-                                        acc
-                                        (recur (concat acc [{:r1 r :c1 c :r2 next-row :c2 next-col :l l :fr fr :fc fc}])
-                                               (fc next-col)
-                                               (fr next-row)
-                                               (inc l))))
-                                    []))
-        mix-cols (fn [col1 col2] (mapcat (fn [e] (map (fn [e1] [e e1]) col1)) col2))
-        all-line-from (fn [r c] (concat (line-from r c inc inc)
-                                        (line-from r c inc identity)
-                                        (line-from r c identity inc)
-                                        (line-from r c inc dec)))
-        size1 (fn [a b c] (let [mxl (max a b c) mnl (min a b c)]
-                            (/ (* (inc mxl) mnl) 2)))
-        validate-tr (fn [l1 l2] (and (= (l1 :r2) (l2 :r2)) (= (l1 :c2) (l2 :c2))
-                                     (not (and (= (l1 :fr) (l2 :fr)) (= (l1 :fc) (l2 :fc))))))
-        triangle-from-line (fn [line] (let [lines1 (all-line-from (line :r1) (line :c1))
-                                            lines2 (all-line-from (line :r2) (line :c2))
-                                            line-combines (mix-cols lines1 lines2)
-                                            validate-combines (filter #(validate-tr (first %) (second %)) line-combines)]
-                                        (map #(size1 (line :l) ((first %) :l) ((second %) :l)) validate-combines)))
-        all-lines (flatten (let [points (mix-cols (range (inc row-num)) (range (inc col-num)))]
-                             (mapcat #(apply all-line-from %) points)))
-
-        all-size (flatten (map triangle-from-line all-lines))]
-    (if (empty? all-size) nil (apply max all-size))))
-
-(lt [15 15 15 15 15])
-
-(range 0)
-
-(defn row-num [cols] (dec (count cols)))
-(defn col-num [cols]
-  (loop [acc -1 cur (apply max cols)]
-    (if (= 0 cur) acc
-        (recur (inc acc) (quot cur 2)))))
-
-(defn is-mine [r c cols]
-  (if (or (nil? r) (nil? c) (> c (col-num cols)) (> r (row-num cols))) false
-      (let [validate-v (bit-shift-left 1 (- (col-num cols) c))
-            candidate-v (nth cols r)]
-        (> (bit-and validate-v candidate-v) 0))))
-
-(defn line-from [r c fr fc cols]
-  (if (is-mine r c cols)
-    (loop [acc [] next-col (fc c) next-row (fr r) l 2]
-      (if (or (> next-col (col-num cols)) (> next-row (row-num cols)) (not (is-mine next-row next-col cols)))
-        acc
-        (recur (concat acc [{:r1 r :c1 c :r2 next-row :c2 next-col :l l :fr fr :fc fc}])
-               (fc next-col)
-               (fr next-row)
-               (inc l))))
-    []))
-
-(defn mix-cols [col1 col2]
-  (mapcat (fn [e] (map (fn [e1] [e e1]) col1)) col2))
-
-(defn all-line-from [r c cols]
-  (concat (line-from r c inc inc cols)
-          (line-from r c inc identity cols)
-          (line-from r c identity inc cols) 
-          (line-from r c inc dec cols)))
-
-(defn size1 [a b c]
-  (let [mxl (max a b c) mnl (min a b c)]
-    (/ (* (inc mxl) mnl) 2)))
-
-(defn validate-tr [l1 l2]
-  (and (= (l1 :r2) (l2 :r2)) (= (l1 :c2) (l2 :c2))
-       (not (and (= (l1 :fr) (l2 :fr)) (= (l1 :fc) (l2 :fc))))))
-
-(defn triangle-from-line [line cols]
-  (let [lines1 (all-line-from (line :r1) (line :c1) cols)
-        lines2 (all-line-from (line :r2) (line :c2) cols)
-        line-combines (mix-cols lines1 lines2)
-        validate-combines (filter #(validate-tr (first %) (second %)) line-combines)]
-    (map #(size1 (line :l) ((first %) :l) ((second %) :l)) validate-combines)))
-
-(defn all-lines [cols]
-  (flatten (let [points (mix-cols (range (inc (row-num cols))) (range (inc (col-num cols))))]
-             (mapcat #(apply all-line-from %) points))))
-
-(defn all-size [cols]
-  (flatten (map #(triangle-from-line (all-lines cols) %) cols)))
-
-(defn lt [cols]
-  (if (empty? (all-size cols)) nil (apply max (all-size cols))))
-
-(lt [15 15 15 15 15])
+(conj {:a 1 :b 2 :c 3} {:b 9 :d 4})
