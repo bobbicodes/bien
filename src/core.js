@@ -86,10 +86,12 @@ function get(coll, key, notfound) {
     }
     if (types._hash_map_Q(coll)) {
         for (const [k, value] of coll) {
+            console.log("[get hash-map] checking if", k, "equals", key)
             if (types._equal_Q(k, key)) {
                 return value
             }
         }
+        return notfound
     }
     if (coll != null) {
         return coll.get(key) || notfound
