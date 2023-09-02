@@ -25,7 +25,6 @@ function read_atom(reader) {
     if (token.match(/^-?[0-9]+$/)) {
         return parseInt(token, 10)        // integer
     } else if (token.match(/(\d*?)[\s-]*(\d+)\s*\/\s*(\d+)/g)) {
-        console.log("ratio")
         return types._ratio(token.split('/'))
     } else if (token[0] === "\\") {
         return token[1]

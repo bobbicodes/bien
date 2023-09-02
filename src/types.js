@@ -62,6 +62,7 @@ export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
 
 
 export function _equal_Q(a, b) {
+    //console.log("comparing", a, "and", b)
     var ota = _obj_type(a), otb = _obj_type(b);
     if (!(ota === otb || (_sequential_Q(a) && _sequential_Q(b)))) {
         return false;
@@ -71,7 +72,7 @@ export function _equal_Q(a, b) {
         case 'list':
         case 'vector':
         case 'set':
-            //console.log("comparing", ota, "and", otb)
+            //console.log("comparing", a, "and", b)
             if (a.length !== b.length) { return false; }
             for (var i = 0; i < a.length; i++) {
                 if (!_equal_Q(a[i], b[i])) { return false; }
@@ -83,6 +84,7 @@ export function _equal_Q(a, b) {
                 if (!_equal_Q(a.get(key), b.get(key))) { return false; }
             }
             return true;
+        case 'ratio': return a.equals(b);
         default:
             return a === b;
     }

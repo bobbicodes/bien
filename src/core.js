@@ -397,6 +397,9 @@ function map(f, s) {
 }
 
 function int(x) {
+    if (types._ratio_Q(x)) {
+        return x.floor()
+    }
     if (types._number_Q(x)) {
         return Math.floor(x)
     } else if (x[0] === '\\') {
@@ -469,6 +472,9 @@ function product() {
 function divide() {
     if (arguments[0] === 0) {
         return 0
+    }
+    if (arguments.length === 2 && Number.isInteger(arguments[0]) && Number.isInteger(arguments[1]) && arguments[1] != 1) {
+        return types._ratio({n: arguments[0], d: arguments[1]})
     }
     var divisor = arguments[0]
     var res = Array.from(arguments).slice(1).reduce((acc, a) => acc / a, divisor);
