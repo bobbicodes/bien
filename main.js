@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("ttt2")
+//testSolution("yacht")
 //loadExercise("robot_simulator")
-//testExercisesUntilFail()
-testExercises()
+testExercisesUntilFail()
+//testExercises()

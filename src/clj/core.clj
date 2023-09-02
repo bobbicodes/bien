@@ -483,6 +483,15 @@
     (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
     :else (throw (str "Map not implemented on " (count colls) " colls"))))
 
+(defn mapv [f & colls]
+  (cond
+    (empty? (first colls)) '()
+    (= 1 (count colls)) (map1 f (first colls))
+    (= 2 (count colls)) (map2 f (first colls) (second colls))
+    (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
+    (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
+    :else (throw (str "Map not implemented on " (count colls) " colls"))))
+
 (defn drop-last [n coll]
   (if-not coll
     (drop-last 1 n)
