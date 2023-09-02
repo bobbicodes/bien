@@ -280,16 +280,18 @@
 
 (defn some [pred xs]
   (if (set? pred)
-    (if (empty? xs)
-      nil
-      (or
-       (when (contains? pred (first xs))
-         (first xs))
-       (some pred (rest xs))))
-    (if (empty? xs)
-      nil
-      (or (pred (first xs))
-          (some pred (rest xs))))))
+    (if (empty? xs) nil
+      (or (when (contains? pred (first xs))
+            (first xs))
+          (some pred (rest xs))))
+    (if (map? pred)
+      (if (empty? xs) nil
+          (or (when (contains? pred (first xs))
+                (get pred (first xs)))
+              (some pred (rest xs))))
+      (if (empty? xs) nil
+        (or (pred (first xs))
+            (some pred (rest xs)))))))
 
 (defn not-any? [pred coll]
   (not (some pred coll)))

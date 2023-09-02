@@ -84,8 +84,14 @@ function get(coll, key, notfound) {
     if (types._string_Q(coll)) {
         return coll[key]
     }
+    if (types._hash_map_Q(coll)) {
+        for (const [k, value] of coll) {
+            if (types._equal_Q(k, key)) {
+                return value
+            }
+        }
+    }
     if (coll != null) {
-
         return coll.get(key) || notfound
     } else {
         return null;
@@ -93,7 +99,14 @@ function get(coll, key, notfound) {
 }
 
 function contains_Q(coll, key) {
-    if (types._set_Q(coll) || types._hash_map_Q(coll)) {
+    if (types._hash_map_Q(coll)) {
+        for (const [k, value] of coll) {
+            if (types._equal_Q(k, key)) {
+                return true
+            }
+        }
+    }
+    if (types._set_Q(coll)) {
         return coll.has(key)
     }
     if (key in coll) { return true; } else { return false; }

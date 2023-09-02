@@ -171,8 +171,8 @@ function testExercisesUntilFail() {
   console.log("Fails:", fails)
 }
 
-//testSolution(randExercise())
-//testSolution("db")
+testSolution(randExercise())
+//testSolution("ttt")
 //loadExercise("robot_simulator")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

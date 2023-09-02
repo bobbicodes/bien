@@ -364,34 +364,22 @@
      (iter# ~(second seq-exprs)))))
 
 
-(def  letter-values
-  {"AEIOULNRST" 1
-   "DG"         2
-   "BCMP"       3
-   "FHVWY"      4
-   "K"          5
-   "JX"         8
-   "QZ"        10})
+(def board [[:e :e :e] [:e :e :e] [:e :e :e]])
 
-;; A map from letter (as string) to score
-(def  letter->score
-  (reduce-kv (fn [acc letters score]
-               (-> (map str letters)
-                   (zipmap (repeat score))
-                   (->> (merge acc))))
-             {} letter-values))
+(concat board (apply map list board)
+        (for [d [[[0 0] [1 1] [2 2]] [[2 0] [1 1] [0 2]]]]
+          (for [xy d] ((board (first xy)) (last xy)))))
 
-letter->score
+(def x '([:e :e :e] [:x :x :x] [:e :e :e] (:e :e :e) (:e :e :e) (:e :e :e) (:e :e :e) (:e :e :e)))
 
-;; Defaults to 0 for non-alphabetic input
-(defn score-letter [letter]
-  (get letter->score (.toUpperCase (str letter)) 0))
+(some {[:x :x :x] :x [:o :o :o] :o}
+      x)
 
-(defn score-word [word]
-  (reduce (fn [score letter]
-            (+ score (score-letter letter)))
-          0 word))
+(contains? {[:x :x :x] 1} [:x :x :x])
+(contains? {:a 1} :a)
 
-(score-letter "a")
-
-(conj {:a 1 :b 2 :c 3} {:b 9 :d 4})
+(defn ttt [board]
+  (some {[:x :x :x] :x [:o :o :o] :o}
+        (concat board (apply map list board)
+                (for [d [[[0 0] [1 1] [2 2]] [[2 0] [1 1] [0 2]]]]
+                  (for [xy d] (get (board (first xy)) (last xy)))))))
