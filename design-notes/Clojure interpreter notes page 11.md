@@ -104,3 +104,4 @@
 - There's a question on Clojureverse from Shaun Lebron about resources for learning about the Clojure compiler. Alex Miller gave some video links! Let's check 'em out! https://clojureverse.org/t/resources-for-learning-how-the-clojure-compiler-works/9059
 - Brainstorming [[function arities]]
 - glad that's done and seems to be working
+- time for [[Clojure interpreter notes page 12]]
