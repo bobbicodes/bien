@@ -272,6 +272,15 @@ export function _assoc_BANG(hm) {
     if (arguments.length % 2 !== 1) {
         throw new Error("Odd number of assoc arguments");
     }
+    if (_vector_Q(hm)) {
+        for (let i = 0; i < arguments.length; i++) {
+            var ktoken = arguments[i],
+                vtoken = arguments[i + 1];
+            hm[ktoken] = vtoken
+        }
+        return hm
+    }
+
     for (var i = 1; i < arguments.length; i += 2) {
         var ktoken = arguments[i],
             vtoken = arguments[i + 1];
