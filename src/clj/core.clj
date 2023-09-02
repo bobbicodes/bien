@@ -627,6 +627,7 @@
         gxs (gensym "s__")
         iterys# (gensym "iterys__")
         fs#     (gensym "fs__")
+        ;; TODO: create named lambdas so won't need to do this
         do-mod (defn do-mod [mod]
                  (cond
                    (= (ffirst mod) :let) `(let ~(second (first mod)) ~(do-mod (next mod)))
