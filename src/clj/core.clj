@@ -295,7 +295,7 @@
   (not (some pred coll)))
 
 (defn quot [n d]
-  (int (/ n d)))
+  (int (double (/ n d))))
 
 (defn pos? [n]
   (> n 0))
