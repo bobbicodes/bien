@@ -410,6 +410,10 @@ function int(x) {
     }
 }
 
+function double(x) {
+    return x.valueOf()
+}
+
 function char(int) {
     return String.fromCharCode(int)
 }
@@ -763,6 +767,7 @@ export var ns = {
     'cycle': cycle,
     'str/split': split,
     're-pattern': re_pattern,
+    'double': double,
 
     'pr-str': pr_str,
     'str': str,

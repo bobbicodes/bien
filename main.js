@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("complex_numbers")
+//testSolution("complex_numbers")
 //loadExercise("robot_simulator")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

@@ -289,7 +289,7 @@ function _EVAL(ast, env) {
     }
 }
 
-function EVAL(ast, env) {
+export function EVAL(ast, env) {
     var result = _EVAL(ast, env);
     return (typeof result !== "undefined") ? result : null;
 }
