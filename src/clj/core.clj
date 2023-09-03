@@ -27,6 +27,9 @@
       `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
                     ~{:name (str name)})))))
 
+(defmacro lazy-seq [& body]
+  `(new LazySeq (fn [] ~@body)))
+
 (defn not [a] (if a false true))
 (defn not= [a b] (not (= a b)))
 (defn dec [a] (- a 1))

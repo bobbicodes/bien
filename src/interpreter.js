@@ -268,6 +268,10 @@ function _EVAL(ast, env) {
                 } else {
                     return types._function(EVAL, Env, a2, env, a1, a0);
                 }
+            case "new":
+                var constructor = EVAL(a1, env)
+                var args = EVAL([types._symbol('do')].concat(ast.slice(2)), env)
+                return new constructor(args)
             default:
                 var el = eval_ast(ast, env), f = el[0];
                 //console.log("f:", f, PRINT(ast), env)

@@ -173,6 +173,6 @@ function testExercisesUntilFail() {
 
 //testSolution(randExercise())
 //testSolution("queen_attack")
-//loadExercise("robot_simulator")
+//loadExercise("rn")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

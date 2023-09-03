@@ -508,9 +508,63 @@ function divide() {
     return res
 }
 
-function take(n, coll) {
+// https://github.com/squint-cljs/squint/blob/main/src/squint/core.js
+class LazyIterable {
+    constructor(gen) {
+        this.name = 'LazyIterable'
+        this.gen = gen;
+    }
+    [Symbol.iterator]() {
+        return this.gen();
+    }
+}
+
+export function lazy(f) {
+    return new LazyIterable(f);
+}
+
+export function seqable_QMARK_(x) {
+    // String is iterable but doesn't allow `m in s`
+    return typeof x === 'string' || x === null || x === undefined || Symbol.iterator in x;
+}
+
+export function iterable(x) {
+    // nil puns to empty iterable, support passing nil to first/rest/reduce, etc.
+    if (x === null || x === undefined) {
+        return [];
+    }
+    if (seqable_QMARK_(x)) {
+        return x;
+    }
+    return Object.entries(x);
+}
+
+export class LazySeq {
+    constructor(f) {
+        this.name = 'LazySeq'
+        this.f = f;
+    }
+    *[Symbol.iterator]() {
+        yield* this.f();
+    }
+}
+
+export function take(n, coll) {
     if (types._lazy_range_Q(coll)) {
         return range(0, n)
+    }
+    if (types._lazy_seq_Q(coll)) {
+        return lazy(function* () {
+            let i = n - 1;
+            for (const x of iterable(coll)) {
+                if (i-- >= 0) {
+                    yield x;
+                }
+                if (i < 0) {
+                    return;
+                }
+            }
+        });
     }
     if (types._iterate_Q(coll)) {
         for (let i = 0; i < n; i++) {
@@ -750,18 +804,25 @@ function require(lib) {
     }
 }
 
-export class LazySeq {
-    constructor(f) {
-        this.f = f;
-    }
-    *[Symbol.iterator]() {
-        yield* this.f();
-    }
+function downloadObjectAsJson(exportObj, exportName) {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", exportName);
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function spit_json(name, obj) {
+    return downloadObjectAsJson(obj, name)
 }
 
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
+    'spit-json': spit_json,
+    'LazySeq': LazySeq,
     'require': require,
     'type': types._obj_type,
     '=': types.allEqual,
