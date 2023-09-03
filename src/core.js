@@ -508,6 +508,7 @@ function divide() {
     return res
 }
 
+// https://github.com/squint-cljs/squint/blob/main/src/squint/core.js
 class LazyIterable {
     constructor(gen) {
         this.name = 'LazyIterable'
@@ -585,42 +586,6 @@ export function take(n, coll) {
     }
     return coll.slice(0, n)
 }
-
-/* function take(n, coll) {
-    if (types._lazy_range_Q(coll)) {
-        return range(0, n)
-    }
-    if (types._lazy_seq_Q(coll)) {
-        let i = n - 1;
-        for (const x of coll) {
-            if (i-- >= 0) {
-              yield x;
-            }
-            if (i < 0) {
-              return;
-            }
-          }
-    }
-    if (types._iterate_Q(coll)) {
-        for (let i = 0; i < n; i++) {
-            coll.next()
-        }
-        return coll.realized.slice(0, -1)
-    }
-    if (types._cycle_Q(coll)) {
-        const cycles = Math.floor(n / coll.coll.length)
-        const mod = n % coll.coll.length
-        let res = []
-        for (let i = 0; i < cycles; i++) {
-            res = res.concat(coll.coll)
-        }
-        if (mod != 0) {
-            res = res.concat(coll.coll.slice(0, mod))
-        }
-        return res
-    }
-    return coll.slice(0, n)
-} */
 
 function drop(n, coll) {
     return coll.slice(n)
