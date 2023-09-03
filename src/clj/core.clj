@@ -755,11 +755,10 @@
                              (if (keyword? mk)
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
-                                     (println (name mk))
-                                     (cond (= mkn "keys") 
+                                     (cond (= mkn "keys")
                                            (assoc transforms 
                                                   mk 
-                                                  #(keyword (or mkns (namespace %)) (name %)))
+                                                  (fn [k] (keyword (or mkns (namespace k)) (name k))))
                                            (= mkn "syms") 
                                            (assoc transforms 
                                                   mk 
@@ -798,9 +797,8 @@
             ret))))
 
 (defn namespace [x]
-  (first (str/split (str x) "/")))
-
-(namespace :keys)
+  (when (str/includes? x "/")
+    (first (str/split (str x) "/"))))
 
 (defn name [x]
   (if (keyword? x)

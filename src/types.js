@@ -179,12 +179,19 @@ export function _ratio_Q(obj) {
 }
 
 // Keywords
-export function _keyword(obj) {
-    if (typeof obj === 'string' && obj[0] === '\u029e') {
-        return obj;
-    } else {
-        return "\u029e" + obj;
+export function _keyword(ns, name) {
+    if (!name) {
+        name = ns
+        if (typeof name === 'string' && name[0] === '\u029e') {
+            return name;
+        } else {
+            return "\u029e" + name;
+        }
     }
+    if (ns === null) {
+        return "\u029e" + name
+    }
+    return "\u029e" + ns + "/" + name
 }
 export function _keyword_Q(obj) {
     return typeof obj === 'string' && obj[0] === '\u029e';
