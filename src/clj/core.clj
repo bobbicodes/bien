@@ -689,7 +689,7 @@
     (assoc m (first ks) v)))
 
 (defn str/includes? [s substr]
-  (. (str "'" s "'" ".toUpperCase")))
+  (js-eval (str "'" s "'" ".includes(" "'" substr "'" ")")))
 
 ;; currently only sequential destructuring is working
 
@@ -702,6 +702,7 @@
 (comment
   (defn has-rest? [b] (some #{'&} b))
   )
+
 
 (defn pvec [bvec b val]
   (let [gvec (gensym "vec__")
@@ -754,16 +755,30 @@
                              (if (keyword? mk)
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
-                                     (cond (= mkn "keys") (assoc transforms mk #(keyword (or mkns (namespace %)) (name %)))
-                                           (= mkn "syms") (assoc transforms mk #(list `quote (symbol (or mkns (namespace %)) (name %))))
-                                           (= mkn "strs") (assoc transforms mk str)
+                                     (println (name mk))
+                                     (cond (= mkn "keys") 
+                                           (assoc transforms 
+                                                  mk 
+                                                  #(keyword (or mkns (namespace %)) (name %)))
+                                           (= mkn "syms") 
+                                           (assoc transforms 
+                                                  mk 
+                                                  #(list 
+                                                    `quote 
+                                                    (symbol 
+                                                     (or mkns 
+                                                         (namespace %)) (name %))))
+                                           (= mkn "strs") 
+                                           (assoc transforms mk str)
                                            :else transforms))
                                transforms))
                            {}
                            (keys b))]
+                         
                          (reduce
                           (fn [bes entry]
-                            (reduce #(assoc %1 %2 ((val entry) %2))
+                            (reduce (fn [a b] (assoc a b ((val entry) b)))
+                                    
                                     (dissoc bes (key entry))
                                     ((key entry) bes)))
                           (dissoc b :as :or)
@@ -784,6 +799,8 @@
 
 (defn namespace [x]
   (first (str/split (str x) "/")))
+
+(namespace :keys)
 
 (defn name [x]
   (if (keyword? x)

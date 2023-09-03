@@ -7,13 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(defn fib
-  ([]
-   (fib 1 1))
-  ([a b]
-   (lazy-seq (cons a (fib b (+ a b))))))
-
-(take 5 (fib))`,
+  doc: `(destructure '[{:keys [w b]} {:w [2 4] :b [6 6]}])`,
   extensions: [basicSetup, clojure()]
 })
 

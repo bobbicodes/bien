@@ -520,6 +520,7 @@ class LazyIterable {
 }
 
 export function lazy(f) {
+    console.log("creating lazy-iterable of", f)
     return new LazyIterable(f);
 }
 
@@ -529,11 +530,13 @@ export function seqable_QMARK_(x) {
 }
 
 export function iterable(x) {
+    console.log("calling iterable on", x)
     // nil puns to empty iterable, support passing nil to first/rest/reduce, etc.
     if (x === null || x === undefined) {
         return [];
     }
     if (seqable_QMARK_(x)) {
+        console.log(x, "is seqable, returning")
         return x;
     }
     return Object.entries(x);
@@ -545,6 +548,7 @@ export class LazySeq {
         this.f = f;
     }
     *[Symbol.iterator]() {
+        console.log("yielding:", this.f())
         yield* this.f();
     }
 }
@@ -554,10 +558,12 @@ export function take(n, coll) {
         return range(0, n)
     }
     if (types._lazy_seq_Q(coll)) {
+        console.log("taking from:", Array.from(coll))
         return lazy(function* () {
             let i = n - 1;
             for (const x of iterable(coll)) {
                 if (i-- >= 0) {
+                    console.log("yielding", x)
                     yield x;
                 }
                 if (i < 0) {
