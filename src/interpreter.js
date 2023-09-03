@@ -4,6 +4,7 @@ import { Env } from './env.js'
 import * as types from './types.js'
 import * as core from './core.js'
 import core_clj from './clj/core.clj?raw'
+import pprint_clj from './clj/pprint.clj?raw'
 
 // read
 export function READ(str) {
@@ -319,3 +320,6 @@ repl_env.set(types._symbol('*ARGV*'), []);
 
 // load core.clj
 evalString("(do " + core_clj + ")")
+
+// pprint_clj
+evalString("(do " + pprint_clj + ")")
