@@ -13,6 +13,11 @@ export function _pr_str(obj, print_readably) {
     switch (ot) {
         case 'lazy-range':
             return "(0 1 2 3 4 5 6 7 8 9 10 ...)";
+        case 'lazy-seq':
+            return obj
+        case 'lazy-iterable':
+            var ret = [...obj].map(function (e) { return _pr_str(e, _r); });
+            return "(" + ret.join(' ') + ")";
         case 'iterate':
             return "#iterate[" + obj.f + "]";
         case 'cycle':
