@@ -593,11 +593,11 @@ export function take(n, coll) {
         }
         return res
     }
-    return coll.slice(0, n)
+    return seq(coll).slice(0, n)
 }
 
 function drop(n, coll) {
-    return coll.slice(n)
+    return seq(coll).slice(n)
 }
 
 function repeat(n, x) {

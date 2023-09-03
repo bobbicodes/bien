@@ -296,3 +296,59 @@
 
 (let [a 1]
   a)
+
+(defn add [x y]
+  (some #(and (= (take % (seq x)) (take % (seq y)))
+              (= (drop % (seq x)) (drop (inc %) (seq y))))
+        (range (inc (count x)))))
+
+(defn subst [x y]
+  (some #(and (= (take % x) (take % y))
+              (= (drop (inc %) x) (drop (inc %) y)))
+        (range (count x))))
+
+(def s #{"cot" "hot" "bat" "fat"})
+(def x s)
+(def w s)
+(subst w s)
+(def y s)
+
+(def a 0)
+
+(take a x)
+
+(take 1 #{"cot" "hot" "bat" "fat"})
+(take 1 {:a 1 :b 2})
+
+(and (= (take a x) (take a y))
+     (= (drop (inc a) x) (drop (inc a) y)))
+
+(some (fn [a] (and (= (take a x) (take a y))
+                   (= (drop (inc a) x) (drop (inc a) y))))
+      (range (count x)))
+
+(defn search
+  ([x] (if (some #(search x %) x) true false))
+  ([x w] (or (empty? (disj x w))
+             (some #(and (or (add w %) (add % w) (subst w %))
+                         (search (disj x w) %))
+                   (disj x w)))))
+
+
+(some (fn [s] (and (or (add w s) (add s w) (subst w s))
+                   (search (disj x w) s)))
+      (disj x w))
+
+(subst w s)
+
+(and (or (add w s) (add s w) (subst w s))
+     (search (disj x w) s))
+
+(search (disj x w) s)
+
+(search s s)
+
+(defn word-chain [s]
+  (search s))
+
+(word-chain #{"cot" "hot" "bat" "fat"})
