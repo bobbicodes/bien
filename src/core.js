@@ -362,10 +362,11 @@ function _difference(setA, setB) {
 
 function _disj(set) {
     var args = Array.from(arguments).slice(1)
+    var new_set = types._clone(set)
     for (let i = 0; i < args.length; i++) {
-        set.delete(args[i])
+        new_set.delete(args[i])
     }
-    return set
+    return new_set
 }
 
 function _is(a) {
@@ -869,7 +870,6 @@ export var ns = {
     'str/split': split,
     're-pattern': re_pattern,
     'double': double,
-
     'pr-str': pr_str,
     'str': str,
     'prn': prn,
