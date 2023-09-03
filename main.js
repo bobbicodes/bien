@@ -7,7 +7,13 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(destructure '[{:keys [w b]} {:w [2 4] :b [6 6]}])`,
+  doc: `(def client {:name "Super Co."
+             :location "Philadelphia"
+             :description "The worldwide leader in plastic tableware."})
+  
+(destructure '[{name :name
+                location :location
+                description :description} client])`,
   extensions: [basicSetup, clojure()]
 })
 

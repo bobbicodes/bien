@@ -100,6 +100,9 @@ function get(coll, key, notfound) {
 }
 
 function contains_Q(coll, key) {
+    if (coll === null) {
+        return false
+    }
     if (types._hash_map_Q(coll)) {
         for (const [k, value] of coll) {
             if (types._equal_Q(k, key)) {

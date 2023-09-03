@@ -756,28 +756,18 @@
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
                                      (cond (= mkn "keys")
-                                           (assoc transforms 
-                                                  mk 
-                                                  (fn [k] (keyword (or mkns (namespace k)) (name k))))
-                                           (= mkn "syms") 
-                                           (assoc transforms 
-                                                  mk 
-                                                  #(list 
-                                                    `quote 
-                                                    (symbol 
-                                                     (or mkns 
-                                                         (namespace %)) (name %))))
-                                           (= mkn "strs") 
-                                           (assoc transforms mk str)
+                                           (assoc transforms mk (fn [k] (keyword (or mkns (namespace k)) (name k))))
+                                           (= mkn "syms") (assoc transforms mk #(list `quote (symbol (or mkns (namespace %)) (name %))))
+                                           (= mkn "strs") (assoc transforms mk str)
                                            :else transforms))
                                transforms))
                            {}
                            (keys b))]
-                         
                          (reduce
                           (fn [bes entry]
-                            (reduce (fn [a b] (assoc a b ((val entry) b)))
-                                    
+                            (reduce (fn [a b]
+                                      (do (println (dissoc bes (key entry)))
+                                          (assoc a b ((val entry) b))))
                                     (dissoc bes (key entry))
                                     ((key entry) bes)))
                           (dissoc b :as :or)
