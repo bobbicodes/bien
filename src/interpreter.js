@@ -187,7 +187,7 @@ function _EVAL(ast, env) {
                 env.set(a1, res);
                 return res
             case "let*":
-            //case "let":
+                //case "let":
                 var let_env = new Env(env);
                 for (var i = 0; i < a1.length; i += 2) {
                     let_env.set(a1[i], EVAL(a1[i + 1], let_env));
@@ -202,8 +202,8 @@ function _EVAL(ast, env) {
                 for (var i = 0; i < a1.length; i += 2) {
                     loopLocals.push(a1[i], EVAL(a1[i + 1], loop_env))
                 }
-                for (let i = 0; i < loopLocals.length; i+=2) {
-                    loop_env.set(a1[i], loopLocals[i+1])
+                for (let i = 0; i < loopLocals.length; i += 2) {
+                    loop_env.set(a1[i], loopLocals[i + 1])
                 }
                 ast = loop_body
                 env = loop_env

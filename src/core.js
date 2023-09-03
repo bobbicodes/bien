@@ -491,9 +491,9 @@ function divide() {
     if (arguments[0] === 0) {
         return 0
     }
-    if (arguments.length === 2 && Number.isInteger(arguments[0]) 
-          && Number.isInteger(arguments[1]) && arguments[1] != 1) {
-        var quotient = types._ratio({n: arguments[0], d: arguments[1]})
+    if (arguments.length === 2 && Number.isInteger(arguments[0])
+        && Number.isInteger(arguments[1]) && arguments[1] != 1) {
+        var quotient = types._ratio({ n: arguments[0], d: arguments[1] })
         if (quotient.d === 1) {
             return quotient.n
         } else {
@@ -540,6 +540,8 @@ function drop(n, coll) {
 function repeat(n, x) {
     return Array(n).fill(x)
 }
+
+
 
 // lazy ranges
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators#generator_functions
@@ -745,6 +747,15 @@ function require(lib) {
             break;
         default:
             break;
+    }
+}
+
+export class LazySeq {
+    constructor(f) {
+        this.f = f;
+    }
+    *[Symbol.iterator]() {
+        yield* this.f();
     }
 }
 

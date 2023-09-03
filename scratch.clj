@@ -242,151 +242,57 @@
                                     n/from-to
                                     (j/assoc! :insert " "))])})))))))
 
-(defmacro for [seq-exprs body-expr]
-  (let [to-groups (fn [seq-exprs]
-                    (reduce (fn [groups [k v]]
-                               (if (keyword? k)
-                                 (conj (pop groups) (conj (peek groups) [k v]))
-                                 (conj groups [k v])))
-                             [] (partition 2 seq-exprs)))
-        err (fn [& msg] (throw (IllegalArgumentException. ^String (apply str msg))))
-        emit-bind (fn emit-bind [[[bind expr & mod-pairs]
-                                  & [[_ next-expr] :as next-groups]]]
-                    (let [giter (gensym "iter__")
-                          gxs (gensym "s__")
-                          do-mod (fn do-mod [[[k v :as pair] & etc]]
-                                   (cond
-                                     (= k :let) `(let ~v ~(do-mod etc))
-                                     (= k :while) `(when ~v ~(do-mod etc))
-                                     (= k :when) `(if ~v
-                                                    ~(do-mod etc)
-                                                    (recur (rest ~gxs)))
-                                     (keyword? k) (err "Invalid 'for' keyword " k)
-                                     next-groups
-                                     `(let [iterys# ~(emit-bind next-groups)
-                                            fs# (seq (iterys# ~next-expr))]
-                                        (if fs#
-                                          (concat fs# (~giter (rest ~gxs)))
-                                          (recur (rest ~gxs))))
-                                     :else `(cons ~body-expr
-                                                  (~giter (rest ~gxs)))))]
-                      (if next-groups
-                        #_"not the inner-most loop"
-                        `(fn ~giter [~gxs]
-                           (lazy-seq
-                            (loop [~gxs ~gxs]
-                              (when-first [~bind ~gxs]
-                                ~(do-mod mod-pairs)))))
-                        #_"inner-most loop"
-                        (let [gi (gensym "i__")
-                              gb (gensym "b__")
-                              do-cmod (fn do-cmod [[[k v :as pair] & etc]]
-                                        (cond
-                                          (= k :let) `(let ~v ~(do-cmod etc))
-                                          (= k :while) `(when ~v ~(do-cmod etc))
-                                          (= k :when) `(if ~v
-                                                         ~(do-cmod etc)
-                                                         (recur
-                                                          (unchecked-inc ~gi)))
-                                          (keyword? k)
-                                          (err "Invalid 'for' keyword " k)
-                                          :else
-                                          `(do (chunk-append ~gb ~body-expr)
-                                               (recur (unchecked-inc ~gi)))))]
-                          `(fn ~giter [~gxs]
-                             (lazy-seq
-                              (loop [~gxs ~gxs]
-                                (when-let [~gxs (seq ~gxs)]
-                                  (if (chunked-seq? ~gxs)
-                                    (let [c# (chunk-first ~gxs)
-                                          size# (int (count c#))
-                                          ~gb (chunk-buffer size#)]
-                                      (if (loop [~gi (int 0)]
-                                            (if (< ~gi size#)
-                                              (let [~bind (.nth c# ~gi)]
-                                                ~(do-cmod mod-pairs))
-                                              true))
-                                        (chunk-cons
-                                         (chunk ~gb)
-                                         (~giter (chunk-rest ~gxs)))
-                                        (chunk-cons (chunk ~gb) nil)))
-                                    (let [~bind (first ~gxs)]
-                                      ~(do-mod mod-pairs)))))))))))]
-    `(let [iter# ~(emit-bind (to-groups seq-exprs))]
-       (iter# ~(second seq-exprs)))))
+(ns queen-attack
+  (:require [clojure.string :as str]))
 
-(declare do-mod)
-(declare do-mod*)
+(defn abs [n]
+  (if (neg? n) (- n) n))
 
-(defn emit-bind [bindings body-expr]
-  (let [giter (gensym)
-        gxs (gensym)]
-    (println "bindings:" bindings)
-    (if (next bindings)
-      `(defn ~giter [~gxs]
-         (loop [~gxs ~gxs]
-           (when-first [~(ffirst bindings) ~gxs]
-             ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))
-      `(defn ~giter [~gxs]
-         (loop [~gxs ~gxs]
-           (when-let [~gxs (seq ~gxs)]
-             (let [~(ffirst bindings) (first ~gxs)]
-               ~(do-mod (subvec (first bindings) 2) body-expr bindings giter gxs))))))))
+(def empty-board
+  (->> ["_" "_" "_" "_" "_" "_" "_" "_"]
+       (repeat 8)
+       vec))
 
-(defn do-mod [domod body-expr bindings giter gxs]
-  (cond
-    (= (ffirst domod) :let) `(let ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
-    (= (ffirst domod) :while) `(when ~(second (first domod)) ~(do-mod (next domod) body-expr bindings giter gxs))
-    (= (ffirst domod) :when) `(if ~(second (first domod))
-                                ~(do-mod (next domod) body-expr bindings giter gxs)
-                                (recur (rest ~gxs)))
-    (keyword? (ffirst domod)) (str "Invalid 'for' keyword " (ffirst domod))
-    (next bindings)
-    `(let [iterys# ~(emit-bind (next bindings) body-expr)
-           fs# (seq (iterys# ~(second (first (next bindings)))))]
-       (if fs#
-         (concat fs# (~giter (rest ~gxs)))
-         (recur (rest ~gxs))))
-    :else `(cons ~body-expr
-                 (~giter (rest ~gxs)))))
+(defn board->str [board]
+  (->> board
+       (map #(str/join " " %))
+       (map #(str % "\n"))
+       (apply str)))
 
-(defn do-mod* [domod body-expr bindings giter gxs]
-  (if (next bindings)
-    `(let [iterys# ~(emit-bind (next bindings) body-expr)
-           fs#     (seq (iterys# ~(second (first (next bindings)))))]
-       (if fs#
-         (concat fs# (~giter (rest ~gxs)))
-         (recur (rest ~gxs))))
-    `(cons ~body-expr
-           (~giter (rest ~gxs)))))
+(defn board-string [{:keys [w b]}]
+  (-> empty-board
+      (cond-> w (assoc-in w \W)
+              b (assoc-in b \B))
+      board->str))
 
-(defmacro for* [seq-exprs body-expr]
-  (let [to-groups (fn [seq-exprs]
-                    (reduce (fn [groups kv]
-                              (if (keyword? (first kv))
-                                (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
-                                (conj groups [(first kv) (last kv)])))
-                            [] (partition 2 seq-exprs)))]
-   `(let [iter# ~(emit-bind (to-groups seq-exprs) body-expr)]
-     (iter# ~(second seq-exprs)))))
+(defn can-attack [{[wx wy] :w [bx by] :b :as state}]
+  (or (= wx bx)
+      (= wy by)
+      (= (abs (- wx bx))
+         (abs (- wy by)))))
 
+(let [{:keys [w b]} {:w [2 4] :b [6 6]}]
+  [w b])
 
-(def board [[:e :e :e] [:e :e :e] [:e :e :e]])
+(destructure '[{:keys [w b]} {:w [2 4] :b [6 6]}])
+[map__147 {:w [2 4], :b [6 6]}
+ map__147 (if (clojure.core/seq? map__147)
+            (if (clojure.core/next map__147)
+              (createAsIfByAssoc (clojure.core/to-array map__147))
+              (if (clojure.core/seq map__147)
+                (clojure.core/first map__147)
+                clojure.lang.PersistentArrayMap/EMPTY))
+            map__147)
+ w (clojure.core/get map__147 :w)
+ b (clojure.core/get map__147 :b)]
 
-(concat board (apply map list board)
-        (for [d [[[0 0] [1 1] [2 2]] [[2 0] [1 1] [0 2]]]]
-          (for [xy d] ((board (first xy)) (last xy)))))
+(defn myfn [[a b]]
+  [a b])
 
-(def x '([:e :e :e] [:x :x :x] [:e :e :e] (:e :e :e) (:e :e :e) (:e :e :e) (:e :e :e) (:e :e :e)))
+(defn a [a]
+  a)
 
-(some {[:x :x :x] :x [:o :o :o] :o}
-      x)
+(a 1)
 
-(contains? {[:x :x :x] 1} [:x :x :x])
-(contains? {:a 1} :a)
-
-(defn ttt [board]
-  (some {[:x :x :x] :x [:o :o :o] :o}
-        (concat board (apply map list board)
-                (for [d [[[0 0] [1 1] [2 2]] [[2 0] [1 1] [0 2]]]]
-                  (for [xy d] (get (board (first xy)) (last xy)))))))
+(let [a 1]
+  a)
