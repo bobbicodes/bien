@@ -348,8 +348,6 @@ export function _vector() {
 }
 export function _vector_Q(obj) { return Array.isArray(obj) && !!obj.__isvector__; }
 
-
-
 // Hash Maps
 export function _hash_map() {
     if (arguments.length % 2 === 1) {

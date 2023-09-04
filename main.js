@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("say")
+//testSolution("nth_prime")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

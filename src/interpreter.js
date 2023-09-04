@@ -62,7 +62,7 @@ function eval_ast(ast, env) {
     } else if (types._hash_map_Q(ast)) {
         var new_hm = new Map();
         for (var [key, value] of ast) {
-            new_hm.set(key, EVAL(ast.get(key), env))
+            new_hm.set(EVAL(key, env), EVAL(ast.get(key), env))
         }
         return new_hm;
     } else {
