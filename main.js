@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("robot_simulator")
+//testSolution("clock")
 //loadExercise("rn")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()
