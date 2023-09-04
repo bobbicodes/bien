@@ -558,6 +558,9 @@ export class LazySeq {
 }
 
 export function take(n, coll) {
+    if (empty_Q(coll)) {
+        return []
+    }
     if (types._lazy_range_Q(coll)) {
         return range(0, n)
     }

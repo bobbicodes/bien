@@ -816,30 +816,25 @@
 (defmacro let [bindings & body]
   `(let* ~(destructure bindings) ~@body))
 
-(defn emit-condp [pred expr args]
-  (let [vec__6119 (split-at (if (= :>> (second args)) 3 2) args)
-        vec__6122 (nth vec__6119 0 nil)
-        a (nth vec__6122 0 nil)
-        b (nth vec__6122 1 nil)
-        c (nth vec__6122 2 nil)
-        clause vec__6122 more (nth vec__6119 1 nil)
-        n (count clause)]
-    (cond
-      (= 0 n) `(throw (str "No matching clause: " ~expr))
-      (= 1 n) a
-      (= 2 n) `(if (~pred ~a ~expr)
-                 ~b
-                 ~(emit-condp pred expr more))
-      :else `(if-let [p# (~pred ~a ~expr)]
-               (~c p#)
-               ~(emit-condp pred expr more)))))
-
 (defmacro condp [pred expr & clauses]
   (let [gpred (gensym "pred__")
-        gexpr (gensym "expr__")]
+        gexpr (gensym "expr__")
+        emit (defn emit [pred expr args]
+               (let [[[a b c :as clause] more]
+                     (split-at (if (= :>> (second args)) 3 2) args)
+                     n (count clause)]
+                 (cond
+                   (= 0 n) `(throw (str "No matching clause: " ~expr))
+                   (= 1 n) a
+                   (= 2 n) `(if (~pred ~a ~expr)
+                              ~b
+                              ~(emit pred expr more))
+                   :else `(if-let [p# (~pred ~a ~expr)]
+                            (~c p#)
+                            ~(emit pred expr more)))))]
     `(let [~gpred ~pred
            ~gexpr ~expr]
-       ~(emit-condp gpred gexpr clauses))))
+       ~(emit gpred gexpr clauses))))
 
 (defn Math/log [n]
   (js-eval (str "Math.log(" n ")")))

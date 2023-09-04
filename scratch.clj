@@ -242,9 +242,6 @@
                                     n/from-to
                                     (j/assoc! :insert " "))])})))))))
 
-(ns queen-attack
-  (:require [clojure.string :as str]))
-
 (defn abs [n]
   (if (neg? n) (- n) n))
 
@@ -274,81 +271,27 @@
 (let [{:keys [w b]} {:w [2 4] :b [6 6]}]
   [w b])
 
-(destructure '[{:keys [w b]} {:w [2 4] :b [6 6]}])
-[map__147 {:w [2 4], :b [6 6]}
- map__147 (if (clojure.core/seq? map__147)
-            (if (clojure.core/next map__147)
-              (createAsIfByAssoc (clojure.core/to-array map__147))
-              (if (clojure.core/seq map__147)
-                (clojure.core/first map__147)
-                clojure.lang.PersistentArrayMap/EMPTY))
-            map__147)
- w (clojure.core/get map__147 :w)
- b (clojure.core/get map__147 :b)]
+(defn powerset [s]
+  (reduce 
+   (fn [x y] 
+     (into x 
+           (for [subset x] 
+             (conj subset y))))
+   #{#{}} 
+   s))
 
-(defn myfn [[a b]]
-  [a b])
+(count (powerset (into #{} (range 10))))
 
-(defn a [a]
-  a)
+(def n 2)
+(def step 2)
+(def pad [0])
+(def coll '(9 5))
+(def s coll)
+(def p [])
 
-(a 1)
+(loop [s coll p []]
+  (if (= n (count (take n s)))
+    (recur (drop step s) (conj p (take n s)))
+    (conj p (concat (take n s) pad))))
 
-(let [a 1]
-  a)
-
-(defn add [x y]
-  (some #(and (= (take % (seq x)) (take % (seq y)))
-              (= (drop % (seq x)) (drop (inc %) (seq y))))
-        (range (inc (count x)))))
-
-(defn subst [x y]
-  (some #(and (= (take % x) (take % y))
-              (= (drop (inc %) x) (drop (inc %) y)))
-        (range (count x))))
-
-(def s #{"cot" "hot" "bat" "fat"})
-(def x s)
-(def w s)
-(subst w s)
-(def y s)
-
-(def a 0)
-
-(take a x)
-
-(take 1 #{"cot" "hot" "bat" "fat"})
-(take 1 {:a 1 :b 2})
-
-(and (= (take a x) (take a y))
-     (= (drop (inc a) x) (drop (inc a) y)))
-
-(some (fn [a] (and (= (take a x) (take a y))
-                   (= (drop (inc a) x) (drop (inc a) y))))
-      (range (count x)))
-
-(defn search
-  ([x] (if (some #(search x %) x) true false))
-  ([x w] (or (empty? (disj x w))
-             (some #(and (or (add w %) (add % w) (subst w %))
-                         (search (disj x w) %))
-                   (disj x w)))))
-
-
-(some (fn [s] (and (or (add w s) (add s w) (subst w s))
-                   (search (disj x w) s)))
-      (disj x w))
-
-(subst w s)
-
-(and (or (add w s) (add s w) (subst w s))
-     (search (disj x w) s))
-
-(search (disj x w) s)
-
-(search s s)
-
-(defn word-chain [s]
-  (search s))
-
-(word-chain #{"cot" "hot" "bat" "fat"})
+(take 2 '())

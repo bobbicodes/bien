@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("word_chain")
+//testSolution("luhn")
 //loadExercise("rn")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()
