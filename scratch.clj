@@ -294,4 +294,27 @@
     (recur (drop step s) (conj p (take n s)))
     (conj p (concat (take n s) pad))))
 
-(take 2 '())
+(def e [[:a :a] [:b :b]])
+
+(if (#{0 2} (count (filter odd? (vals (frequencies (mapcat seq e))))))
+  (not (next (reduce
+              (fn [g e]
+                (let [[a b] (map (fn [n] (or (some #(if (% n) %) g) #{n})) e)]
+                  (conj (disj g a b) (into a b))))
+              #{}
+              e)))
+  false)
+
+(defn graph
+  ([nodes]
+   (graph (set (first nodes)) (rest nodes) []))
+  ([connected new-paths parked-nodes]
+   (if (empty? new-paths)
+     (empty? parked-nodes)
+     (let [[a b] (first new-paths)]
+       (if (or (connected a) (connected b))
+         (graph (conj connected a b) (concat (rest new-paths) parked-nodes) [])
+         (graph connected (rest new-paths) (conj parked-nodes [a b])))))))
+
+(graph #{[1 2] [2 3] [3 1]
+         [4 5] [5 6] [6 4] [3 4]})
