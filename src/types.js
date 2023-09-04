@@ -205,11 +205,74 @@ export function _regex_Q(obj) {
     return obj instanceof RegExp
 }
 
+export function walk(inner, outer, form) {
+    //console.log("Walking form:", form)
+    if (_list_Q(form)) {
+        return outer(form.map(inner))
+    } else if (form === null) {
+        return null
+    }
+    else if (_vector_Q(form)) {
+        let v = outer(form.map(inner))
+        v.__isvector__ = true;
+        return v
+    } else if (form.__mapEntry__) {
+        const k = inner(form[0])
+        const v = inner(form[1])
+        let mapEntry = [k, v]
+        mapEntry.__mapEntry__ = true
+        return outer(mapEntry)
+    } else if (_hash_map_Q(form)) {
+        let newMap = new Map()
+        form.forEach((value, key, map) => newMap.set(key, inner(value)))
+        return outer(newMap)
+    } else {
+        return outer(form)
+    }
+}
+
+export function postwalk(f, form) {
+    return walk(x => postwalk(f, x), f, form)
+}
+
+function hasLoop(ast) {
+    let loops = []
+    postwalk(x => {
+        if (x.value == _symbol("loop")) {
+            loops.push(true)
+            return true
+        } else {
+            return x
+        }
+        return x
+    }, ast)
+    if (loops.length > 0) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export function swapRecur(ast, f) {
+    if (!hasLoop(ast)) {
+        return postwalk(x => {
+            if (x.value == _symbol("recur")) {
+                return f
+            } else {
+                return x
+            }
+            return x
+        }, ast)
+    }
+    return ast
+}
+
 // Functions
 export function _function(Eval, Env, ast, env, params) {
     var fn = function () {
         return Eval(ast, new Env(env, params, arguments));
     };
+    ast = swapRecur(ast, fn)
     fn.__meta__ = null;
     fn.__ast__ = ast;
     fn.__gen_env__ = function (args) { return new Env(env, params, args); };

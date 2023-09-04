@@ -1,7 +1,7 @@
 import { read_str } from './reader.js';
 import { _pr_str, _println } from './printer.js'
 import * as types from './types.js'
-import { repl_env, walk, evalString } from './interpreter.js';
+import { repl_env, evalString } from './interpreter.js';
 import zip from './clj/zip.clj?raw'
 
 // Errors/Exceptions
@@ -921,7 +921,7 @@ export var ns = {
     //'mod': mod,
     'rem': mod,
     'iterate': iterate,
-    'walk': walk,
+    'walk': types.walk,
 
     'sequential?': types._sequential_Q,
     'cons': cons,
