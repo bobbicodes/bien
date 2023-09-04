@@ -172,7 +172,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("minesweeper")
+testSolution("say")
 //loadExercise("all_your_base")
-testExercisesUntilFail()
+//testExercisesUntilFail()
 //testExercises()

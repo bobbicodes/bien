@@ -601,6 +601,9 @@ export function take(n, coll) {
 }
 
 function drop(n, coll) {
+    if (empty_Q(coll)) {
+        return []
+    }
     return seq(coll).slice(n)
 }
 

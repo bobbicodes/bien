@@ -304,17 +304,108 @@
               #{}
               e)))
   false)
+(def english-cardinal-units
+  ["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"
+   "ten" "eleven" "twelve" "thirteen" "fourteen"
+   "fifteen" "sixteen" "seventeen" "eighteen" "nineteen"])
+(def english-cardinal-tens
+  ["" "" "twenty" "thirty" "forty" "fifty" "sixty" "seventy" "eighty" "ninety"])
 
-(defn graph
-  ([nodes]
-   (graph (set (first nodes)) (rest nodes) []))
-  ([connected new-paths parked-nodes]
-   (if (empty? new-paths)
-     (empty? parked-nodes)
-     (let [[a b] (first new-paths)]
-       (if (or (connected a) (connected b))
-         (graph (conj connected a b) (concat (rest new-paths) parked-nodes) [])
-         (graph connected (rest new-paths) (conj parked-nodes [a b])))))))
+(def english-scale-numbers
+  ["" "thousand" "million" "billion" "trillion" "quadrillion" "quintillion"
+   "sextillion" "septillion" "octillion" "nonillion" "decillion"
+   "undecillion" "duodecillion" "tredecillion" "quattuordecillion"
+   "quindecillion" "sexdecillion" "septendecillion"
+   "octodecillion" "novemdecillion" "vigintillion"])
 
-(graph #{[1 2] [2 3] [3 1]
-         [4 5] [5 6] [6 4] [3 4]})
+(def parts ["one"])
+(def offset 0)
+(def cnt (count parts))
+
+(def acc [])
+(def pos 0)
+(def this "one")
+(def remainder nil)
+
+(apply str (interpose " " []))
+
+
+
+(drop 1 (interleave (repeat (count []) " ") []))
+
+(defn add-english-scales [parts offset]
+  (let [cnt (count parts)]
+    (loop [acc []
+           pos (dec cnt)
+           this (first parts)
+           remainder (next parts)]
+      (if (nil? remainder)
+        (str (apply str (interpose " " acc))
+             (if (and (not (empty? this)) (not (empty? acc))) " ")
+             this
+             (if (and (not (empty? this)) (pos? (+ pos offset)))
+               (str " " (nth english-scale-numbers (+ pos offset)))))
+        (recur
+         (if (empty? this)
+           acc
+           (conj acc (str this " " (nth english-scale-numbers (+ pos offset)))))
+         (dec pos)
+         (first remainder)
+         (next remainder))))))
+
+(str (apply str (interpose " " acc))
+     (if (and (not (empty? this)) (not (empty? acc))) " ")
+     this
+     (if (and (not (empty? this)) (pos? (+ pos offset)))
+       (str " " (nth english-scale-numbers (+ pos offset)))))
+
+(add-english-scales ["one"] 0)
+
+(defn format-simple-cardinal [num]
+  (let [hundreds (quot num 100)
+        tens (rem num 100)]
+    (str
+     (if (pos? hundreds) (str (nth english-cardinal-units hundreds) " hundred"))
+     (if (and (pos? hundreds) (pos? tens)) " ")
+     (if (pos? tens)
+       (if (< tens 20)
+         (nth english-cardinal-units tens)
+         (let [ten-digit (quot tens 10)
+               unit-digit (rem tens 10)]
+           (str
+            (if (pos? ten-digit) (nth english-cardinal-tens ten-digit))
+            (if (and (pos? ten-digit) (pos? unit-digit)) "-")
+            (if (pos? unit-digit) (nth english-cardinal-units unit-digit)))))))))
+
+(defn consume [func initial-context]
+  (loop [context initial-context
+         acc []]
+    (let [[result new-context] (apply func [context])]
+      (if (not result)
+        [acc new-context]
+        (recur new-context (conj acc result))))))
+
+(defn remainders [base val]
+  (reverse
+   (first
+    (consume #(if (pos? %)
+                [(rem % base) (quot % base)]
+                [nil nil])
+             val))))
+
+(def n 1)
+(def abs-arg (if (neg? n) (- n) n))
+(def parts (remainders 1000 abs-arg))
+(def parts-strs (map format-simple-cardinal parts))
+(def full-str (add-english-scales parts-strs 0))
+
+(defn number [n]
+  (if (= 0 n)
+    "zero"
+    (let [abs-arg (if (neg? n) (- n) n)
+          parts (remainders 1000 abs-arg)]
+      (let [parts-strs (map format-simple-cardinal parts)
+            full-str (add-english-scales parts-strs 0)]
+        (str (if (neg? n) "minus ") full-str)))))
+
+(number 1)
