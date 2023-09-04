@@ -76,54 +76,6 @@ export function clearTests() {
 
 export var deftests = []
 
-export function walk(inner, outer, form) {
-    //console.log("Walking form:", form)
-    if (types._list_Q(form)) {
-        return outer(form.map(inner))
-    } else if (form === null) {
-        return null
-    }
-    else if (types._vector_Q(form)) {
-        let v = outer(form.map(inner))
-        v.__isvector__ = true;
-        return v
-    } else if (form.__mapEntry__) {
-        const k = inner(form[0])
-        const v = inner(form[1])
-        let mapEntry = [k, v]
-        mapEntry.__mapEntry__ = true
-        return outer(mapEntry)
-    } else if (types._hash_map_Q(form)) {
-        let newMap = new Map()
-        form.forEach((value, key, map) => newMap.set(key, inner(value)))
-        return outer(newMap)
-    } else {
-        return outer(form)
-    }
-}
-
-export function postwalk(f, form) {
-    return walk(x => postwalk(f, x), f, form)
-}
-
-function hasLet(ast) {
-    let lets = []
-    postwalk(x => {
-        if (x.value == types._symbol("let*")) {
-            lets.push(true)
-            return true
-        } else {
-            return x
-        }
-        return x
-    }, ast)
-    if (lets.length > 0) {
-        return true
-    } else {
-        return false
-    }
-}
-
 function _EVAL(ast, env) {
     while (true) {
         //console.log(ast)
@@ -277,6 +229,7 @@ function _EVAL(ast, env) {
                 //console.log("f:", f, PRINT(ast), env)
                 if (f.__multifn__) {
                     ast = f.__ast__(el.slice(1))
+                    ast = types.swapRecur(ast, f)
                     env = f.__gen_env__(el.slice(1));
                 } else if (f.__ast__) {
                     ast = f.__ast__;
