@@ -123,20 +123,14 @@ function _EVAL(ast, env) {
             case "discard-form":
                 return null
             case "dispatch":
-                //console.log("eval dispatch")
                 // Regex
                 if (types._string_Q(a1)) {
-                    const re = new RegExp(a1, 'g')
-                    return re
+                    return new RegExp(a1, 'g')
                 }
                 // Anonymous function shorthand
                 if (types._list_Q(a1)) {
-                    let fun = [types._symbol('fn')]
                     var args = Array.from(new Set(ast.toString().match(/%\d?/g))).map(x => types._symbol(x))
-                    let body = ast.slice(1)[0]
-                    fun.push(args)
-                    fun.push(body)
-                    return types._function(EVAL, Env, body, env, args);
+                    return types._function(EVAL, Env, a1, env, args);
                 }
             case "def":
                 var res = EVAL(a2, env);
