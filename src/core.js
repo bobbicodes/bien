@@ -712,6 +712,55 @@ function sort(x) {
     }
 }
 
+function makeComparator(f) {
+    return function(x, y) {
+        let r = f(x, y)
+        if (types._number_Q(r)) {
+            return r
+        } else if (r) {
+            return -1
+        } else if (f(y, x)) {
+            return 1
+        } else {
+            return 0
+        }
+    }
+}
+
+function sort_by() {
+    if (arguments.length === 2) {
+        var keyfn = arguments[0]
+        var x = arguments[1]
+        var comp = subtract
+    }
+    if (arguments.length === 3) {
+        var keyfn = arguments[0]
+        var comp = makeComparator(arguments[1])
+        var x = arguments[2]
+    }
+    if (types._keyword_Q(keyfn)) {
+        var comparator = (a, b) => comp(get(a, keyfn), get(b, keyfn))
+    } else {
+        var comparator = (a, b) => comp(keyfn(a), keyfn(b))
+    }
+    if (types._string_Q(x)) {
+        return x.split('').sort(comparator).join('');
+    }
+    if (types._list_Q(x)) {
+        return x.sort(comparator)
+    }
+    if (types._hash_map_Q(x)) {
+        return new Map(Array.from(x).sort(comparator))
+    }
+    if (types._set_Q(x)) {
+        return new Set(Array.from(x).sort(comparator))
+    } else {
+        var v = x.sort(comparator)
+        v.__isvector__ = true;
+        return v;
+    }
+}
+
 function pop(lst) {
     if (types._list_Q(lst)) {
         return lst.slice(1);
@@ -940,7 +989,7 @@ export var ns = {
     'rem': mod,
     'iterate': iterate,
     'walk': types.walk,
-
+    'sort-by': sort_by,
     'sequential?': types._sequential_Q,
     'cons': cons,
     'concat': concat,
