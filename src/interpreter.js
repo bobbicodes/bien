@@ -132,13 +132,11 @@ function _EVAL(ast, env) {
                 // Anonymous function shorthand
                 if (types._list_Q(a1)) {
                     let fun = [types._symbol('fn')]
-                    var args = Array.from(new Set(ast.toString().match(/%\d?/g))).map(types._symbol)
+                    var args = Array.from(new Set(ast.toString().match(/%\d?/g))).map(x => types._symbol(x))
                     let body = ast.slice(1)[0]
                     fun.push(args)
                     fun.push(body)
-                    var lambda = types._function(EVAL, Env, body, env, args, a0);
-                    lambda.lambda = true
-                    return lambda
+                    return types._function(EVAL, Env, body, env, args);
                 }
             case "def":
                 var res = EVAL(a2, env);

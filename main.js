@@ -7,12 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(def client {:name "Super Co."
-             :location "Philadelphia"
-             :description "The worldwide leader in plastic tableware."})
-  
-(let [{:keys [name location description]} client]
-  [name location description])`,
+  doc: `(mapcat #(for [p (k (- i 1) %2)] (conj p %)))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -170,8 +165,8 @@ function testExercisesUntilFail() {
   console.log("Fails:", fails)
 }
 
-//testSolution(randExercise())
-//testSolution("nth_prime")
+testSolution(randExercise())
+//testSolution("f")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
 //testExercises()
