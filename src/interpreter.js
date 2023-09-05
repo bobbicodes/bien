@@ -55,6 +55,12 @@ function eval_ast(ast, env) {
         return env.get(ast);
     } else if (types._list_Q(ast)) {
         return ast.map(function (a) { return EVAL(a, env); });
+    } else if (types._set_Q(ast)) {
+        var new_set = new Set()
+        for (const item of ast) {
+            new_set.add(EVAL(item, env))
+        }
+        return new_set
     } else if (types._vector_Q(ast)) {
         var v = ast.map(function (a) { return EVAL(a, env); });
         v.__isvector__ = true;
