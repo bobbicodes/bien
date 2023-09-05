@@ -1,5 +1,5 @@
 {
-  "find_path" : "(defn find-path [s e]\r\n  (loop [opts [s] depth 1]\r\n    (if (some #{e} opts)\r\n      depth\r\n      (letfn [(solutions [n]\r\n                (concat\r\n                 [(* n 2) (+ n 2)]\r\n                 (if (even? n) [(/ n 2)] [])))]\r\n        (recur (mapcat solutions opts) (inc depth))))))",
+  "find_path" : "(defn solutions [n]\r\n  (concat [(* n 2) (+ n 2)]\r\n    (if (even? n) [(/ n 2)] [])))\r\n\r\n(defn find-path [s e]\r\n  (loop [opts [s] depth 1]\r\n    (if (some #{e} opts)\r\n      depth\r\n        (recur (mapcat solutions opts) (inc depth)))))",
   "compress" : "(defn compress [s]\r\n  (map first\r\n       (partition-by identity s)))",
   "map" : "(def l '(6 7 8))", 
   "vectors" : "(def v [:a :b :c])",
@@ -64,7 +64,7 @@
   "filter" : "(def l '(6 7))",
   "functions" : "(def n 8)",
   "seqs" : "(def n 3)",
-  "uce" : "(defn uce [x]\r\n  (fn [m] ((fn e [x m]\r\n             (if (seq? x)\r\n               (apply ({'+ + '- - '* * '/ /} (first x))\r\n                      (map #(e % m) (rest x)))\r\n               (m x x)))\r\n           x m)))",
+  "uce" : "(defn uce [coll]\r\n  (fn [m]\r\n    (cond\r\n      (number? coll) coll\r\n      (symbol? coll) (get m coll)\r\n      :else (apply (cond\r\n                     (= '/ (first coll)) /\r\n                     (= '* (first coll)) *\r\n                     (= '+ (first coll)) +\r\n                     (= '- (first coll)) -)\r\n              (map #((uce %) m) (rest coll))))))",
   "make_map" : "(defn make-map [keys vals]\r\n  (apply hash-map (interleave keys vals)))",
   "my_group_by" : "(defn my-group-by [f s]\r\n  (reduce\r\n   (fn [m x] (assoc m (f x) (conj (get m (f x) []) x)))\r\n   {} s))",
   "fib" : "(defn fib [n]\r\n  (loop [f [1 1]]\r\n    (if (= n (count f))\r\n      f\r\n      (recur (conj f (+ (last f)\r\n                        (nth f (- (count f) 2))))))))",

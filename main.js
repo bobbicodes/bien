@@ -7,7 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(mapcat #(for [p (k (- i 1) %2)] (conj p %)))`,
+  doc: `(map-indexed #(when (= 2 %2) [%1 "Hi"]) [1 1 2 2])`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -166,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("f")
+//testSolution("binary")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

@@ -839,6 +839,16 @@ function spit_json(name, obj) {
     return downloadObjectAsJson(obj, name)
 }
 
+function map_indexed(f, coll) {
+    let ret = [];
+    let i = 0;
+    for (const x of coll) {
+      ret.push(f(i, x));
+      i++;
+    }
+    return ret;
+  }
+
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
@@ -911,7 +921,7 @@ export var ns = {
     //'isletter': isLetter,
     'subs': _substring,
     'subvec': _subvec,
-
+    'map-indexed': map_indexed,
     'list': types._list,
     'list?': types._list_Q,
     'vector': types._vector,

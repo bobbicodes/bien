@@ -129,7 +129,9 @@ function _EVAL(ast, env) {
                 }
                 // Anonymous function shorthand
                 if (types._list_Q(a1)) {
-                    var args = Array.from(new Set(ast.toString().match(/%\d?/g))).map(x => types._symbol(x))
+                    var arg_strs = Array.from(new Set(ast.toString().match(/%\d?/g)))
+                    var sort_strs = arg_strs.sort((a, b) => parseInt(a.substring(1)) - parseInt(b.substring(1)))
+                    var args = sort_strs.map(x => types._symbol(x))
                     return types._function(EVAL, Env, a1, env, args);
                 }
             case "def":

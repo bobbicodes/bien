@@ -543,6 +543,9 @@
           (str (upper-case (subs s 0 1))
                (lower-case (subs s 1))))))
 
+(defn seq? [x]
+  (list? x))
+
 (defn keep [s]
   (remove nil? s))
 
