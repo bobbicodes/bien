@@ -691,6 +691,15 @@
 (defn str/includes? [s substr]
   (js-eval (str "'" s "'" ".includes(" "'" substr "'" ")")))
 
+(defn namespace [x]
+  (when (str/includes? x "/")
+    (first (str/split (str x) "/"))))
+
+(defn name [x]
+  (if (keyword? x)
+    (subs (str x) 1)
+    (str x)))
+
 (defn comment [& forms] nil)
 
 (defn pvec [bvec b val]
@@ -744,7 +753,7 @@
                              (if (keyword? mk)
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
-                                     (cond (= mkn "keys")
+                                     (cond (= mkn "keys") 
                                            (assoc transforms mk (fn [k] (keyword (or mkns (namespace k)) (name k))))
                                            (= mkn "syms") (assoc transforms mk #(list `quote (symbol (or mkns (namespace %)) (name %))))
                                            (= mkn "strs") (assoc transforms mk str)
@@ -753,14 +762,10 @@
                            {}
                            (keys b))]
                          (reduce
-                          (fn [bes entry]
-                            (reduce (fn [a b]
-                                      (do (println (dissoc bes (key entry)))
-                                          (assoc a b ((val entry) b))))
-                                    (dissoc bes (key entry))
-                                    ((key entry) bes)))
+                          (fn [bes entry] (reduce (fn [a b] (assoc a b ((val entry) b))) (dissoc bes (key entry)) (get bes (key entry))))
                           (dissoc b :as :or)
                           transforms))]
+          bes
           (if (seq bes)
             (let* [bb (key (first bes))
                    bk (val (first bes))
@@ -774,15 +779,6 @@
                      (pb ret bb bv))
                    (next bes)))
             ret))))
-
-(defn namespace [x]
-  (when (str/includes? x "/")
-    (first (str/split (str x) "/"))))
-
-(defn name [x]
-  (if (keyword? x)
-    (subs (str x) 1)
-    (str x)))
 
 (defn pb [bvec b v]
   (cond
@@ -801,6 +797,12 @@
           (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
             (throw (str "Unsupported binding key: " (ffirst kwbs)))
             (reduce process-entry [] bents)))))
+
+(def client {:name "Super Co."
+             :location "Philadelphia"
+             :description "The worldwide leader in plastic tableware."})
+
+(destructure '[{:keys [name location description]} client])
 
 (defmacro let [bindings & body]
   `(let* ~(destructure bindings) ~@body))
