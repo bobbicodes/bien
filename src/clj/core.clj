@@ -691,24 +691,13 @@
 (defn str/includes? [s substr]
   (js-eval (str "'" s "'" ".includes(" "'" substr "'" ")")))
 
-;; currently only sequential destructuring is working
-
-;; string hack, because `some` fails on symbols 
-(defn has-rest? [b]
-  (js-eval (str "'" b "'" ".includes(" "'" "&" "'" ")")))
-
 (defn comment [& forms] nil)
-
-(comment
-  (defn has-rest? [b] (some #{'&} b))
-  )
-
 
 (defn pvec [bvec b val]
   (let [gvec (gensym "vec__")
         gseq (gensym "seq__")
         gfirst (gensym "first__")
-        has-rest (has-rest? b)]
+        has-rest (some #{'&} b)]
         (loop [ret (let [ret (conj bvec gvec val)]
                          (if has-rest
                            (conj ret gseq (list seq gvec))

@@ -170,7 +170,7 @@ function testExercisesUntilFail() {
   console.log("Fails:", fails)
 }
 
-testSolution(randExercise())
+//testSolution(randExercise())
 //testSolution("nth_prime")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
