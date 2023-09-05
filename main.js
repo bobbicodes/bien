@@ -11,9 +11,8 @@ let editorState = EditorState.create({
              :location "Philadelphia"
              :description "The worldwide leader in plastic tableware."})
   
-(destructure '[{name :name
-                location :location
-                description :description} client])`,
+(let [{:keys [name location description]} client]
+  [name location description])`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -175,4 +174,4 @@ function testExercisesUntilFail() {
 //testSolution("nth_prime")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()

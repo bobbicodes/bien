@@ -111,7 +111,12 @@ function contains_Q(coll, key) {
         }
     }
     if (types._set_Q(coll)) {
-        return coll.has(key)
+        for (const item of coll) {
+            if (types._equal_Q(item, key)) {
+                return true
+            }
+        }
+        return false
     }
     if (key in coll) { return true; } else { return false; }
 }
