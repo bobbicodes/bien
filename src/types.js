@@ -166,7 +166,17 @@ function Symbol(name) {
     return this;
 }
 Symbol.prototype.toString = function () { return this.value; }
-export function _symbol(name) { return new Symbol(name); }
+
+export function _symbol(ns, name) {
+    if (!name) {
+        return new Symbol(ns)
+    }
+    if (ns === null) {
+        return new Symbol(name)
+    }
+    return new Symbol(ns + "/" + name)
+}
+
 export function _symbol_Q(obj) { return obj instanceof Symbol; }
 
 // Ratios
