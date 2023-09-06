@@ -7,7 +7,11 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(map-indexed #(when (= 2 %2) [%1 "Hi"]) [1 1 2 2])`,
+  doc: `((fn ([[exponent bit]]
+       (if (= "1" bit)
+         (Math/pow 2 exponent)
+         0)))
+ [0 "1"])`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -166,7 +170,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("binary")
+//testSolution("binary")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
 //testExercises()

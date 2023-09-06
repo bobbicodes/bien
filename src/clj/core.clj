@@ -801,6 +801,9 @@
             (throw (str "Unsupported binding key: " (ffirst kwbs)))
             (reduce process-entry [] bents)))))
 
+(defmacro let [bindings & body]
+  `(let* ~(destructure bindings) ~@body))
+
 (defn maybe-destructured [params body]
   (if (every? symbol? params)
     (cons params body)
@@ -825,68 +828,23 @@
                (list sigs)
                (if (seq? (first sigs))
                  sigs
-                   ;; Assume single arity syntax
                  (throw (if (seq sigs)
                           (str "Parameter declaration "
                                (first sigs)
                                " should be a vector")
                           (str "Parameter declaration missing")))))
-        _ (println sigs)
         psig (fn* [sig]
-                 ;; Ensure correct type before destructuring sig
-                  (when (not (seq? sig))
-                    (throw (str "Invalid signature " sig
-                                " should be a list")))
-                  (let [[params & body] sig
-                        _ (when (not (vector? params))
-                            (throw (if (seq? (first sigs))
-                                     (str "Parameter declaration " params
-                                          " should be a vector")
-                                     (str "Invalid signature " sig
-                                          " should be a list"))))
-                        conds (when (and (next body) (map? (first body)))
-                                (first body))
-                        body (if conds (next body) body)
-                        conds (or conds (meta params))
-                        pre (:pre conds)
-                        post (:post conds)
-                        body (if post
-                               `((let [~'% ~(if (< 1 (count body))
-                                              `(do ~@body)
-                                              (first body))]
-                                   ~@(map (fn* [c] `(assert ~c)) post)
-                                   ~'%))
-                               body)
-                        body (if pre
-                               (concat (map (fn* [c] `(assert ~c)) pre)
-                                       body)
-                               body)]
+                  (let [[params & body] sig]
                     (maybe-destructured params body)))
         new-sigs (map psig sigs)]
-    (with-meta
-      (if name
-        (list* 'fn* name new-sigs)
-        (cons 'fn* new-sigs))
-      (meta &form))))
-
-#_(fn ([[exponent bit]]
-     (if (= "1" bit)
-       (Math/pow 2 exponent)
-       0)))
-
-#_((fn ([[exponent bit]]
-       (if (= "1" bit)
-         (Math/pow 2 exponent)
-         0)))
- [0 "1"])
-
-(defmacro let [bindings & body]
-  `(let* ~(destructure bindings) ~@body))
+    (if name
+      (list* 'fn* name new-sigs)
+      (cons 'fn* new-sigs))))
 
 (defmacro condp [pred expr & clauses]
   (let [gpred (gensym "pred__")
         gexpr (gensym "expr__")
-        emit (defn emit [pred expr args]
+        emit-condp (defn emit-condp [pred expr args]
                (let [[[a b c :as clause] more]
                      (split-at (if (= :>> (second args)) 3 2) args)
                      n (count clause)]
@@ -895,13 +853,13 @@
                    (= 1 n) a
                    (= 2 n) `(if (~pred ~a ~expr)
                               ~b
-                              ~(emit pred expr more))
+                              ~(emit-condp pred expr more))
                    :else `(if-let [p# (~pred ~a ~expr)]
                             (~c p#)
-                            ~(emit pred expr more)))))]
+                            ~(emit-condp pred expr more)))))]
     `(let [~gpred ~pred
            ~gexpr ~expr]
-       ~(emit gpred gexpr clauses))))
+       ~(emit-condp gpred gexpr clauses))))
 
 (defn Math/log [n]
   (js-eval (str "Math.log(" n ")")))
