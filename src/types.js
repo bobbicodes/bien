@@ -217,6 +217,9 @@ export function _regex_Q(obj) {
 
 export function walk(inner, outer, form) {
     //console.log("Walking form:", form)
+    if (typeof form === 'undefined') {
+        return null
+    }
     if (_list_Q(form)) {
         return outer(form.map(inner))
     } else if (form === null) {
