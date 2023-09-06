@@ -10,38 +10,56 @@
             (throw "odd number of forms to cond"))
           (cons 'cond (rest (rest xs))))))
 
-(def map1 (fn* [f coll]
-               (loop [s (seq coll) res []]
-                 (if (empty? s) res
-                     (recur (rest s)
-                            (conj res (if (keyword? f) (get (first s) f) (f (first s)))))))))
+(def spread (fn* [arglist]
+                 (cond
+                   (nil? arglist) nil
+                   (nil? (next arglist)) (seq (first arglist))
+                   :else (cons (first arglist) (spread (next arglist))))))
 
-(def map2 (fn* [f c1 c2]
-               (loop [s1 (seq c1) s2 (seq c2) res []]
-                 (if (or (empty? s1) (empty? s2)) res
-                     (recur (rest s1) (rest s2)
-                            (conj res (f (first s1) (first s2))))))))
+(def list* (fn*
+            ([args] (seq args))
+            ([a args] (cons a args))
+            ([a b args] (cons a (cons b args)))
+            ([a b c args] (cons a (cons b (cons c args))))
+            ([a b c d & more]
+             (cons a (cons b (cons c (cons d (spread more))))))))
 
-(def map3 (fn* [f c1 c2 c3]
-               (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
-                 (if (or (empty? s1) (empty? s2) (empty? s3)) res
-                     (recur (rest s1) (rest s2) (rest s3)
-                            (conj res (f (first s1) (first s2) (first s3))))))))
+(def apply (fn*
+            ([f args]
+             (if (keyword? f)
+               (get args f)
+               (apply* f args)))
+            ([f x args]
+             (apply f (list* x args)))
+            ([f x y args]
+             (apply f (list* x y args)))
+            ([f x y z args]
+             (apply f (list* x y z args)))
+            ([f a b c d & args]
+             (apply f (cons a (cons b (cons c (cons d (spread args)))))))))
 
-(def map4 (fn* [f c1 c2 c3 c4]
-               (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
-                 (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) res
-                     (recur (rest s1) (rest s2) (rest s3) (rest s4)
-                            (conj res (f (first s1) (first s2) (first s3) (first s4))))))))
-
-(def map (fn* [f & colls]
-              (cond
-                (empty? (first colls)) '()
-                (= 1 (count colls)) (map1 f (first colls))
-                (= 2 (count colls)) (map2 f (first colls) (second colls))
-                (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
-                (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
-                :else (throw (str "Map not implemented on " (count colls) " colls")))))
+(def map
+  (fn* 
+   ([f coll]
+    (loop [s (seq coll) res []]
+      (if (empty? s) (apply list res)
+          (recur (rest s)
+                 (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
+   ([f c1 c2]
+    (loop [s1 (seq c1) s2 (seq c2) res []]
+      (if (or (empty? s1) (empty? s2)) res
+          (recur (rest s1) (rest s2)
+                 (conj res (f (first s1) (first s2)))))))
+   ([f c1 c2 c3]
+    (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
+      (if (or (empty? s1) (empty? s2) (empty? s3)) res
+          (recur (rest s1) (rest s2) (rest s3)
+                 (conj res (f (first s1) (first s2) (first s3)))))))
+   ([f c1 c2 c3 c4]
+    (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
+      (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) res
+          (recur (rest s1) (rest s2) (rest s3) (rest s4)
+                 (conj res (f (first s1) (first s2) (first s3) (first s4)))))))))
 
 (def seq? (fn* [x] (list? x)))
 
@@ -162,34 +180,6 @@
     (if (= (count s) index) buffer
         (recur (inc index) 
                (str buffer (get cmap (nth s index) (nth s index)))))))
-
-(defn apply
-  ([f args]
-   (if (keyword? f)
-     (get args f)
-     (apply* f args)))
-  ([f x args]
-   (apply f (list* x args)))
-  ([f x y args]
-   (apply f (list* x y args)))
-  ([f x y z args]
-   (apply f (list* x y z args)))
-  ([f a b c d & args]
-   (apply f (cons a (cons b (cons c (cons d (spread args))))))))
-
-(defn spread [arglist]
-  (cond
-    (nil? arglist) nil
-    (nil? (next arglist)) (seq (first arglist))
-    :else (cons (first arglist) (spread (next arglist)))))
-
-(defn list*
-  ([args] (seq args))
-  ([a args] (cons a args))
-  ([a b args] (cons a (cons b args)))
-  ([a b c args] (cons a (cons b (cons c args))))
-  ([a b c d & more]
-   (cons a (cons b (cons c (cons d (spread more)))))))
 
 (defn juxt
   ([f]
@@ -514,13 +504,7 @@
     (string? coll) ""))
 
 (defn mapv [f & colls]
-  (cond
-    (empty? (first colls)) '()
-    (= 1 (count colls)) (map1 f (first colls))
-    (= 2 (count colls)) (map2 f (first colls) (second colls))
-    (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
-    (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
-    :else (throw (str "Map not implemented on " (count colls) " colls"))))
+  (vec (map f (spread colls))))
 
 (defn drop-last [n coll]
   (if-not coll
