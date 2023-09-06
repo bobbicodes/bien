@@ -1073,3 +1073,6 @@
 (defn satisfies? [protocol obj]
   (contains? @protocol (find-type obj)))
 
+(defprotocol ISeq
+  (-first [coll]
+    (-rest [coll])))
