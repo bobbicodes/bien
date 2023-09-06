@@ -1,29 +1,98 @@
 (ns core {:clj-kondo/ignore true})
 
+(defmacro when [x & xs] (list 'if x (cons 'do xs)))
+
+(defmacro cond [& xs]
+  (when (> (count xs) 0)
+    (list 'if (first xs)
+          (if (> (count xs) 1)
+            (nth xs 1)
+            (throw "odd number of forms to cond"))
+          (cons 'cond (rest (rest xs))))))
+
+(def map1 (fn* [f coll]
+               (loop [s (seq coll) res []]
+                 (if (empty? s) res
+                     (recur (rest s)
+                            (conj res (if (keyword? f) (get (first s) f) (f (first s)))))))))
+
+(def map2 (fn* [f c1 c2]
+               (loop [s1 (seq c1) s2 (seq c2) res []]
+                 (if (or (empty? s1) (empty? s2)) res
+                     (recur (rest s1) (rest s2)
+                            (conj res (f (first s1) (first s2))))))))
+
+(def map3 (fn* [f c1 c2 c3]
+               (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
+                 (if (or (empty? s1) (empty? s2) (empty? s3)) res
+                     (recur (rest s1) (rest s2) (rest s3)
+                            (conj res (f (first s1) (first s2) (first s3))))))))
+
+(def map4 (fn* [f c1 c2 c3 c4]
+               (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
+                 (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) res
+                     (recur (rest s1) (rest s2) (rest s3) (rest s4)
+                            (conj res (f (first s1) (first s2) (first s3) (first s4))))))))
+
+(def map (fn* [f & colls]
+              (cond
+                (empty? (first colls)) '()
+                (= 1 (count colls)) (map1 f (first colls))
+                (= 2 (count colls)) (map2 f (first colls) (second colls))
+                (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
+                (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
+                :else (throw (str "Map not implemented on " (count colls) " colls")))))
+
+(def seq? (fn* [x] (list? x)))
+
+;; first define let, fn without destructuring
+
+(defmacro let [bindings & body]
+  `(let* ~bindings ~@body))
+
+(defmacro fn [& sigs]
+  (let [name (if (symbol? (first sigs)) (first sigs) nil)
+        sigs (if name (next sigs) sigs)
+        sigs (if (vector? (first sigs))
+               (list sigs)
+               (if (seq? (first sigs))
+                 sigs
+                 (throw (if (seq sigs)
+                          (str "Parameter declaration "
+                               (first sigs)
+                               " should be a vector")
+                          (str "Parameter declaration missing")))))
+        psig (fn* [sig]
+                  sig)
+        new-sigs (map psig sigs)]
+    (if name
+      (list* 'fn* name new-sigs)
+      (cons 'fn* new-sigs))))
+
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
     (if (list? (second fdecl))
-      `(def ~name (with-meta (fn* ~@(rest fdecl))
+      `(def ~name (with-meta (fn ~@(rest fdecl))
                     ~{:name (str name) :doc (first fdecl)}))
-      `(def ~name (with-meta (fn* ~(second fdecl) (do ~@(nnext fdecl)))
+      `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl)))
                     ~{:name (str name) :doc (first fdecl)})))
     (if (list? (first fdecl))
-      `(def ~name (with-meta (fn* ~@fdecl)
+      `(def ~name (with-meta (fn ~@fdecl)
                     ~{:name (str name)}))
-      `(def ~name (with-meta (fn* ~(first fdecl) (do ~@(rest fdecl)))
+      `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
                     ~{:name (str name)})))))
 
 (defmacro defn- [name & fdecl]
   (if (string? (first fdecl))
     (if (list? (second fdecl))
-      `(def ~name (with-meta (fn* ~@(rest fdecl))
+      `(def ~name (with-meta (fn ~@(rest fdecl))
                     ~{:name (str name) :doc (first fdecl)}))
-      `(def ~name (with-meta (fn* ~(second fdecl) (do ~@(nnext fdecl)))
+      `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl)))
                     ~{:name (str name) :doc (first fdecl)})))
     (if (list? (first fdecl))
-      `(def ~name (with-meta (fn* ~@fdecl)
+      `(def ~name (with-meta (fn ~@fdecl)
                     ~{:name (str name)}))
-      `(def ~name (with-meta (fn* ~(first fdecl) (do ~@(rest fdecl)))
+      `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
                     ~{:name (str name)})))))
 
 (defmacro lazy-seq [& body]
@@ -34,14 +103,6 @@
 (defn dec [a] (- a 1))
 (defn zero? [n] (= 0 n))
 (defn identity [x] x)
-
-(defmacro cond [& xs]
-  (when (> (count xs) 0)
-    (list 'if (first xs)
-          (if (> (count xs) 1)
-            (nth xs 1)
-            (throw "odd number of forms to cond"))
-          (cons 'cond (rest (rest xs))))))
 
 (defn next [s]
   (if (or (= 1 (count s)) (= 0 (count s)))
@@ -196,9 +257,9 @@
 (def gensym-counter
   (atom 0))
 
-(defn gensym [prefix]
-  (symbol (str (if prefix prefix "G__")
-               (swap! gensym-counter inc))))
+(def gensym (fn* [prefix]
+                 (symbol (str (if prefix prefix "G__")
+                              (swap! gensym-counter inc)))))
 
 (defn memoize [f]
   (let* [mem (atom {})]
@@ -249,8 +310,6 @@
 
 (defn not-every? [pred xs]
   (not (every? pred xs)))
-
-(defmacro when [x & xs] (list 'if x (cons 'do xs)))
 
 (defmacro if-not [test then else]
   `(if (not ~test) ~then ~else))
@@ -454,39 +513,6 @@
     (map? coll) {}
     (string? coll) ""))
 
-(defn map1 [f coll]
-  (loop [s (seq coll) res []]
-    (if (empty? s) res
-        (recur (rest s) 
-               (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
-
-(defn map2 [f c1 c2]
-  (loop [s1 (seq c1) s2 (seq c2) res []]
-    (if (or (empty? s1) (empty? s2)) res
-        (recur (rest s1) (rest s2)
-               (conj res (f (first s1) (first s2)))))))
-
-(defn map3 [f c1 c2 c3]
-  (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
-    (if (or (empty? s1) (empty? s2) (empty? s3)) res
-        (recur (rest s1) (rest s2) (rest s3)
-               (conj res (f (first s1) (first s2) (first s3)))))))
-
-(defn map4 [f c1 c2 c3 c4]
-  (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
-    (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) res
-        (recur (rest s1) (rest s2) (rest s3) (rest s4)
-               (conj res (f (first s1) (first s2) (first s3) (first s4)))))))
-
-(defn map [f & colls]
-  (cond
-    (empty? (first colls)) '()
-    (= 1 (count colls)) (map1 f (first colls))
-    (= 2 (count colls)) (map2 f (first colls) (second colls))
-    (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
-    (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
-    :else (throw (str "Map not implemented on " (count colls) " colls"))))
-
 (defn mapv [f & colls]
   (cond
     (empty? (first colls)) '()
@@ -541,9 +567,6 @@
           (upper-case s)
           (str (upper-case (subs s 0 1))
                (lower-case (subs s 1))))))
-
-(defn seq? [x]
-  (list? x))
 
 (defn keep [s]
   (remove nil? s))
