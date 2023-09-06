@@ -296,3 +296,4 @@
               return true;
   ```
 - Looking at [[associative destructuring]]
+- [[Clojure interpreter notes page 14]]

@@ -113,3 +113,37 @@
 - improving the `for` macro by breaking out helpers
 - Was only partly successful since `do-mod` needs like everything. But it felt wonderful to get the big `emit` function out of there. The real solution is named lambdas, but I don't see it causing any major issues in the meantime. Unless someone wants to name a fn `do-mod`
 - Somewhere between 138-143 tests passing. Some seem to fail depending on the order or something, because my attempt at having each test initialize a fresh env didn't work.
+- I figured out the mystery of destructuring bindings containing a single map. When the function is passed a map, it "completes" the binding:
+- ```clojure
+  (destructure '[{:keys [w b]} {:w [2 4] :b [6 6]}])
+  [map__147 {:w [2 4], :b [6 6]}
+   map__147 (if (clojure.core/seq? map__147)
+              (if (clojure.core/next map__147)
+                (createAsIfByAssoc (clojure.core/to-array map__147))
+                (if (clojure.core/seq map__147)
+                  (clojure.core/first map__147)
+                  clojure.lang.PersistentArrayMap/EMPTY))
+              map__147)
+   w (clojure.core/get map__147 :w)
+   b (clojure.core/get map__147 :b)]
+  ```
+- I asked on Slack and then answered it myself once I realized that a binding can't have just one side
+- So this applies to sequential destructuring as well... I could have asked the same question about this
+- ```clojure
+  (defn myfn [[a b]]
+    [a b])
+  ```
+- So that means we need some kind of additional logic for function calls, maybe even definitions
+- If it gets confusing, we could just make it so every function gets an implicit let binding
+- So this
+- ```clojure
+  (defn a [a]
+    a)
+  
+  (a 1)
+  ```
+- would become
+- ```clojure
+  (let [a 1]
+    a)
+  ```
