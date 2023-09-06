@@ -1,34 +1,33 @@
-(ns core {:clj-kondo/ignore true} 
-  (:require [clojure.string :as str]))
+(ns core {:clj-kondo/ignore true})
 
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
     (if (list? (second fdecl))
-      `(def ~name (with-meta (fn ~@(rest fdecl))
+      `(def ~name (with-meta (fn* ~@(rest fdecl))
                     ~{:name (str name) :doc (first fdecl)}))
-      `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl)))
+      `(def ~name (with-meta (fn* ~(second fdecl) (do ~@(nnext fdecl)))
                     ~{:name (str name) :doc (first fdecl)})))
     (if (list? (first fdecl))
-      `(def ~name (with-meta (fn ~@fdecl)
+      `(def ~name (with-meta (fn* ~@fdecl)
                     ~{:name (str name)}))
-      `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
+      `(def ~name (with-meta (fn* ~(first fdecl) (do ~@(rest fdecl)))
                     ~{:name (str name)})))))
 
 (defmacro defn- [name & fdecl]
   (if (string? (first fdecl))
     (if (list? (second fdecl))
-      `(def ~name (with-meta (fn ~@(rest fdecl))
+      `(def ~name (with-meta (fn* ~@(rest fdecl))
                     ~{:name (str name) :doc (first fdecl)}))
-      `(def ~name (with-meta (fn ~(second fdecl) (do ~@(nnext fdecl)))
+      `(def ~name (with-meta (fn* ~(second fdecl) (do ~@(nnext fdecl)))
                     ~{:name (str name) :doc (first fdecl)})))
     (if (list? (first fdecl))
-      `(def ~name (with-meta (fn ~@fdecl)
+      `(def ~name (with-meta (fn* ~@fdecl)
                     ~{:name (str name)}))
-      `(def ~name (with-meta (fn ~(first fdecl) (do ~@(rest fdecl)))
+      `(def ~name (with-meta (fn* ~(first fdecl) (do ~@(rest fdecl)))
                     ~{:name (str name)})))))
 
 (defmacro lazy-seq [& body]
-  `(new LazySeq (fn [] ~@body)))
+  `(new LazySeq (fn* [] ~@body)))
 
 (defn not [a] (if a false true))
 (defn not= [a b] (not (= a b)))
@@ -87,12 +86,12 @@
 
 (defn merge-with [f & maps]
   (when (some identity maps)
-    (let [merge-entry (fn [m e]
+    (let [merge-entry (fn* [m e]
                         (let [k (key e) v (val e)]
                           (if (contains? m k)
                             (assoc m k (f (get m k) v))
                             (assoc m k v))))
-          merge2 (fn [m1 m2]
+          merge2 (fn* [m1 m2]
                    (reduce merge-entry (or m1 {}) (seq m2)))]
       (reduce merge2 maps))))
 
@@ -133,21 +132,21 @@
 
 (defn juxt
   ([f]
-   (fn
+   (fn*
      ([] [(f)])
      ([x] [(f x)])
      ([x y] [(f x y)])
      ([x y z] [(f x y z)])
      ([x y z & args] [(apply f x y z args)])))
   ([f g]
-   (fn
+   (fn*
      ([] [(f) (g)])
      ([x] [(f x) (g x)])
      ([x y] [(f x y) (g x y)])
      ([x y z] [(f x y z) (g x y z)])
      ([x y z & args] [(apply f x y z args) (apply g x y z args)])))
   ([f g h]
-   (fn
+   (fn*
      ([] [(f) (g) (h)])
      ([x] [(f x) (g x) (h x)])
      ([x y] [(f x y) (g x y) (h x y)])
@@ -155,7 +154,7 @@
      ([x y z & args] [(apply f x y z args) (apply g x y z args) (apply h x y z args)])))
   ([f g h & fs]
    (let [fs (list* f g h fs)]
-     (fn
+     (fn*
        ([] (reduce #(conj %1 (%2)) [] fs))
        ([x] (reduce #(conj %1 (%2 x)) [] fs))
        ([x y] (reduce #(conj %1 (%2 x y)) [] fs))
@@ -166,7 +165,7 @@
   ([] identity)
   ([f] f)
   ([f g]
-   (fn
+   (fn*
      ([] (f (g)))
      ([x] (f (g x)))
      ([x y] (f (g x y)))
@@ -203,7 +202,7 @@
 
 (defn memoize [f]
   (let* [mem (atom {})]
-        (fn [& args]
+        (fn* [& args]
           (let* [key (str args)]
                 (if (contains? @mem key)
                   (get @mem key)
@@ -212,7 +211,7 @@
                             ret)))))))
 
 (defn partial [pfn & args]
-  (fn [& args-inner]
+  (fn* [& args-inner]
     (apply pfn (concat args args-inner))))
 
 (defn every? [pred xs]
@@ -227,14 +226,14 @@
   (walk (partial prewalk f) identity (f form)))
 
 (defn postwalk-replace [smap form]
-  (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
+  (postwalk (fn* [x] (if (contains? smap x) (smap x) x)) form))
 
 (defn apply-template [argv expr values]
   (postwalk-replace (zipmap argv values) expr))
 
 (defmacro do-template [argv expr & values]
   (let [c (count argv)]
-    `(do ~@(map (fn [a] (apply-template argv expr a))
+    `(do ~@(map (fn* [a] (apply-template argv expr a))
                 (partition c values)))))
 
 (defmacro are [argv expr & args]
@@ -315,7 +314,7 @@
   (not (zero? (mod n 2))))
 
 (defn complement [f]
-  (fn
+  (fn*
     ([] (not (f)))
     ([x] (not (f x)))
     ([x y] (not (f x y)))
@@ -331,7 +330,7 @@
   (remove nil?
           (cons node
                 (when (branch? node)
-                  (mapcat (fn [x] (tree-seq branch? children x))
+                  (mapcat (fn* [x] (tree-seq branch? children x))
                           (children node))))))
 
 (defn flatten [x]
@@ -395,15 +394,15 @@
 (defn partition-by [f coll]
   (loop [s (seq coll) res []]
     (if (= 0 (count s)) res
-        (recur (drop (count (take-while (fn [x] (= (f (first s)) (f x))) s)) s)
-               (conj res (take-while (fn [x] (= (f (first s)) (f x))) s))))))
+        (recur (drop (count (take-while (fn* [x] (= (f (first s)) (f x))) s)) s)
+               (conj res (take-while (fn* [x] (= (f (first s)) (f x))) s))))))
 
 (defn coll? [x]
   (or (list? x) (vector? x) (set? x) (map? x)))
 
 (defn group-by [f coll]
   (reduce
-   (fn [ret x]
+   (fn* [ret x]
      (let* [k (f x)]
            (assoc ret k (conj (get ret k []) x))))
    {} coll))
@@ -500,7 +499,7 @@
 (defn drop-last [n coll]
   (if-not coll
     (drop-last 1 n)
-    (map (fn [x _] x) coll (drop n coll))))
+    (map (fn* [x _] x) coll (drop n coll))))
 
 (defn interleave [c1 c2]
   (loop [s1  (seq c1)
@@ -530,11 +529,11 @@
                    ~else)))))
 
 (defn frequencies [coll]
-  (reduce (fn [counts x]
+  (reduce (fn* [counts x]
             (assoc counts x (inc (get counts x 0))))
           {} coll))
 
-(defn constantly [x] (fn [& args] x))
+(defn constantly [x] (fn* [& args] x))
 
 (defn str/capitalize [s]
   (let* [s (str s)]
@@ -552,7 +551,7 @@
 (defn not-empty [coll] (when (seq coll) coll))
 
 (defn reduce-kv [f init coll]
-  (reduce (fn [ret kv] (f ret (first kv) (last kv))) init coll))
+  (reduce (fn* [ret kv] (f ret (first kv) (last kv))) init coll))
 
 (defn merge [& maps]
   (loop [maps (mapcat seq maps) res {}]
@@ -663,8 +662,8 @@
 (defmacro for [seq-exprs body-expr]
   (let [body-expr* body-expr
          iter# (gensym)
-         to-groups (fn [seq-exprs]
-                     (reduce (fn [groups kv]
+         to-groups (fn* [seq-exprs]
+                     (reduce (fn* [groups kv]
                                (if (keyword? (first kv))
                                  (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
                                  (conj groups [(first kv) (last kv)])))
@@ -746,27 +745,27 @@
          defaults (:or b)]
         (loop [ret (-> bvec (conj gmap) (conj v)
                        (conj gmap) (conj gmap)
-                       ((fn [ret]
+                       ((fn* [ret]
                           (if (:as b)
                             (conj ret (:as b) gmap)
                             ret))))
                bes (let* [transforms
                           (reduce
-                           (fn [transforms mk]
+                           (fn* [transforms mk]
                              (if (keyword? mk)
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
-                                     (cond (= mkn "keys") (assoc transforms mk (fn [k] (keyword (or mkns (namespace k)) (name k))))
+                                     (cond (= mkn "keys") (assoc transforms mk (fn* [k] (keyword (or mkns (namespace k)) (name k))))
                                            (= mkn "syms") 
                                            (do (println "syms")
-                                               (assoc transforms mk (fn [k] (list `quote (symbol (or mkns (namespace k)) (name k))))))
+                                               (assoc transforms mk (fn* [k] (list `quote (symbol (or mkns (namespace k)) (name k))))))
                                            (= mkn "strs") (assoc transforms mk str)
                                            :else transforms))
                                transforms))
                            {}
                            (keys b))]
                          (reduce
-                          (fn [bes entry] (reduce (fn [a b] (assoc a b ((val entry) b))) (dissoc bes (key entry)) (get bes (key entry))))
+                          (fn* [bes entry] (reduce (fn* [a b] (assoc a b ((val entry) b))) (dissoc bes (key entry)) (get bes (key entry))))
                           (dissoc b :as :or)
                           transforms))]
           bes
@@ -795,14 +794,14 @@
 
 (defn destructure [bindings]
   (let* [bents (partition 2 bindings)
-         process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
+         process-entry (fn* [bvec b] (pb bvec (first b) (second b)))]
         (if (every? symbol? (map first bents))
           bindings
           (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
             (throw (str "Unsupported binding key: " (ffirst kwbs)))
             (reduce process-entry [] bents)))))
 
-#_(defn maybe-destructured [params body]
+(defn maybe-destructured [params body]
   (if (every? symbol? params)
     (cons params body)
     (loop [params params
@@ -819,7 +818,7 @@
             ~@body))))))
 
 ;redefine fn with destructuring
-#_(defmacro fn [& sigs]
+(defmacro fn [& sigs]
   (let [name (if (symbol? (first sigs)) (first sigs) nil)
         sigs (if name (next sigs) sigs)
         sigs (if (vector? (first sigs))
@@ -832,6 +831,7 @@
                                (first sigs)
                                " should be a vector")
                           (str "Parameter declaration missing")))))
+        _ (println sigs)
         psig (fn* [sig]
                  ;; Ensure correct type before destructuring sig
                   (when (not (seq? sig))
@@ -868,6 +868,17 @@
         (list* 'fn* name new-sigs)
         (cons 'fn* new-sigs))
       (meta &form))))
+
+#_(fn ([[exponent bit]]
+     (if (= "1" bit)
+       (Math/pow 2 exponent)
+       0)))
+
+#_((fn ([[exponent bit]]
+       (if (= "1" bit)
+         (Math/pow 2 exponent)
+         0)))
+ [0 "1"])
 
 (defmacro let [bindings & body]
   `(let* ~(destructure bindings) ~@body))

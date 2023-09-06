@@ -213,7 +213,7 @@ function _EVAL(ast, env) {
                     ast = a2;
                 }
                 break;
-            case "fn":
+            case "fn*":
                 //console.log("[eval fn] defining fn", PRINT(ast))
                 if (types._list_Q(a1)) {
                     return types.multifn(EVAL, Env, ast.slice(1), env);
