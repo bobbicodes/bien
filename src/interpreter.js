@@ -84,7 +84,7 @@ export var deftests = []
 
 function _EVAL(ast, env) {
     while (true) {
-        //console.log(ast)
+        //console.log(PRINT(ast))
         //console.log(env)
         if (!types._list_Q(ast)) {
             return eval_ast(ast, env);
@@ -213,7 +213,7 @@ function _EVAL(ast, env) {
                     ast = a2;
                 }
                 break;
-            case "fn":
+            case "fn*":
                 //console.log("[eval fn] defining fn", PRINT(ast))
                 if (types._list_Q(a1)) {
                     return types.multifn(EVAL, Env, ast.slice(1), env);

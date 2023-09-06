@@ -1,5 +1,91 @@
-(ns core {:clj-kondo/ignore true} 
-  (:require [clojure.string :as str]))
+(ns core {:clj-kondo/ignore true})
+
+(defmacro when [x & xs] (list 'if x (cons 'do xs)))
+
+(defmacro cond [& xs]
+  (when (> (count xs) 0)
+    (list 'if (first xs)
+          (if (> (count xs) 1)
+            (nth xs 1)
+            (throw "odd number of forms to cond"))
+          (cons 'cond (rest (rest xs))))))
+
+(def spread (fn* [arglist]
+                 (cond
+                   (nil? arglist) nil
+                   (nil? (next arglist)) (seq (first arglist))
+                   :else (cons (first arglist) (spread (next arglist))))))
+
+(def list* (fn*
+            ([args] (seq args))
+            ([a args] (cons a args))
+            ([a b args] (cons a (cons b args)))
+            ([a b c args] (cons a (cons b (cons c args))))
+            ([a b c d & more]
+             (cons a (cons b (cons c (cons d (spread more))))))))
+
+(def apply (fn*
+            ([f args]
+             (if (keyword? f)
+               (get args f)
+               (apply* f args)))
+            ([f x args]
+             (apply f (list* x args)))
+            ([f x y args]
+             (apply f (list* x y args)))
+            ([f x y z args]
+             (apply f (list* x y z args)))
+            ([f a b c d & args]
+             (apply f (cons a (cons b (cons c (cons d (spread args)))))))))
+
+(def map
+  (fn* 
+   ([f coll]
+    (loop [s (seq coll) res []]
+      (if (empty? s) (apply list res)
+          (recur (rest s)
+                 (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
+   ([f c1 c2]
+    (loop [s1 (seq c1) s2 (seq c2) res []]
+      (if (or (empty? s1) (empty? s2)) (apply list res)
+          (recur (rest s1) (rest s2)
+                 (conj res (f (first s1) (first s2)))))))
+   ([f c1 c2 c3]
+    (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
+      (if (or (empty? s1) (empty? s2) (empty? s3)) (apply list res)
+          (recur (rest s1) (rest s2) (rest s3)
+                 (conj res (f (first s1) (first s2) (first s3)))))))
+   ([f c1 c2 c3 c4]
+    (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
+      (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) (apply list res)
+          (recur (rest s1) (rest s2) (rest s3) (rest s4)
+                 (conj res (f (first s1) (first s2) (first s3) (first s4)))))))))
+
+(def seq? (fn* [x] (list? x)))
+
+;; first define let, fn without destructuring
+
+(defmacro let [bindings & body]
+  `(let* ~bindings ~@body))
+
+(defmacro fn [& sigs]
+  (let [name (if (symbol? (first sigs)) (first sigs) nil)
+        sigs (if name (next sigs) sigs)
+        sigs (if (vector? (first sigs))
+               (list sigs)
+               (if (seq? (first sigs))
+                 sigs
+                 (throw (if (seq sigs)
+                          (str "Parameter declaration "
+                               (first sigs)
+                               " should be a vector")
+                          (str "Parameter declaration missing")))))
+        psig (fn* [sig]
+                  sig)
+        new-sigs (map psig sigs)]
+    (if name
+      (list* 'fn* name new-sigs)
+      (cons 'fn* new-sigs))))
 
 (defmacro defn [name & fdecl]
   (if (string? (first fdecl))
@@ -28,21 +114,13 @@
                     ~{:name (str name)})))))
 
 (defmacro lazy-seq [& body]
-  `(new LazySeq (fn [] ~@body)))
+  `(new LazySeq (fn* [] ~@body)))
 
 (defn not [a] (if a false true))
 (defn not= [a b] (not (= a b)))
 (defn dec [a] (- a 1))
 (defn zero? [n] (= 0 n))
 (defn identity [x] x)
-
-(defmacro cond [& xs]
-  (when (> (count xs) 0)
-    (list 'if (first xs)
-          (if (> (count xs) 1)
-            (nth xs 1)
-            (throw "odd number of forms to cond"))
-          (cons 'cond (rest (rest xs))))))
 
 (defn next [s]
   (if (or (= 1 (count s)) (= 0 (count s)))
@@ -87,12 +165,12 @@
 
 (defn merge-with [f & maps]
   (when (some identity maps)
-    (let [merge-entry (fn [m e]
+    (let [merge-entry (fn* [m e]
                         (let [k (key e) v (val e)]
                           (if (contains? m k)
                             (assoc m k (f (get m k) v))
                             (assoc m k v))))
-          merge2 (fn [m1 m2]
+          merge2 (fn* [m1 m2]
                    (reduce merge-entry (or m1 {}) (seq m2)))]
       (reduce merge2 maps))))
 
@@ -103,51 +181,23 @@
         (recur (inc index) 
                (str buffer (get cmap (nth s index) (nth s index)))))))
 
-(defn apply
-  ([f args]
-   (if (keyword? f)
-     (get args f)
-     (apply* f args)))
-  ([f x args]
-   (apply f (list* x args)))
-  ([f x y args]
-   (apply f (list* x y args)))
-  ([f x y z args]
-   (apply f (list* x y z args)))
-  ([f a b c d & args]
-   (apply f (cons a (cons b (cons c (cons d (spread args))))))))
-
-(defn spread [arglist]
-  (cond
-    (nil? arglist) nil
-    (nil? (next arglist)) (seq (first arglist))
-    :else (cons (first arglist) (spread (next arglist)))))
-
-(defn list*
-  ([args] (seq args))
-  ([a args] (cons a args))
-  ([a b args] (cons a (cons b args)))
-  ([a b c args] (cons a (cons b (cons c args))))
-  ([a b c d & more]
-   (cons a (cons b (cons c (cons d (spread more)))))))
-
 (defn juxt
   ([f]
-   (fn
+   (fn*
      ([] [(f)])
      ([x] [(f x)])
      ([x y] [(f x y)])
      ([x y z] [(f x y z)])
      ([x y z & args] [(apply f x y z args)])))
   ([f g]
-   (fn
+   (fn*
      ([] [(f) (g)])
      ([x] [(f x) (g x)])
      ([x y] [(f x y) (g x y)])
      ([x y z] [(f x y z) (g x y z)])
      ([x y z & args] [(apply f x y z args) (apply g x y z args)])))
   ([f g h]
-   (fn
+   (fn*
      ([] [(f) (g) (h)])
      ([x] [(f x) (g x) (h x)])
      ([x y] [(f x y) (g x y) (h x y)])
@@ -155,7 +205,7 @@
      ([x y z & args] [(apply f x y z args) (apply g x y z args) (apply h x y z args)])))
   ([f g h & fs]
    (let [fs (list* f g h fs)]
-     (fn
+     (fn*
        ([] (reduce #(conj %1 (%2)) [] fs))
        ([x] (reduce #(conj %1 (%2 x)) [] fs))
        ([x y] (reduce #(conj %1 (%2 x y)) [] fs))
@@ -166,7 +216,7 @@
   ([] identity)
   ([f] f)
   ([f g]
-   (fn
+   (fn*
      ([] (f (g)))
      ([x] (f (g x)))
      ([x y] (f (g x y)))
@@ -197,13 +247,13 @@
 (def gensym-counter
   (atom 0))
 
-(defn gensym [prefix]
-  (symbol (str (if prefix prefix "G__")
-               (swap! gensym-counter inc))))
+(def gensym (fn* [prefix]
+                 (symbol (str (if prefix prefix "G__")
+                              (swap! gensym-counter inc)))))
 
 (defn memoize [f]
   (let* [mem (atom {})]
-        (fn [& args]
+        (fn* [& args]
           (let* [key (str args)]
                 (if (contains? @mem key)
                   (get @mem key)
@@ -212,7 +262,7 @@
                             ret)))))))
 
 (defn partial [pfn & args]
-  (fn [& args-inner]
+  (fn* [& args-inner]
     (apply pfn (concat args args-inner))))
 
 (defn every? [pred xs]
@@ -227,14 +277,14 @@
   (walk (partial prewalk f) identity (f form)))
 
 (defn postwalk-replace [smap form]
-  (postwalk (fn [x] (if (contains? smap x) (smap x) x)) form))
+  (postwalk (fn* [x] (if (contains? smap x) (smap x) x)) form))
 
 (defn apply-template [argv expr values]
   (postwalk-replace (zipmap argv values) expr))
 
 (defmacro do-template [argv expr & values]
   (let [c (count argv)]
-    `(do ~@(map (fn [a] (apply-template argv expr a))
+    `(do ~@(map (fn* [a] (apply-template argv expr a))
                 (partition c values)))))
 
 (defmacro are [argv expr & args]
@@ -250,8 +300,6 @@
 
 (defn not-every? [pred xs]
   (not (every? pred xs)))
-
-(defmacro when [x & xs] (list 'if x (cons 'do xs)))
 
 (defmacro if-not [test then else]
   `(if (not ~test) ~then ~else))
@@ -315,7 +363,7 @@
   (not (zero? (mod n 2))))
 
 (defn complement [f]
-  (fn
+  (fn*
     ([] (not (f)))
     ([x] (not (f x)))
     ([x y] (not (f x y)))
@@ -331,7 +379,7 @@
   (remove nil?
           (cons node
                 (when (branch? node)
-                  (mapcat (fn [x] (tree-seq branch? children x))
+                  (mapcat (fn* [x] (tree-seq branch? children x))
                           (children node))))))
 
 (defn flatten [x]
@@ -395,15 +443,15 @@
 (defn partition-by [f coll]
   (loop [s (seq coll) res []]
     (if (= 0 (count s)) res
-        (recur (drop (count (take-while (fn [x] (= (f (first s)) (f x))) s)) s)
-               (conj res (take-while (fn [x] (= (f (first s)) (f x))) s))))))
+        (recur (drop (count (take-while (fn* [x] (= (f (first s)) (f x))) s)) s)
+               (conj res (take-while (fn* [x] (= (f (first s)) (f x))) s))))))
 
 (defn coll? [x]
   (or (list? x) (vector? x) (set? x) (map? x)))
 
 (defn group-by [f coll]
   (reduce
-   (fn [ret x]
+   (fn* [ret x]
      (let* [k (f x)]
            (assoc ret k (conj (get ret k []) x))))
    {} coll))
@@ -455,52 +503,13 @@
     (map? coll) {}
     (string? coll) ""))
 
-(defn map1 [f coll]
-  (loop [s (seq coll) res []]
-    (if (empty? s) res
-        (recur (rest s) 
-               (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
-
-(defn map2 [f c1 c2]
-  (loop [s1 (seq c1) s2 (seq c2) res []]
-    (if (or (empty? s1) (empty? s2)) res
-        (recur (rest s1) (rest s2)
-               (conj res (f (first s1) (first s2)))))))
-
-(defn map3 [f c1 c2 c3]
-  (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
-    (if (or (empty? s1) (empty? s2) (empty? s3)) res
-        (recur (rest s1) (rest s2) (rest s3)
-               (conj res (f (first s1) (first s2) (first s3)))))))
-
-(defn map4 [f c1 c2 c3 c4]
-  (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
-    (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) res
-        (recur (rest s1) (rest s2) (rest s3) (rest s4)
-               (conj res (f (first s1) (first s2) (first s3) (first s4)))))))
-
-(defn map [f & colls]
-  (cond
-    (empty? (first colls)) '()
-    (= 1 (count colls)) (map1 f (first colls))
-    (= 2 (count colls)) (map2 f (first colls) (second colls))
-    (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
-    (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
-    :else (throw (str "Map not implemented on " (count colls) " colls"))))
-
 (defn mapv [f & colls]
-  (cond
-    (empty? (first colls)) '()
-    (= 1 (count colls)) (map1 f (first colls))
-    (= 2 (count colls)) (map2 f (first colls) (second colls))
-    (= 3 (count colls)) (map3 f (first colls) (second colls) (last colls))
-    (= 4 (count colls)) (map4 f (first colls) (second colls) (nth colls 2) (last colls))
-    :else (throw (str "Map not implemented on " (count colls) " colls"))))
+  (vec (map f (spread colls))))
 
 (defn drop-last [n coll]
   (if-not coll
     (drop-last 1 n)
-    (map (fn [x _] x) coll (drop n coll))))
+    (map (fn* [x _] x) coll (drop n coll))))
 
 (defn interleave [c1 c2]
   (loop [s1  (seq c1)
@@ -530,11 +539,11 @@
                    ~else)))))
 
 (defn frequencies [coll]
-  (reduce (fn [counts x]
+  (reduce (fn* [counts x]
             (assoc counts x (inc (get counts x 0))))
           {} coll))
 
-(defn constantly [x] (fn [& args] x))
+(defn constantly [x] (fn* [& args] x))
 
 (defn str/capitalize [s]
   (let* [s (str s)]
@@ -543,16 +552,13 @@
           (str (upper-case (subs s 0 1))
                (lower-case (subs s 1))))))
 
-(defn seq? [x]
-  (list? x))
-
 (defn keep [s]
   (remove nil? s))
 
 (defn not-empty [coll] (when (seq coll) coll))
 
 (defn reduce-kv [f init coll]
-  (reduce (fn [ret kv] (f ret (first kv) (last kv))) init coll))
+  (reduce (fn* [ret kv] (f ret (first kv) (last kv))) init coll))
 
 (defn merge [& maps]
   (loop [maps (mapcat seq maps) res {}]
@@ -663,8 +669,8 @@
 (defmacro for [seq-exprs body-expr]
   (let [body-expr* body-expr
          iter# (gensym)
-         to-groups (fn [seq-exprs]
-                     (reduce (fn [groups kv]
+         to-groups (fn* [seq-exprs]
+                     (reduce (fn* [groups kv]
                                (if (keyword? (first kv))
                                  (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
                                  (conj groups [(first kv) (last kv)])))
@@ -746,27 +752,27 @@
          defaults (:or b)]
         (loop [ret (-> bvec (conj gmap) (conj v)
                        (conj gmap) (conj gmap)
-                       ((fn [ret]
+                       ((fn* [ret]
                           (if (:as b)
                             (conj ret (:as b) gmap)
                             ret))))
                bes (let* [transforms
                           (reduce
-                           (fn [transforms mk]
+                           (fn* [transforms mk]
                              (if (keyword? mk)
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
-                                     (cond (= mkn "keys") (assoc transforms mk (fn [k] (keyword (or mkns (namespace k)) (name k))))
+                                     (cond (= mkn "keys") (assoc transforms mk (fn* [k] (keyword (or mkns (namespace k)) (name k))))
                                            (= mkn "syms") 
                                            (do (println "syms")
-                                               (assoc transforms mk (fn [k] (list `quote (symbol (or mkns (namespace k)) (name k))))))
+                                               (assoc transforms mk (fn* [k] (list `quote (symbol (or mkns (namespace k)) (name k))))))
                                            (= mkn "strs") (assoc transforms mk str)
                                            :else transforms))
                                transforms))
                            {}
                            (keys b))]
                          (reduce
-                          (fn [bes entry] (reduce (fn [a b] (assoc a b ((val entry) b))) (dissoc bes (key entry)) (get bes (key entry))))
+                          (fn* [bes entry] (reduce (fn* [a b] (assoc a b ((val entry) b))) (dissoc bes (key entry)) (get bes (key entry))))
                           (dissoc b :as :or)
                           transforms))]
           bes
@@ -795,14 +801,17 @@
 
 (defn destructure [bindings]
   (let* [bents (partition 2 bindings)
-         process-entry (fn [bvec b] (pb bvec (first b) (second b)))]
+         process-entry (fn* [bvec b] (pb bvec (first b) (second b)))]
         (if (every? symbol? (map first bents))
           bindings
           (if-let [kwbs (seq (filter #(keyword? (first %)) bents))]
             (throw (str "Unsupported binding key: " (ffirst kwbs)))
             (reduce process-entry [] bents)))))
 
-#_(defn maybe-destructured [params body]
+(defmacro let [bindings & body]
+  `(let* ~(destructure bindings) ~@body))
+
+(defn maybe-destructured [params body]
   (if (every? symbol? params)
     (cons params body)
     (loop [params params
@@ -819,63 +828,30 @@
             ~@body))))))
 
 ;redefine fn with destructuring
-#_(defmacro fn [& sigs]
+(defmacro fn [& sigs]
   (let [name (if (symbol? (first sigs)) (first sigs) nil)
         sigs (if name (next sigs) sigs)
         sigs (if (vector? (first sigs))
                (list sigs)
                (if (seq? (first sigs))
                  sigs
-                   ;; Assume single arity syntax
                  (throw (if (seq sigs)
                           (str "Parameter declaration "
                                (first sigs)
                                " should be a vector")
                           (str "Parameter declaration missing")))))
         psig (fn* [sig]
-                 ;; Ensure correct type before destructuring sig
-                  (when (not (seq? sig))
-                    (throw (str "Invalid signature " sig
-                                " should be a list")))
-                  (let [[params & body] sig
-                        _ (when (not (vector? params))
-                            (throw (if (seq? (first sigs))
-                                     (str "Parameter declaration " params
-                                          " should be a vector")
-                                     (str "Invalid signature " sig
-                                          " should be a list"))))
-                        conds (when (and (next body) (map? (first body)))
-                                (first body))
-                        body (if conds (next body) body)
-                        conds (or conds (meta params))
-                        pre (:pre conds)
-                        post (:post conds)
-                        body (if post
-                               `((let [~'% ~(if (< 1 (count body))
-                                              `(do ~@body)
-                                              (first body))]
-                                   ~@(map (fn* [c] `(assert ~c)) post)
-                                   ~'%))
-                               body)
-                        body (if pre
-                               (concat (map (fn* [c] `(assert ~c)) pre)
-                                       body)
-                               body)]
+                  (let [[params & body] sig]
                     (maybe-destructured params body)))
         new-sigs (map psig sigs)]
-    (with-meta
-      (if name
-        (list* 'fn* name new-sigs)
-        (cons 'fn* new-sigs))
-      (meta &form))))
-
-(defmacro let [bindings & body]
-  `(let* ~(destructure bindings) ~@body))
+    (if name
+      (list* 'fn* name new-sigs)
+      (cons 'fn* new-sigs))))
 
 (defmacro condp [pred expr & clauses]
   (let [gpred (gensym "pred__")
         gexpr (gensym "expr__")
-        emit (defn emit [pred expr args]
+        emit-condp (defn emit-condp [pred expr args]
                (let [[[a b c :as clause] more]
                      (split-at (if (= :>> (second args)) 3 2) args)
                      n (count clause)]
@@ -884,13 +860,13 @@
                    (= 1 n) a
                    (= 2 n) `(if (~pred ~a ~expr)
                               ~b
-                              ~(emit pred expr more))
+                              ~(emit-condp pred expr more))
                    :else `(if-let [p# (~pred ~a ~expr)]
                             (~c p#)
-                            ~(emit pred expr more)))))]
+                            ~(emit-condp pred expr more)))))]
     `(let [~gpred ~pred
            ~gexpr ~expr]
-       ~(emit gpred gexpr clauses))))
+       ~(emit-condp gpred gexpr clauses))))
 
 (defn Math/log [n]
   (js-eval (str "Math.log(" n ")")))
