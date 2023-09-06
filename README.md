@@ -10,13 +10,11 @@ I'd estimate that the goal is around 50% complete *by quantity*, though the unim
 
 ### Differences from Clojure
 
-1. Lazy sequences have recently been implemented but not everything uses them yet.
+1. [Lazy sequences](https://github.com/bobbicodes/bien/issues/13) are probably the biggest one.
 
 2. No multimethods/protocols. Chris Houser (Chouser) has created a [sketch](https://gist.github.com/Chouser/6081ea66d144d13e56fc) of protocols which is included but nothing uses them yet.
 
-3. Destructuring. Currently only sequential destructuring works, and only in `let` forms.
-
-4. Namespaces. These are not a high priority because it is not meant for writing production software. However, there are many functions which have slashes in their name to support patterns such as `str/join`, `Character/digit`, etc. 
+3. Namespaces. At this point they are not a high priority because this tool is meant for doing simple exercises and not writing production software. However, there are many functions which have slashes in their name to support patterns such as `str/join`, `Character/digit`, etc. 
 
 [Zippers](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf) have been implemented, and are available as a library that can be loaded:
 
