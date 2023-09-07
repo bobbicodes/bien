@@ -583,12 +583,7 @@
         `(when-let [xs# (seq ~xs)]
            (let* [~x (first xs#)]
                  ~@body))))
-
-(defn Integer/parseInt [s r]
-  (when (re-seq #"\\d" s)
-    (if-not r (js-eval (str "parseInt(" s ")"))
-            (js-eval (str "parseInt(" s ", " r ")")))))
-
+  
 (defmacro as-> [expr name & forms]
   `(let* [~name ~expr
           ~@(interleave (repeat (count forms) name) (butlast forms))]

@@ -930,6 +930,7 @@ function map_indexed(f, coll) {
 export var ns = {
     'env': printEnv,
     'print': _print,
+    'Integer/parseInt': parseInt,
     'pr': _pr,
     'spit-json': spit_json,
     'LazySeq': LazySeq,

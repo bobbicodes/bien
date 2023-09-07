@@ -177,7 +177,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("meetup")
+//testSolution("run_length_encoding")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()
