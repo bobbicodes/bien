@@ -819,7 +819,7 @@
 (defmacro let [bindings & body]
   `(let* ~(destructure bindings) ~@body))
 
-#_(defmacro loop [bindings & body]
+(defmacro loop [bindings & body]
   (let [db (destructure bindings)]
     (if (= db bindings)
       `(loop* ~bindings ~@body)

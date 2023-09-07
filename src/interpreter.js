@@ -168,7 +168,7 @@ function _EVAL(ast, env) {
                     let f = recurForms[i]
                     loopLocals[i] = f
                 }
-                ast = [types._symbol('loop')].concat([loopLocals, loop_body])
+                ast = [types._symbol('loop*')].concat([loopLocals, loop_body])
                 break
             case 'deftest':
                 var res = ast.slice(2).map((x) => EVAL(x, env))
