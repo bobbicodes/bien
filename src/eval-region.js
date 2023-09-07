@@ -2,7 +2,7 @@ import { Prec } from '@codemirror/state'
 import { keymap } from '@codemirror/view'
 import { syntaxTree } from "@codemirror/language"
 import { repp } from "./interpreter"
-import {out_buffer, appendBuffer, clearBuffer} from './core'
+import { out_buffer, appendBuffer, clearBuffer } from './core'
 
 const up = (node) => node.parent;
 const isTopType = (nodeType) => nodeType.isTop
@@ -55,6 +55,7 @@ var codeBeforeEval = ""
 export var testCodeBeforeEval = ""
 var posBeforeEval = 0
 var testPosBeforeEval = 0
+var lastEditorEvaluated
 
 export const updateEditor = (view, text, pos) => {
     var parent = view.dom.parentElement.id
@@ -67,7 +68,7 @@ export const updateEditor = (view, text, pos) => {
             changes: { from: 0, to: end, insert: text },
             selection: { anchor: pos, head: pos }
         })
-    }    
+    }
     if (parent === 'test') {
         testCodeBeforeEval = doc
         testPosBeforeEval = view.state.selection.main.head
@@ -91,7 +92,7 @@ export function tryEval(s) {
 
 export const clearEval = (view) => {
     const parent = view.dom.parentElement.id
-    if (parent === 'app') {
+    if (parent === 'app' && lastEditorEvaluated === 'app') {
         var previousDoc = codeBeforeEval
         var previousPos = posBeforeEval
         if (evalResult.length != 0) {
@@ -100,7 +101,7 @@ export const clearEval = (view) => {
             updateEditor(view, previousDoc, previousPos)
         }
     }
-    if (parent === 'test') {
+    if (parent === 'test' && lastEditorEvaluated === 'test') {
         var previousTestDoc = testCodeBeforeEval
         var previousTestPos = testPosBeforeEval
         if (evalResult.length != 0) {
@@ -125,6 +126,7 @@ export const evalAtCursor = (view) => {
         updateEditor(view, codeWithResult, posBeforeEval)
         view.dispatch({ selection: { anchor: posBeforeEval, head: posBeforeEval } })
         clearBuffer()
+        lastEditorEvaluated = 'app'
         return true
     }
     if (parent === 'test') {
@@ -137,38 +139,64 @@ export const evalAtCursor = (view) => {
         updateEditor(view, codeWithResult, posBeforeEval)
         view.dispatch({ selection: { anchor: posBeforeEval, head: posBeforeEval } })
         clearBuffer()
+        lastEditorEvaluated = 'test'
         return true
     }
 }
 
 export const evalTopLevel = (view) => {
+    var parent = view.dom.parentElement.id
     clearEval(view)
     posAtFormEnd = topLevelNode(view.state).to
-    const doc = view.state.doc.toString()
-    //console.log("doc:", doc)
-    posBeforeEval = view.state.selection.main.head
-    //console.log("set posBeforeEval to", posBeforeEval)
-    codeBeforeEval = doc
-    const codeBeforeFormEnd = codeBeforeEval.slice(0, posAtFormEnd)
-    const codeAfterFormEnd = codeBeforeEval.slice(posAtFormEnd, codeBeforeEval.length)
-    evalResult = tryEval(topLevelString(view.state))
-    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + out_buffer + evalResult + " " + codeAfterFormEnd
-    //console.log("setting cursor position to", posBeforeEval)
-    updateEditor(view, codeWithResult, posBeforeEval)
-    clearBuffer()
-    return true
+    var doc = view.state.doc.toString()
+    if (parent === 'app') {
+        posBeforeEval = view.state.selection.main.head
+        codeBeforeEval = doc
+        var codeBeforeFormEnd = codeBeforeEval.slice(0, posAtFormEnd)
+        var codeAfterFormEnd = codeBeforeEval.slice(posAtFormEnd, codeBeforeEval.length)
+        evalResult = tryEval(topLevelString(view.state))
+        const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + out_buffer + evalResult + " " + codeAfterFormEnd
+        updateEditor(view, codeWithResult, posBeforeEval)
+        clearBuffer()
+        lastEditorEvaluated = 'app'
+        return true
+    }
+    if (parent === 'test') {
+        testPosBeforeEval = view.state.selection.main.head
+        testCodeBeforeEval = doc
+        var codeBeforeFormEnd = testCodeBeforeEval.slice(0, posAtFormEnd)
+        var codeAfterFormEnd = testCodeBeforeEval.slice(posAtFormEnd, testCodeBeforeEval.length)
+        evalResult = tryEval(topLevelString(view.state))
+        const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + out_buffer + evalResult + " " + codeAfterFormEnd
+        updateEditor(view, codeWithResult, testPosBeforeEval)
+        clearBuffer()
+        lastEditorEvaluated = 'test'
+        return true
+    }
 }
 
 export const evalCell = (view) => {
+    var parent = view.dom.parentElement.id
     clearEval(view)
-    const doc = view.state.doc.toString()
-    //console.log("doc:", doc)
-    posBeforeEval = view.state.selection.main.head
-    evalResult = tryEval("(do " + view.state.doc.text.join(" ") + ")")
-    const codeWithResult = doc + "\n" + "=> " + "\n" + out_buffer + evalResult
-    updateEditor(view, codeWithResult, posBeforeEval)
-    clearBuffer()
-    return true
+    var doc = view.state.doc.toString()
+    if (parent === 'app') {
+        posBeforeEval = view.state.selection.main.head
+        evalResult = tryEval("(do " + view.state.doc.text.join(" ") + ")")
+        var codeWithResult = doc + "\n" + "=> " + "\n" + out_buffer + evalResult
+        updateEditor(view, codeWithResult, posBeforeEval)
+        clearBuffer()
+        lastEditorEvaluated = 'app'
+        return true
+    }
+    if (parent === 'test') {
+        testPosBeforeEval = view.state.selection.main.head
+        evalResult = tryEval("(do " + view.state.doc.text.join(" ") + ")")
+        var codeWithResult = doc + "\n" + "=> " + "\n" + out_buffer + evalResult
+        updateEditor(view, codeWithResult, testPosBeforeEval)
+        clearBuffer()
+        lastEditorEvaluated = 'test'
+        return true
+    }
 }
 
 const alpha = Array.from(Array(58)).map((e, i) => i + 65);

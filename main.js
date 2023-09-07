@@ -168,5 +168,5 @@ function testExercisesUntilFail() {
 //testSolution(randExercise())
 //testSolution("meetup")
 //loadExercise("all_your_base")
-//testExercisesUntilFail()
-testExercises()
+testExercisesUntilFail()
+//testExercises()
