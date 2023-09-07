@@ -35,4 +35,5 @@
        :else         (pr-str obj)))
 
 (defn pprint [obj]
-  (pp- obj 0))
+  (if (empty? obj) (str obj)
+      (pp- obj 0)))

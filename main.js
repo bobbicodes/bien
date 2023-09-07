@@ -177,7 +177,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("say")
+//testSolution("say")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
 //testExercises()
