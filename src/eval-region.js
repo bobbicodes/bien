@@ -2,6 +2,7 @@ import { Prec } from '@codemirror/state'
 import { keymap } from '@codemirror/view'
 import { syntaxTree } from "@codemirror/language"
 import { repp } from "./interpreter"
+import {out_buffer, appendBuffer, clearBuffer} from './core'
 
 const up = (node) => node.parent;
 const isTopType = (nodeType) => nodeType.isTop
@@ -55,7 +56,7 @@ export var testCodeBeforeEval = ""
 var posBeforeEval = 0
 var testPosBeforeEval = 0
 
-const updateEditor = (view, text, pos) => {
+export const updateEditor = (view, text, pos) => {
     var parent = view.dom.parentElement.id
     var doc = view.state.doc.toString()
     const end = doc.length
@@ -121,9 +122,10 @@ export const evalAtCursor = (view) => {
         var codeBeforeCursor = codeBeforeEval.slice(0, posBeforeEval)
         var codeAfterCursor = codeBeforeEval.slice(posBeforeEval, codeBeforeEval.length)
         evalResult = tryEval(cursorNodeString(view.state))
-        var codeWithResult = codeBeforeCursor + " =>" + "\n" + evalResult + " " + codeAfterCursor
+        var codeWithResult = codeBeforeCursor + " =>" + "\n" + out_buffer + evalResult + " " + codeAfterCursor
         updateEditor(view, codeWithResult, posBeforeEval)
         view.dispatch({ selection: { anchor: posBeforeEval, head: posBeforeEval } })
+        clearBuffer()
         return true
     }
     if (parent === 'test') {
@@ -132,9 +134,10 @@ export const evalAtCursor = (view) => {
         var codeBeforeCursor = codeBeforeEval.slice(0, posBeforeEval)
         var codeAfterCursor = codeBeforeEval.slice(posBeforeEval, codeBeforeEval.length)
         evalResult = tryEval(cursorNodeString(view.state))
-        var codeWithResult = codeBeforeCursor + " =>" + "\n" + evalResult + " " + codeAfterCursor
+        var codeWithResult = codeBeforeCursor + " =>" + "\n" + out_buffer + evalResult + " " + codeAfterCursor
         updateEditor(view, codeWithResult, posBeforeEval)
         view.dispatch({ selection: { anchor: posBeforeEval, head: posBeforeEval } })
+        clearBuffer()
         return true
     }
 }
@@ -145,14 +148,15 @@ export const evalTopLevel = (view) => {
     const doc = view.state.doc.toString()
     //console.log("doc:", doc)
     posBeforeEval = view.state.selection.main.head
-    console.log("set posBeforeEval to", posBeforeEval)
+    //console.log("set posBeforeEval to", posBeforeEval)
     codeBeforeEval = doc
     const codeBeforeFormEnd = codeBeforeEval.slice(0, posAtFormEnd)
     const codeAfterFormEnd = codeBeforeEval.slice(posAtFormEnd, codeBeforeEval.length)
     evalResult = tryEval(topLevelString(view.state))
-    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + evalResult + " " + codeAfterFormEnd
-    console.log("setting cursor position to", posBeforeEval)
+    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + out_buffer + evalResult + " " + codeAfterFormEnd
+    //console.log("setting cursor position to", posBeforeEval)
     updateEditor(view, codeWithResult, posBeforeEval)
+    clearBuffer()
     return true
 }
 
@@ -162,8 +166,9 @@ export const evalCell = (view) => {
     //console.log("doc:", doc)
     posBeforeEval = view.state.selection.main.head
     evalResult = tryEval("(do " + view.state.doc.text.join(" ") + ")")
-    const codeWithResult = doc + "\n" + "=> " + "\n" + evalResult
+    const codeWithResult = doc + "\n" + "=> " + "\n" + out_buffer + evalResult
     updateEditor(view, codeWithResult, posBeforeEval)
+    clearBuffer()
     return true
 }
 

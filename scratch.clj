@@ -409,3 +409,31 @@
         (str (if (neg? n) "minus ") full-str)))))
 
 (number 1)
+
+
+{:a 1 :b 2 :c 3 :d 4}
+
+(clojure.pprint/pprint
+ (into {} (for [x (range 11)
+                y (range 11)]
+            [x y])))
+
+(def I #{#{'a 'B 'C 'd}
+         #{'A 'b 'c 'd}
+         #{'A 'b 'c 'D}
+         #{'A 'b 'C 'd}
+         #{'A 'b 'C 'D}
+         #{'A 'B 'c 'd}
+         #{'A 'B 'c 'D}
+         #{'A 'B 'C 'd}})
+
+#{#{'a 'B 'C 'd}
+  #{'A 'b 'c 'd}
+  #{'A 'b 'c 'D}
+  #{'A 'b 'C 'd}
+  #{'A 'b 'C 'D}
+  #{'A 'B 'c 'd}
+  #{'A 'B 'c 'D}
+  #{'A 'B 'C 'd}}
+
+(print ['a :b "\n" \space "c"])

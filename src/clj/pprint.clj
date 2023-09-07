@@ -1,5 +1,19 @@
 (ns pprint {:clj-kondo/ignore true})
 
+(def *print-pretty* true)
+(def *print-pprint-dispatch* nil)
+(def *print-right-margin* 72)
+(def *print-miser-width* 40)
+(def *print-lines* nil)
+(def *print-circle* nil)
+(def *print-shared* nil)
+(def *print-suppress-namespaces* nil)
+(def *print-radix* nil)
+(def *print-base* 10)
+(def *current-level* 0)
+(def *current-length* nil)
+(def format-simple-number)
+
 (defn spaces- [indent]
      (if (> indent 0)
        (str " " (spaces- (- indent 1)))
@@ -30,6 +44,7 @@
      (cond
        (list? obj)   (str "(" (pp-seq- obj indent) ")")
        (vector? obj) (str "[" (pp-seq- obj indent) "]")
+       (set? obj) (str "#{" (pp-seq- obj indent) "}")
        (map? obj)    (str "{" (pp-map- obj indent) "}")
        :else         (pr-str obj)))
 
