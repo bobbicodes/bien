@@ -242,198 +242,87 @@
                                     n/from-to
                                     (j/assoc! :insert " "))])})))))))
 
-(defn abs [n]
-  (if (neg? n) (- n) n))
+(def day-structure
+  {1 :sunday 2 :monday 3 :tuesday 4 :wednesday
+   5 :thursday 6 :friday 7 :saturday})
 
-(def empty-board
-  (->> ["_" "_" "_" "_" "_" "_" "_" "_"]
-       (repeat 8)
-       vec))
+(defn leap-year? [year]
+  (cond (zero? (mod year 400)) true
+        (zero? (mod year 100)) false
+        :else  (zero? (mod year 4))))
 
-(defn board->str [board]
-  (->> board
-       (map #(str/join " " %))
-       (map #(str % "\n"))
-       (apply str)))
+(defn zellers-congruence [input_year input_month input_day]
+  (let [month (+ (mod (+ input_month 9) 12) 3)
+        year (- input_year (quot (- month input_month) 12))
+        century (quot year 100)
+        century-year (mod year 100)]
+    (mod (+ input_day
+            (quot (* 26 (inc month)) 10)
+            century-year
+            (quot century-year 4)
+            (quot century 4)
+            (* 5 century)) 7)))
 
-(defn board-string [{:keys [w b]}]
-  (-> empty-board
-      (cond-> w (assoc-in w \W)
-              b (assoc-in b \B))
-      board->str))
+(defn get-day-counts [year]
+  {1 31, 2 (if (leap-year? year) 29 28), 3 31, 4 30
+   5 31, 6 30, 7 31, 8 31, 9 30, 10 31, 11 30, 12 31})
 
-(defn can-attack [{[wx wy] :w [bx by] :b :as state}]
-  (or (= wx bx)
-      (= wy by)
-      (= (abs (- wx bx))
-         (abs (- wy by)))))
+(defn get-days
+  ([year month]
+   (get-days year month
+             (zellers-congruence year month 1)
+             (get-in (get-day-counts year) [month])))
+  ([year month start-day limit]
+   (loop [count 2
+          day (inc start-day)
+          day-arrangement {1 (get-in day-structure [start-day])}]
+     (if (not= count (inc limit))
+       (recur  (inc count)
+               (if (= (inc day) 8) 1 (inc day))
+               (assoc day-arrangement count
+                      (get-in day-structure [day])))
+       day-arrangement))))
 
-(let [{:keys [w b]} {:w [2 4] :b [6 6]}]
-  [w b])
+(def days (get-days year month))
 
-(defn powerset [s]
-  (reduce 
-   (fn [x y] 
-     (into x 
-           (for [subset x] 
-             (conj subset y))))
-   #{#{}} 
-   s))
-
-(count (powerset (into #{} (range 10))))
-
-(def n 2)
-(def step 2)
-(def pad [0])
-(def coll '(9 5))
-(def s coll)
-(def p [])
-
-(loop [s coll p []]
-  (if (= n (count (take n s)))
-    (recur (drop step s) (conj p (take n s)))
-    (conj p (concat (take n s) pad))))
-
-(def e [[:a :a] [:b :b]])
-
-(if (#{0 2} (count (filter odd? (vals (frequencies (mapcat seq e))))))
-  (not (next (reduce
-              (fn [g e]
-                (let [[a b] (map (fn [n] (or (some #(if (% n) %) g) #{n})) e)]
-                  (conj (disj g a b) (into a b))))
-              #{}
-              e)))
-  false)
-(def english-cardinal-units
-  ["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"
-   "ten" "eleven" "twelve" "thirteen" "fourteen"
-   "fifteen" "sixteen" "seventeen" "eighteen" "nineteen"])
-(def english-cardinal-tens
-  ["" "" "twenty" "thirty" "forty" "fifty" "sixty" "seventy" "eighty" "ninety"])
-
-(def english-scale-numbers
-  ["" "thousand" "million" "billion" "trillion" "quadrillion" "quintillion"
-   "sextillion" "septillion" "octillion" "nonillion" "decillion"
-   "undecillion" "duodecillion" "tredecillion" "quattuordecillion"
-   "quindecillion" "sexdecillion" "septendecillion"
-   "octodecillion" "novemdecillion" "vigintillion"])
-
-(def parts ["one"])
-(def offset 0)
-(def cnt (count parts))
-
-(def acc [])
-(def pos 0)
-(def this "one")
-(def remainder nil)
-
-(apply str (interpose " " []))
+(apply hash-map (flatten (filter #(-> % val (= day)) days)))
 
 
 
-(drop 1 (interleave (repeat (count []) " ") []))
+(sort-by first
+         (get-days year month))
 
-(defn add-english-scales [parts offset]
-  (let [cnt (count parts)]
-    (loop [acc []
-           pos (dec cnt)
-           this (first parts)
-           remainder (next parts)]
-      (if (nil? remainder)
-        (str (apply str (interpose " " acc))
-             (if (and (not (empty? this)) (not (empty? acc))) " ")
-             this
-             (if (and (not (empty? this)) (pos? (+ pos offset)))
-               (str " " (nth english-scale-numbers (+ pos offset)))))
-        (recur
-         (if (empty? this)
-           acc
-           (conj acc (str this " " (nth english-scale-numbers (+ pos offset)))))
-         (dec pos)
-         (first remainder)
-         (next remainder))))))
+(defn filter-by-day [year month day]
+  (let [days (get-days year month)]
+    (apply hash-map (flatten (filter #(-> % val (= day)) days)))))
 
-(str (apply str (interpose " " acc))
-     (if (and (not (empty? this)) (not (empty? acc))) " ")
-     this
-     (if (and (not (empty? this)) (pos? (+ pos offset)))
-       (str " " (nth english-scale-numbers (+ pos offset)))))
+(defn filter-keys [year month day style]
+  (let [days (filter-by-day year month day)
+        dates (sort (keys days))]
+    (cond
+      (= style :first)
+      (nth dates 0)
+      (= style :second)
+      (nth dates 1)
+      (= style :third)
+      (nth dates 2)
+      (= style :fourth)
+      (nth dates 3)
+      (= style :last)
+      (nth dates (dec (count dates)))
+      (= style :teenth)
+      (first (filter #(and (> % 12) (< % 20)) (vec dates))))))
 
-(add-english-scales ["one"] 0)
+(def month 3)
+(def year 2013)
+(def day :monday)
+(def style :first)
 
-(defn format-simple-cardinal [num]
-  (let [hundreds (quot num 100)
-        tens (rem num 100)]
-    (str
-     (if (pos? hundreds) (str (nth english-cardinal-units hundreds) " hundred"))
-     (if (and (pos? hundreds) (pos? tens)) " ")
-     (if (pos? tens)
-       (if (< tens 20)
-         (nth english-cardinal-units tens)
-         (let [ten-digit (quot tens 10)
-               unit-digit (rem tens 10)]
-           (str
-            (if (pos? ten-digit) (nth english-cardinal-tens ten-digit))
-            (if (and (pos? ten-digit) (pos? unit-digit)) "-")
-            (if (pos? unit-digit) (nth english-cardinal-units unit-digit)))))))))
+(filter-by-day year month day)
 
-(defn consume [func initial-context]
-  (loop [context initial-context
-         acc []]
-    (let [[result new-context] (apply func [context])]
-      (if (not result)
-        [acc new-context]
-        (recur new-context (conj acc result))))))
+(filter-keys year month day style)
 
-(defn remainders [base val]
-  (reverse
-   (first
-    (consume #(if (pos? %)
-                [(rem % base) (quot % base)]
-                [nil nil])
-             val))))
+(defn meetup [month year day style]
+  [year month (filter-keys year month day style)])
 
-(def n 1)
-(def abs-arg (if (neg? n) (- n) n))
-(def parts (remainders 1000 abs-arg))
-(def parts-strs (map format-simple-cardinal parts))
-(def full-str (add-english-scales parts-strs 0))
-
-(defn number [n]
-  (if (= 0 n)
-    "zero"
-    (let [abs-arg (if (neg? n) (- n) n)
-          parts (remainders 1000 abs-arg)]
-      (let [parts-strs (map format-simple-cardinal parts)
-            full-str (add-english-scales parts-strs 0)]
-        (str (if (neg? n) "minus ") full-str)))))
-
-(number 1)
-
-
-{:a 1 :b 2 :c 3 :d 4}
-
-(clojure.pprint/pprint
- (into {} (for [x (range 11)
-                y (range 11)]
-            [x y])))
-
-(def I #{#{'a 'B 'C 'd}
-         #{'A 'b 'c 'd}
-         #{'A 'b 'c 'D}
-         #{'A 'b 'C 'd}
-         #{'A 'b 'C 'D}
-         #{'A 'B 'c 'd}
-         #{'A 'B 'c 'D}
-         #{'A 'B 'C 'd}})
-
-#{#{'a 'B 'C 'd}
-  #{'A 'b 'c 'd}
-  #{'A 'b 'c 'D}
-  #{'A 'b 'C 'd}
-  #{'A 'b 'C 'D}
-  #{'A 'B 'c 'd}
-  #{'A 'B 'c 'D}
-  #{'A 'B 'C 'd}}
-
-(print ['a :b "\n" \space "c"])
+(= [2013 3 4] (meetup 3 2013 :monday :first))

@@ -726,15 +726,15 @@ function sort(x) {
         return x.split('').sort().join('');
     }
     if (types._list_Q(x)) {
-        return x.sort()
+        return x.sort(subtract)
     }
     if (types._hash_map_Q(x)) {
-        return new Map(Array.from(x).sort())
+        return new Map(Array.from(x).sort(subtract))
     }
     if (types._set_Q(x)) {
-        return new Set(Array.from(x).sort())
+        return new Set(Array.from(x).sort(subtract))
     } else {
-        var v = x.sort()
+        var v = x.sort(subtract)
         v.__isvector__ = true;
         return v;
     }
