@@ -1,5 +1,7 @@
 (ns pprint {:clj-kondo/ignore true})
 
+;; adapted from clojure.pprint
+
 (def *print-pretty* true)
 (def *print-pprint-dispatch* nil)
 (def *print-right-margin* 72)
@@ -13,6 +15,32 @@
 (def *current-level* 0)
 (def *current-length* nil)
 (def format-simple-number)
+(def orig-pr pr)
+
+(defn- pr-with-base [x]
+  (if-let [s (format-simple-number x)]
+    (print s)
+    (orig-pr x)))
+
+(def write-option-table
+  {;:array            *print-array*
+   :base             '*print-base*,
+      ;;:case             *print-case*,
+   :circle           '*print-circle*,
+      ;;:escape           *print-escape*,
+      ;;:gensym           *print-gensym*,
+   :length           '*print-length*,
+   :level            '*print-level*,
+   :lines            '*print-lines*,
+   :miser-width      '*print-miser-width*,
+   :dispatch         '*print-pprint-dispatch*,
+   :pretty           '*print-pretty*,
+   :radix            '*print-radix*,
+   :readably         '*print-readably*,
+   :right-margin     '*print-right-margin*,
+   :suppress-namespaces '*print-suppress-namespaces*})
+
+;; basic MAL pretty printer
 
 (defn spaces- [indent]
      (if (> indent 0)
