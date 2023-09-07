@@ -4,6 +4,28 @@ import * as types from './types.js'
 import { repl_env, evalString } from './interpreter.js';
 import zip from './clj/zip.clj?raw'
 
+export var out_buffer = ""
+
+export function appendBuffer(s) {
+    out_buffer = out_buffer + s
+}
+
+export function clearBuffer() {
+    out_buffer = ""
+}
+
+function _print(s) {
+    appendBuffer(s)
+}
+
+function _pr(s) {
+    if (arguments.length > 1) {
+        appendBuffer(Array.from(arguments).join(' '))
+    } else {
+        appendBuffer(s)
+    }
+}
+
 // Errors/Exceptions
 function mal_throw(exc) { throw new Error(exc); }
 
@@ -29,14 +51,17 @@ function str() {
     }).join("");
 }
 
-function prn() {
-    _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
-        return _pr_str(exp, true);
-    }));
+function prn(s) {
+    if (arguments.length > 1) {
+        appendBuffer(Array.from(arguments).join(' ') + "\n")
+    } else {
+        appendBuffer(s + "\n")
+    }
 }
 
 function println() {
     _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
+        appendBuffer(exp + "\n")
         return _pr_str(exp, false);
     }));
 }
@@ -716,7 +741,7 @@ function sort(x) {
 }
 
 function makeComparator(f) {
-    return function(x, y) {
+    return function (x, y) {
         let r = f(x, y)
         if (types._number_Q(r)) {
             return r
@@ -895,15 +920,17 @@ function map_indexed(f, coll) {
     let ret = [];
     let i = 0;
     for (const x of coll) {
-      ret.push(f(i, x));
-      i++;
+        ret.push(f(i, x));
+        i++;
     }
     return ret;
-  }
+}
 
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
+    'print': _print,
+    'pr': _pr,
     'spit-json': spit_json,
     'LazySeq': LazySeq,
     'require': require,

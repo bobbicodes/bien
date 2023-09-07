@@ -7,11 +7,7 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `((fn ([[exponent bit]]
-       (if (= "1" bit)
-         (Math/pow 2 exponent)
-         0)))
- [0 "1"])`,
+  doc: `(+ (do (print "hi") (+ 1 1)) 1)`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -170,7 +166,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("two_fer")
+//testSolution("veitch")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
 //testExercises()

@@ -1,7 +1,8 @@
-import {Prec} from '@codemirror/state'
-import {keymap} from '@codemirror/view'
-import {syntaxTree} from "@codemirror/language"
-import {evalString} from "./interpreter"
+import { Prec } from '@codemirror/state'
+import { keymap } from '@codemirror/view'
+import { syntaxTree } from "@codemirror/language"
+import { repp } from "./interpreter"
+import {out_buffer, appendBuffer, clearBuffer} from './core'
 
 const up = (node) => node.parent;
 const isTopType = (nodeType) => nodeType.isTop
@@ -29,7 +30,7 @@ const uppermostEdge = (pos, node) => {
 }
 
 const nodeAtCursor = (state) => {
-    const pos =  mainSelection(state).from
+    const pos = mainSelection(state).from
     const n = nearestTouching(state, pos)
     return uppermostEdge(pos, n)
 }
@@ -37,7 +38,7 @@ const nodeAtCursor = (state) => {
 let posAtFormEnd = 0
 
 const topLevelNode = (state) => {
-    const pos =  mainSelection(state).from
+    const pos = mainSelection(state).from
     const p = parents(nearestTouching(state, pos), [])
     if (p.length === 0) {
         return nodeAtCursor(state)
@@ -49,71 +50,96 @@ const topLevelNode = (state) => {
 const cursorNodeString = (state) => rangeStr(state, nodeAtCursor(state))
 const topLevelString = (state) => rangeStr(state, topLevelNode(state))
 
-let evalResult = ""
-let codeBeforeEval = ""
-export let testCodeBeforeEval = ""
-let posBeforeEval = 0
-let testPosBeforeEval = 0
+var evalResult = ""
+var codeBeforeEval = ""
+export var testCodeBeforeEval = ""
+var posBeforeEval = 0
+var testPosBeforeEval = 0
 
-const updateEditor = (view, text, pos) => {
-    const parent = view.dom.parentElement.id
-  //  console.log(view.dom.parentElement.id)
-    const doc = view.state.doc.toString()
+export const updateEditor = (view, text, pos) => {
+    var parent = view.dom.parentElement.id
+    var doc = view.state.doc.toString()
+    const end = doc.length
+    if (parent === 'app') {
+        codeBeforeEval = doc
+        posBeforeEval = view.state.selection.main.head
+        view.dispatch({
+            changes: { from: 0, to: end, insert: text },
+            selection: { anchor: pos, head: pos }
+        })
+    }    
     if (parent === 'test') {
         testCodeBeforeEval = doc
-        testPosBeforeEval = pos
+        testPosBeforeEval = view.state.selection.main.head
+        view.dispatch({
+            changes: { from: 0, to: end, insert: text },
+            selection: { anchor: pos, head: pos }
+        })
     }
-    codeBeforeEval = doc
-    const end = doc.length
-    view.dispatch({
-        changes: {from: 0, to: end, insert: text},
-        selection: {anchor: testPosBeforeEval, head: testPosBeforeEval}
-    })
 }
 
 export function tryEval(s) {
-   // console.log("Trying to eval", s)
+    //console.log("Trying to eval", s)
     try {
-        return evalString(s)
-      } catch (err) {
+        //console.log("evalPretty:", evalPretty(s))
+        return repp(s)
+    } catch (err) {
         console.log(err)
         return "\nError: " + err.message
-      }
+    }
 }
 
 export const clearEval = (view) => {
-    //posBeforeEval = view.state.selection.main.head
-    testPosBeforeEval = view.state.selection.main.head
-    //console.log("Clearing previous evaluation result")
     const parent = view.dom.parentElement.id
-    let previousDoc = codeBeforeEval
-    let previousPos = posBeforeEval
-    if (parent === 'test') {
-        previousDoc = testCodeBeforeEval
-        previousPos = testPosBeforeEval
+    if (parent === 'app') {
+        posBeforeEval = view.state.selection.main.head
+        var previousDoc = codeBeforeEval
+        var previousPos = posBeforeEval
+        if (evalResult.length != 0) {
+            evalResult = ""
+            updateEditor(view, previousDoc, previousPos)
+        }
     }
-    if (evalResult.length != 0) {
-        evalResult = ""
-        updateEditor(view, previousDoc, previousPos)
+    if (parent === 'test') {
+        testPosBeforeEval = view.state.selection.main.head
+        var previousTestDoc = testCodeBeforeEval
+        var previousTestPos = testPosBeforeEval
+        if (evalResult.length != 0) {
+            evalResult = ""
+            updateEditor(view, previousTestDoc, previousTestPos)
+        }
     }
 }
 
 export const evalAtCursor = (view) => {
+    var parent = view.dom.parentElement.id
     clearEval(view)
-    const doc = view.state.doc.toString()
+    var doc = view.state.doc.toString()
     //console.log("doc:", doc)
-    codeBeforeEval = doc
-    posBeforeEval = view.state.selection.main.head
-    testPosBeforeEval = view.state.selection.main.head
-    //console.log("posBeforeEval set to", posBeforeEval)
-    const codeBeforeCursor = codeBeforeEval.slice(0, posBeforeEval)
-    const codeAfterCursor = codeBeforeEval.slice(posBeforeEval, codeBeforeEval.length)
-    evalResult = tryEval(cursorNodeString(view.state))
-    const codeWithResult = codeBeforeCursor + " => " + evalResult + " " + codeAfterCursor
-    updateEditor(view, codeWithResult, posBeforeEval)
-    view.dispatch({selection: {anchor: posBeforeEval, head: posBeforeEval}})
-
-    return true
+    if (parent === 'app') {
+        codeBeforeEval = doc
+        posBeforeEval = view.state.selection.main.head
+        var codeBeforeCursor = codeBeforeEval.slice(0, posBeforeEval)
+        var codeAfterCursor = codeBeforeEval.slice(posBeforeEval, codeBeforeEval.length)
+        evalResult = tryEval(cursorNodeString(view.state))
+        var codeWithResult = codeBeforeCursor + " =>" + "\n" + out_buffer + evalResult + " " + codeAfterCursor
+        updateEditor(view, codeWithResult, posBeforeEval)
+        view.dispatch({ selection: { anchor: posBeforeEval, head: posBeforeEval } })
+        clearBuffer()
+        return true
+    }
+    if (parent === 'test') {
+        testCodeBeforeEval = doc
+        testPosBeforeEval = view.state.selection.main.head
+        var codeBeforeCursor = codeBeforeEval.slice(0, posBeforeEval)
+        var codeAfterCursor = codeBeforeEval.slice(posBeforeEval, codeBeforeEval.length)
+        evalResult = tryEval(cursorNodeString(view.state))
+        var codeWithResult = codeBeforeCursor + " =>" + "\n" + out_buffer + evalResult + " " + codeAfterCursor
+        updateEditor(view, codeWithResult, posBeforeEval)
+        view.dispatch({ selection: { anchor: posBeforeEval, head: posBeforeEval } })
+        clearBuffer()
+        return true
+    }
 }
 
 export const evalTopLevel = (view) => {
@@ -122,12 +148,15 @@ export const evalTopLevel = (view) => {
     const doc = view.state.doc.toString()
     //console.log("doc:", doc)
     posBeforeEval = view.state.selection.main.head
+    //console.log("set posBeforeEval to", posBeforeEval)
     codeBeforeEval = doc
     const codeBeforeFormEnd = codeBeforeEval.slice(0, posAtFormEnd)
     const codeAfterFormEnd = codeBeforeEval.slice(posAtFormEnd, codeBeforeEval.length)
     evalResult = tryEval(topLevelString(view.state))
-    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + evalResult + " " + codeAfterFormEnd
+    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + out_buffer + evalResult + " " + codeAfterFormEnd
+    //console.log("setting cursor position to", posBeforeEval)
     updateEditor(view, codeWithResult, posBeforeEval)
+    clearBuffer()
     return true
 }
 
@@ -137,8 +166,9 @@ export const evalCell = (view) => {
     //console.log("doc:", doc)
     posBeforeEval = view.state.selection.main.head
     evalResult = tryEval("(do " + view.state.doc.text.join(" ") + ")")
-    const codeWithResult = doc + "\n" + "=> " + evalResult
+    const codeWithResult = doc + "\n" + "=> " + "\n" + out_buffer + evalResult
     updateEditor(view, codeWithResult, posBeforeEval)
+    clearBuffer()
     return true
 }
 
@@ -146,54 +176,54 @@ const alpha = Array.from(Array(58)).map((e, i) => i + 65);
 const alphabet = alpha.map((x) => String.fromCharCode(x));
 let letterKeys = []
 for (let i = 0; i < alphabet.length; i++) {
-    letterKeys = letterKeys.concat({key: alphabet[i], run: clearEval})
+    letterKeys = letterKeys.concat({ key: alphabet[i], run: clearEval })
 }
 
-export const evalExtension = 
-     Prec.highest(keymap.of(
-        [{key: "Alt-Enter", run: evalCell},
-         {key: "Mod-Enter", run: evalAtCursor},
-         {key: "Shift-Enter", run: evalTopLevel},
-         {key: "Escape", run: clearEval},
-         {key: "ArrowLeft", run: clearEval},
-         {key: "ArrowRight", run: clearEval},
-         {key: "ArrowUp", run: clearEval},
-         {key: "ArrowDown", run: clearEval},
-         {key: "Backspace", run: clearEval},
-         {key: "Enter", run: clearEval},
-         {key: "Tab", run: clearEval},
-         {key: "Delete", run: clearEval},
-         {key: "0", run: clearEval},
-         {key: "1", run: clearEval},
-         {key: "2", run: clearEval},
-         {key: "3", run: clearEval},
-         {key: "4", run: clearEval},
-         {key: "5", run: clearEval},
-         {key: "6", run: clearEval},
-         {key: "7", run: clearEval},
-         {key: "8", run: clearEval},
-         {key: "9", run: clearEval},
-         {key: "!", run: clearEval},
-         {key: "@", run: clearEval},
-         {key: "#", run: clearEval},
-         {key: "$", run: clearEval},
-         {key: "%", run: clearEval},
-         {key: "^", run: clearEval},
-         {key: "&", run: clearEval},
-         {key: "*", run: clearEval},
-         {key: "-", run: clearEval},
-         {key: "=", run: clearEval},
-         {key: "+", run: clearEval},
-         {key: "/", run: clearEval},
-         {key: "`", run: clearEval},
-         {key: "\"", run: clearEval},
-         {key: "'", run: clearEval},
-         {key: ";", run: clearEval},
-         {key: ":", run: clearEval},
-         {key: "[", run: clearEval},
-         {key: "]", run: clearEval},
-         {key: "{", run: clearEval},
-         {key: "}", run: clearEval},
-         {key: "(", run: clearEval},
-         {key: ")", run: clearEval},
-         {key: "Space", run: clearEval}].concat(letterKeys)))
+export const evalExtension =
+    Prec.highest(keymap.of(
+        [{ key: "Alt-Enter", run: evalCell },
+        { key: "Mod-Enter", run: evalAtCursor },
+        { key: "Shift-Enter", run: evalTopLevel },
+        { key: "Escape", run: clearEval },
+        { key: "ArrowLeft", run: clearEval },
+        { key: "ArrowRight", run: clearEval },
+        { key: "ArrowUp", run: clearEval },
+        { key: "ArrowDown", run: clearEval },
+        { key: "Backspace", run: clearEval },
+        { key: "Enter", run: clearEval },
+        { key: "Tab", run: clearEval },
+        { key: "Delete", run: clearEval },
+        { key: "0", run: clearEval },
+        { key: "1", run: clearEval },
+        { key: "2", run: clearEval },
+        { key: "3", run: clearEval },
+        { key: "4", run: clearEval },
+        { key: "5", run: clearEval },
+        { key: "6", run: clearEval },
+        { key: "7", run: clearEval },
+        { key: "8", run: clearEval },
+        { key: "9", run: clearEval },
+        { key: "!", run: clearEval },
+        { key: "@", run: clearEval },
+        { key: "#", run: clearEval },
+        { key: "$", run: clearEval },
+        { key: "%", run: clearEval },
+        { key: "^", run: clearEval },
+        { key: "&", run: clearEval },
+        { key: "*", run: clearEval },
+        { key: "-", run: clearEval },
+        { key: "=", run: clearEval },
+        { key: "+", run: clearEval },
+        { key: "/", run: clearEval },
+        { key: "`", run: clearEval },
+        { key: "\"", run: clearEval },
+        { key: "'", run: clearEval },
+        { key: ";", run: clearEval },
+        { key: ":", run: clearEval },
+        { key: "[", run: clearEval },
+        { key: "]", run: clearEval },
+        { key: "{", run: clearEval },
+        { key: "}", run: clearEval },
+        { key: "(", run: clearEval },
+        { key: ")", run: clearEval },
+        { key: "Space", run: clearEval }].concat(letterKeys)))
