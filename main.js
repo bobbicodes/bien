@@ -167,7 +167,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("two_fer")
+testSolution("roman")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
 //testExercises()

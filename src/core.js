@@ -434,7 +434,10 @@ function int(x) {
 }
 
 function double(x) {
-    return x.valueOf()
+    if (types._ratio_Q(x)) {
+        return x.n / x.d
+    }
+    return x
 }
 
 function char(int) {
