@@ -53,7 +53,7 @@ function str() {
 
 function prn() {
     _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
-        appendBuffer(exp)
+        appendBuffer(exp + "\n")
         return _pr_str(exp, true);
     }));
 }
