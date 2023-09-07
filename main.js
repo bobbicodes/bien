@@ -165,8 +165,8 @@ function testExercisesUntilFail() {
   console.log("Fails:", fails)
 }
 
-testSolution(randExercise())
+//testSolution(randExercise())
 //testSolution("meetup")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

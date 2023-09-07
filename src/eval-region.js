@@ -92,16 +92,15 @@ export function tryEval(s) {
 export const clearEval = (view) => {
     const parent = view.dom.parentElement.id
     if (parent === 'app') {
-        posBeforeEval = view.state.selection.main.head
         var previousDoc = codeBeforeEval
         var previousPos = posBeforeEval
         if (evalResult.length != 0) {
             evalResult = ""
+            console.log("moving cursor to previous pos:", previousPos)
             updateEditor(view, previousDoc, previousPos)
         }
     }
     if (parent === 'test') {
-        testPosBeforeEval = view.state.selection.main.head
         var previousTestDoc = testCodeBeforeEval
         var previousTestPos = testPosBeforeEval
         if (evalResult.length != 0) {
