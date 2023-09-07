@@ -177,7 +177,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("run_length_encoding")
+testSolution("say")
 //loadExercise("all_your_base")
 //testExercisesUntilFail()
 //testExercises()

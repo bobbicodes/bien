@@ -637,6 +637,9 @@ function drop(n, coll) {
     if (coll === null) {
         return []
     }
+    if (empty_Q(coll)) {
+        return []
+    }
     return seq(coll).slice(n)
 }
 
