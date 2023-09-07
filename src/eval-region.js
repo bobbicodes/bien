@@ -1,7 +1,7 @@
 import {Prec} from '@codemirror/state'
 import {keymap} from '@codemirror/view'
 import {syntaxTree} from "@codemirror/language"
-import {evalString} from "./interpreter"
+import {repp} from "./interpreter"
 
 const up = (node) => node.parent;
 const isTopType = (nodeType) => nodeType.isTop
@@ -72,9 +72,10 @@ const updateEditor = (view, text, pos) => {
 }
 
 export function tryEval(s) {
-   // console.log("Trying to eval", s)
+   //console.log("Trying to eval", s)
     try {
-        return evalString(s)
+        //console.log("evalPretty:", evalPretty(s))
+        return repp(s)
       } catch (err) {
         console.log(err)
         return "\nError: " + err.message
@@ -109,7 +110,7 @@ export const evalAtCursor = (view) => {
     const codeBeforeCursor = codeBeforeEval.slice(0, posBeforeEval)
     const codeAfterCursor = codeBeforeEval.slice(posBeforeEval, codeBeforeEval.length)
     evalResult = tryEval(cursorNodeString(view.state))
-    const codeWithResult = codeBeforeCursor + " => " + evalResult + " " + codeAfterCursor
+    const codeWithResult = codeBeforeCursor + " =>"+ "\n" + evalResult + " " + codeAfterCursor
     updateEditor(view, codeWithResult, posBeforeEval)
     view.dispatch({selection: {anchor: posBeforeEval, head: posBeforeEval}})
 
@@ -126,7 +127,7 @@ export const evalTopLevel = (view) => {
     const codeBeforeFormEnd = codeBeforeEval.slice(0, posAtFormEnd)
     const codeAfterFormEnd = codeBeforeEval.slice(posAtFormEnd, codeBeforeEval.length)
     evalResult = tryEval(topLevelString(view.state))
-    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + evalResult + " " + codeAfterFormEnd
+    const codeWithResult = codeBeforeFormEnd + "\n" + "=> " + "\n" + evalResult + " " + codeAfterFormEnd
     updateEditor(view, codeWithResult, posBeforeEval)
     return true
 }
@@ -137,7 +138,7 @@ export const evalCell = (view) => {
     //console.log("doc:", doc)
     posBeforeEval = view.state.selection.main.head
     evalResult = tryEval("(do " + view.state.doc.text.join(" ") + ")")
-    const codeWithResult = doc + "\n" + "=> " + evalResult
+    const codeWithResult = doc + "\n" + "=> "+ "\n" + evalResult
     updateEditor(view, codeWithResult, posBeforeEval)
     return true
 }

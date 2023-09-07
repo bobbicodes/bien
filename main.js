@@ -7,11 +7,8 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `((fn ([[exponent bit]]
-       (if (= "1" bit)
-         (Math/pow 2 exponent)
-         0)))
- [0 "1"])`,
+  doc: `[1 2 
+    3]`,
   extensions: [basicSetup, clojure()]
 })
 
