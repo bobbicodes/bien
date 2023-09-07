@@ -51,11 +51,12 @@ function str() {
     }).join("");
 }
 
-function prn() {
-    _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
-        appendBuffer(exp + "\n")
-        return _pr_str(exp, true);
-    }));
+function prn(s) {
+    if (arguments.length > 1) {
+        appendBuffer(Array.from(arguments).join(' ') + "\n")
+    } else {
+        appendBuffer(s + "\n")
+    }
 }
 
 function println() {
