@@ -7,7 +7,18 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(+ (do (print "hi") (+ 1 1)) 1)`,
+  doc: `(loop [xs (seq [1 2 3 4 5])
+       result []]
+  (if xs
+    (let [x (first xs)]
+      (recur (next xs) (conj result (* x x))))
+    result))
+
+(loop [[x & r :as xs] (seq [1 2 3 4 5])
+       result []]
+  (if xs
+    (recur r (conj result (* x x)))
+    result))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -168,5 +179,5 @@ function testExercisesUntilFail() {
 //testSolution(randExercise())
 //testSolution("meetup")
 //loadExercise("all_your_base")
-testExercisesUntilFail()
-//testExercises()
+//testExercisesUntilFail()
+testExercises()

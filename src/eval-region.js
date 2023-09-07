@@ -1,7 +1,7 @@
 import { Prec } from '@codemirror/state'
 import { keymap } from '@codemirror/view'
 import { syntaxTree } from "@codemirror/language"
-import { repp } from "./interpreter"
+import { evalString, repp } from "./interpreter"
 import { out_buffer, appendBuffer, clearBuffer } from './core'
 
 const up = (node) => node.parent;
@@ -83,6 +83,7 @@ export function tryEval(s) {
     //console.log("Trying to eval", s)
     try {
         //console.log("evalPretty:", evalPretty(s))
+        //return evalString(s)
         return repp(s)
     } catch (err) {
         console.log(err)
@@ -97,7 +98,6 @@ export const clearEval = (view) => {
         var previousPos = posBeforeEval
         if (evalResult.length != 0) {
             evalResult = ""
-            console.log("moving cursor to previous pos:", previousPos)
             updateEditor(view, previousDoc, previousPos)
         }
     }

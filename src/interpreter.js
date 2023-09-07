@@ -148,7 +148,7 @@ function _EVAL(ast, env) {
                 ast = a2;
                 env = let_env;
                 break;
-            case "loop":
+            case "loop*":
                 var loop_body = [types._symbol('do')].concat(ast.slice(2))
                 var loop_env = new Env(env);
                 var loopLocals = []

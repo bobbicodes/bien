@@ -251,7 +251,7 @@ export function postwalk(f, form) {
 function hasLoop(ast) {
     let loops = []
     postwalk(x => {
-        if (x.value == _symbol("loop")) {
+        if (x.value == _symbol("loop") || x.value == _symbol("loop*")) {
             loops.push(true)
             return true
         } else {

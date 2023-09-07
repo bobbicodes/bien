@@ -41,32 +41,35 @@
 (def map
   (fn* 
    ([f coll]
-    (loop [s (seq coll) res []]
+    (loop* [s (seq coll) res []]
       (if (empty? s) (apply list res)
           (recur (rest s)
                  (conj res (if (keyword? f) (get (first s) f) (f (first s))))))))
    ([f c1 c2]
-    (loop [s1 (seq c1) s2 (seq c2) res []]
+    (loop* [s1 (seq c1) s2 (seq c2) res []]
       (if (or (empty? s1) (empty? s2)) (apply list res)
           (recur (rest s1) (rest s2)
                  (conj res (f (first s1) (first s2)))))))
    ([f c1 c2 c3]
-    (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
+    (loop* [s1 (seq c1) s2 (seq c2) s3 (seq c3) res []]
       (if (or (empty? s1) (empty? s2) (empty? s3)) (apply list res)
           (recur (rest s1) (rest s2) (rest s3)
                  (conj res (f (first s1) (first s2) (first s3)))))))
    ([f c1 c2 c3 c4]
-    (loop [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
+    (loop* [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
       (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) (apply list res)
           (recur (rest s1) (rest s2) (rest s3) (rest s4)
                  (conj res (f (first s1) (first s2) (first s3) (first s4)))))))))
 
 (def seq? (fn* [x] (list? x)))
 
-;; first define let, fn without destructuring
+;; first define let, loop, fn without destructuring
 
 (defmacro let [bindings & body]
   `(let* ~bindings ~@body))
+
+(defmacro loop [& decl]
+   (cons 'loop* decl))
 
 (defmacro fn [& sigs]
   (let [name (if (symbol? (first sigs)) (first sigs) nil)
@@ -138,7 +141,7 @@
      (reduce f (f init (first xs)) (rest xs)))))
 
 (defn reductions [f init xs]
-  (loop [s xs acc init res [init]]
+  (loop* [s xs acc init res [init]]
     (if (empty? s)
       res
       (recur (rest s)
@@ -175,7 +178,7 @@
       (reduce merge2 maps))))
 
 (defn str/escape [s cmap]
-  (loop [index  0
+  (loop* [index  0
          buffer ""]
     (if (= (count s) index) buffer
         (recur (inc index) 
@@ -393,14 +396,14 @@
           (+ m div))))
 
 (defn take-while [pred coll]
-  (loop [s (seq coll) res []]
+  (loop* [s (seq coll) res []]
     (if (empty? s) res
         (if (pred (first s))
           (recur (rest s) (conj res (first s)))
           res))))
 
 (defn drop-while [pred coll]
-  (loop [s   (seq coll)]
+  (loop* [s   (seq coll)]
     (if (empty? s) s
         (if (and s (pred (first s)))
           (recur (rest s))
@@ -410,12 +413,12 @@
   ([n coll]
    (partition n n coll))
   ([n step coll]
-     (loop [s coll p []]
+     (loop* [s coll p []]
        (if (= 0 (count s))
          (filter #(= n (count %)) p)
          (recur (drop step s) (conj p (take n s))))))
   ([n step pad coll]
-     (loop [s coll p []]
+     (loop* [s coll p []]
            (if (= n (count (take n s)))
              (recur (drop step s) (conj p (take n s)))
              (conj p (concat (take n s) pad))))))
@@ -435,13 +438,13 @@
 (defn partition-all [n step coll]
   (if-not coll
     (partition-all n n step)
-    (loop [s coll p []]
+    (loop* [s coll p []]
       (if (= 0 (count s)) p
           (recur (drop step s)
                  (conj p (take n s)))))))
 
 (defn partition-by [f coll]
-  (loop [s (seq coll) res []]
+  (loop* [s (seq coll) res []]
     (if (= 0 (count s)) res
         (recur (drop (count (take-while (fn* [x] (= (f (first s)) (f x))) s)) s)
                (conj res (take-while (fn* [x] (= (f (first s)) (f x))) s))))))
@@ -487,7 +490,7 @@
          (= x (lower-case x)))))
 
 (defn zipmap [keys vals]
-  (loop [map {}
+  (loop* [map {}
          ks (seq keys)
          vs (seq vals)]
     (if-not (and ks vs) map
@@ -512,7 +515,7 @@
     (map (fn* [x _] x) coll (drop n coll))))
 
 (defn interleave [c1 c2]
-  (loop [s1  (seq c1)
+  (loop* [s1  (seq c1)
          s2  (seq c2)
          res []]
     (if (or (empty? s1) (empty? s2))
@@ -561,7 +564,7 @@
   (reduce (fn* [ret kv] (f ret (first kv) (last kv))) init coll))
 
 (defn merge [& maps]
-  (loop [maps (mapcat seq maps) res {}]
+  (loop* [maps (mapcat seq maps) res {}]
     (if-not (some identity maps) res
             (recur (rest maps) (conj res (first maps))))))
 
@@ -599,7 +602,7 @@
       true
       (not (= x y)))
     (if (not= x y)
-      (loop [s (set [x y]) xs more]
+      (loop* [s (set [x y]) xs more]
         (if xs
           (if (contains? s (first xs))
             false
@@ -657,11 +660,11 @@
                    :else `(cons ~body-expr (~giter (rest ~gxs)))))]
     (if (next bindings)
       `(defn ~giter [~gxs]
-         (loop [~gxs ~gxs]
+         (loop* [~gxs ~gxs]
            (when-first [~(ffirst bindings) ~gxs]
              ~(do-mod (subvec (first bindings) 2)))))
       `(defn ~giter [~gxs]
-         (loop [~gxs ~gxs]
+         (loop* [~gxs ~gxs]
            (when-let [~gxs (seq ~gxs)]
              (let [~(ffirst bindings) (first ~gxs)]
                ~(do-mod (subvec (first bindings) 2)))))))))
@@ -686,7 +689,7 @@
   (last e))
 
 (defn butlast [s]
-  (loop [ret []
+  (loop* [ret []
          s   s]
     (if (next s)
       (recur (conj ret (first s)) (next s))
@@ -699,6 +702,11 @@
 
 (defn str/includes? [s substr]
   (js-eval (str "'" s "'" ".includes(" "'" substr "'" ")")))
+
+(defn take-nth [n coll]
+  (loop* [s coll res []]
+    (if (empty? s) res
+        (recur (drop n s) (conj res (first s))))))
 
 (defn namespace [x]
   (when (str/includes? x "/")
@@ -716,7 +724,7 @@
         gseq (gensym "seq__")
         gfirst (gensym "first__")
         has-rest (some #{'&} b)]
-        (loop [ret (let [ret (conj bvec gvec val)]
+        (loop* [ret (let [ret (conj bvec gvec val)]
                          (if has-rest
                            (conj ret gseq (list seq gvec))
                            ret))
@@ -750,7 +758,7 @@
 (defn pmap [bvec b v]
   (let* [gmap (gensym "map__")
          defaults (:or b)]
-        (loop [ret (-> bvec (conj gmap) (conj v)
+        (loop* [ret (-> bvec (conj gmap) (conj v)
                        (conj gmap) (conj gmap)
                        ((fn* [ret]
                           (if (:as b)
@@ -811,10 +819,27 @@
 (defmacro let [bindings & body]
   `(let* ~(destructure bindings) ~@body))
 
+#_(defmacro loop [bindings & body]
+  (let [db (destructure bindings)]
+    (if (= db bindings)
+      `(loop* ~bindings ~@body)
+      (let [vs (take-nth 2 (drop 1 bindings))
+            bs (take-nth 2 bindings)
+            gs (map (fn [b] (if (symbol? b) b (gensym))) bs)
+            bfs (reduce (fn [ret [b v g]]
+                           (if (symbol? b)
+                             (conj ret g v)
+                             (conj ret g v b g)))
+                         [] (map vector bs vs gs))]
+        `(let ~bfs
+           (loop* ~(vec (interleave gs gs))
+                  (let ~(vec (interleave bs gs))
+                    ~@body)))))))
+
 (defn maybe-destructured [params body]
   (if (every? symbol? params)
     (cons params body)
-    (loop [params params
+    (loop* [params params
            new-params (with-meta [] (meta params))
            lets []]
       (if params
