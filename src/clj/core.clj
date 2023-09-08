@@ -41,12 +41,12 @@
 
 (defmacro map+ [f colls]
   (let [n (range (count colls))
-        binding-keys (conj (mapv #(symbol (str "s" %)) n) 'res)
-        binding-vals (conj (mapv #(list 'seq (symbol (str "c" %))) n) [])
+        loop-keys (conj (mapv #(symbol (str "s" %)) n) 'res)
+        loop-vals (conj (mapv #(list 'seq (list 'nth colls %)) n) [])
         ors (cons 'or (map #(list 'empty? (symbol (str "s" %))) n))
         recur1 (cons 'recur (map #(list 'rest (symbol (str "s" %))) n))
         recur2 (list 'conj 'res (cons 'f (map #(list 'first (symbol (str "s" %))) n)))]
-    `(loop ~(vec (interleave binding-keys binding-vals))
+    `(loop ~(vec (interleave loop-keys loop-vals))
        (if ~ors (apply list res)
            ~(concat recur1 (list recur2))))))
 
@@ -68,7 +68,7 @@
           (recur (rest s1) (rest s2) (rest s3)
                  (conj res (f (first s1) (first s2) (first s3)))))))
    ([f c0 c1 c2 & colls]
-    (map+ f (list* c1 c2 c3 colls)))))
+    (map+ f (list* c0 c1 c2 colls)))))
 
 (def seq? (fn* [x] (list? x)))
 

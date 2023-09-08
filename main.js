@@ -11,28 +11,39 @@ let editorState = EditorState.create({
   [[1 2] [3 4] [5 6] [7 8] [9 0]])
 
 (def f str)
-(def c1 [1 2])
-(def c2 [3 4])
-(def c3 [5 6])
+(def c0 [1 2])
+(def c1 [3 4])
+(def c2 [5 6])
 (def colls [[7 8] [9 0]])
-(def cs (conj colls c3 c2 c1))
-
-;; loop variables
-(def ss (map seq cs))
-(def res [])
-
-(count (rest ss))
-
-(every? identity ss)
-(map first ss)
-(map rest ss)
-
-(loop [ss (seq cs) res []]
-  (if-not (every? identity ss) res
-    (recur (rest ss) (conj res (map first ss)))))
     
 (macroexpand
-  (map+ str [[1 2] [3 4] [5 6] [7 8] [9 0]]))`,
+  (map+ str [[1 2] [3 4] [5 6] [7 8] [9 0]]))
+
+(def colls mycolls)
+(def f str)
+(loop* [s0 (seq (nth colls 0)) s1 (seq (nth colls 1)) s2 (seq (nth colls 2)) s3 (seq (nth colls 3)) s4 (seq (nth colls 4)) res []] 
+       (if (or (empty? s0) (empty? s1) (empty? s2) (empty? s3) (empty? s4)) 
+         (apply list res) 
+         (recur (rest s0) (rest s1) (rest s2) (rest s3) (rest s4) 
+                (conj res (f (first s0) (first s1) (first s2) (first s3) (first s4))))))
+
+(list* c0 c1 c2 colls)
+
+(map+ f (list* c0 c1 c2 colls))
+
+(macroexpand
+  (map+ f (list* c0 c1 c2 colls)))
+
+(def f str)
+(def colls [[1 2] [3 4] [5 6] [7 8] [9 0]])
+
+(loop* [s0 (seq (nth colls 0)) s1 (seq (nth colls 1)) s2 (seq (nth colls 2)) s3 (seq (nth colls 3)) s4 (seq (nth colls 4)) res []] 
+  (if (or (empty? s0) (empty? s1) (empty? s2) (empty? s3) (empty? s4)) 
+    (apply list res)
+    (recur (rest s0) (rest s1) (rest s2) (rest s3) (rest s4)
+      (conj res (f (first s0) (first s1) (first s2) (first s3) (first s4))))))
+
+(map str [1 2] [3 4] [5 6] [7 8] [9 0])`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -194,4 +205,4 @@ function testExercisesUntilFail() {
 //testSolution("go_counting")
 //loadExercise("go_counting")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()
