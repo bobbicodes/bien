@@ -35,5 +35,8 @@
        :else         (pr-str obj)))
 
 (defn pprint [obj]
-  (if (empty? obj) (str obj)
-      (pp- obj 0)))
+  (if (nil? obj) "nil"
+      (do (console-print obj)
+          (console-print (nil? obj))
+          (cond (empty? obj) (str obj)
+                :else (pp- obj 0)))))

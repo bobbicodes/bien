@@ -66,6 +66,12 @@ function println() {
     }));
 }
 
+function consolePrint() {
+    _println.apply({}, Array.prototype.map.call(arguments, function (exp) {
+        return _pr_str(exp, false);
+    }));
+}
+
 function slurp(f) {
     if (typeof require !== 'undefined') {
         return require('fs').readFileSync(f, 'utf-8');
@@ -932,6 +938,7 @@ function map_indexed(f, coll) {
 // types.ns is namespace of type functions
 export var ns = {
     'env': printEnv,
+    'console-print': consolePrint,
     'print': _print,
     'Integer/parseInt': parseInt,
     'pr': _pr,

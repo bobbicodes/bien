@@ -326,3 +326,100 @@
   [year month (filter-keys year month day style)])
 
 (= [2013 3 4] (meetup 3 2013 :monday :first))
+
+(require '[clojure.set :as set])
+
+(def example
+  ["  B  "
+   " B B "
+   "B W B"
+   " W W "
+   "  W  "])
+
+(def grid example)
+
+(apply mapv vector grid)
+
+(mapv #(mapv {" " nil "B" :black "W" :white} %)
+      (apply mapv vector grid))
+
+(->> (apply mapv vector grid)
+     (mapv #(mapv {\space nil \B :black \W :white} %)))
+
+(first (apply mapv vector grid))
+
+(mapv {" " nil "B" :black "W" :white}
+      (first (apply mapv vector grid)))
+
+(defn grid->board [grid]
+  (->> (apply mapv vector grid)
+       (mapv #(mapv {" " nil "B" :black "W" :white} %))))
+
+(grid->board grid)
+
+(defn invalid? [board [x y]]
+  (or (neg? x)
+      (neg? y)
+      (>= x (count board))
+      (>= y (count (first board)))))
+
+(defn neighbors [board [x y]]
+  (->> [[x (dec y)] [x (inc y)] [(inc x) y] [(dec x) y]]
+       (remove (partial invalid? board))))
+
+
+
+(def board (grid->board grid))
+(def point [0 1])
+(def points #{point})
+
+(neighbors board [0 1])
+
+(mapcat #(neighbors board %) points)
+
+(get-in board [0 0])
+
+(filter #(nil? (get-in board %))
+        (mapcat (partial neighbors board) points))
+
+(->> (mapcat (partial neighbors board) points)
+     (filter #(nil? (get-in board %)))
+     set
+     (set/union points))
+
+(defn point->territory [board point]
+  (loop [points #{point}]
+    (let [new-points (->> (mapcat (partial neighbors board) points)
+                          (filter #(nil? (get-in board %)))
+                          set
+                          (set/union points))]
+      (cond
+        (get-in board point)  #{}
+        (= points new-points) points
+        :else                 (recur new-points)))))
+
+(point->territory (grid->board grid) [0 1])
+
+(defn territory [grid [x y]]
+  (let [board (grid->board grid)
+        t     (point->territory board [x y])]
+    {:stones t
+     :owner  (->> t
+                  (mapcat (partial neighbors board))
+                  (map (partial get-in board))
+                  (remove nil?)
+                  set
+                  (get {#{:black} :black #{:white} :white}))}))
+
+(territory example [0 1])
+
+(defn territories [grid]
+  (let [ts (->> (for [y (range (count grid))
+                      x (range (count (first grid)))]
+                  [x y])
+                (mapv (partial territory grid))
+                (map (fn [m] {(:owner m) (:stones m)}))
+                (apply (partial merge-with set/union)))]
+    {:black-territory (get ts :black #{})
+     :white-territory (get ts :white #{})
+     :null-territory  (get ts nil)}))
