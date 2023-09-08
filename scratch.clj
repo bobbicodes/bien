@@ -329,33 +329,20 @@
 
 (require '[clojure.set :as set])
 
-(def example
+(def grid
   ["  B  "
    " B B "
    "B W B"
    " W W "
    "  W  "])
 
-(def grid example)
-
 (apply mapv vector grid)
-
-(mapv #(mapv {" " nil "B" :black "W" :white} %)
-      (apply mapv vector grid))
-
-(->> (apply mapv vector grid)
-     (mapv #(mapv {\space nil \B :black \W :white} %)))
-
-(first (apply mapv vector grid))
-
-(mapv {" " nil "B" :black "W" :white}
-      (first (apply mapv vector grid)))
 
 (defn grid->board [grid]
   (->> (apply mapv vector grid)
-       (mapv #(mapv {" " nil "B" :black "W" :white} %))))
+       (mapv #(mapv {\space nil \B :black \W :white} %))))
 
-(grid->board grid)
+(count (grid->board grid))
 
 (defn invalid? [board [x y]]
   (or (neg? x)
@@ -373,19 +360,31 @@
 (def point [0 1])
 (def points #{point})
 
-(neighbors board [0 1])
-
-(mapcat #(neighbors board %) points)
-
-(get-in board [0 0])
-
-(filter #(nil? (get-in board %))
-        (mapcat (partial neighbors board) points))
+;; loop local
+(def points
+  #{[0 1] [0 0]})
 
 (->> (mapcat (partial neighbors board) points)
      (filter #(nil? (get-in board %)))
      set
      (set/union points))
+
+(loop [points #{point}]
+  (let [new-points (->> (mapcat (partial neighbors board) points)
+                        (filter #(nil? (get-in board %)))
+                        set
+                        (set/union points))]
+    (cond
+      (get-in board point)  #{}
+      (= points new-points) points
+      :else                 (recur new-points))))
+
+
+(def new-points
+  (->> (mapcat (partial neighbors board) points)
+       (filter #(nil? (get-in board %)))
+       set
+       (set/union points)))
 
 (defn point->territory [board point]
   (loop [points #{point}]
@@ -423,3 +422,15 @@
     {:black-territory (get ts :black #{})
      :white-territory (get ts :white #{})
      :null-territory  (get ts nil)}))
+
+(def mycolls
+  [[1 2] [3 4] [5 6] [7 8] [9 0]])
+
+(def f str)
+(def c1 [1 2])
+(def c2 [3 4])
+(def c3 [5 6])
+(def colls [[7 8] [9 0]])
+(def cs (conj colls c3 c2 c1))
+
+cs
