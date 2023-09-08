@@ -83,7 +83,6 @@ export function _lazy_seq_Q(x) {
 
 export function _sequential_Q(lst) { return _list_Q(lst) || _vector_Q(lst); }
 
-
 export function _equal_Q(a, b) {
     //console.log("comparing", a, "and", b)
     var ota = _obj_type(a), otb = _obj_type(b);
@@ -92,9 +91,18 @@ export function _equal_Q(a, b) {
     }
     switch (ota) {
         case 'symbol': return a.value === b.value;
+        case 'set':
+            return a.size === b.size && [...a].every((x) => {
+                for (const item of b) {
+                    if (_equal_Q(item, x)) {
+                        return true
+                    }
+                }
+                return false
+            });
         case 'list':
         case 'vector':
-        case 'set':
+            //case 'set':
             //console.log("comparing", a, "and", b)
             if (a.length !== b.length) { return false; }
             for (var i = 0; i < a.length; i++) {

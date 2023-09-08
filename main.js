@@ -7,18 +7,32 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(loop [xs (seq [1 2 3 4 5])
-       result []]
-  (if xs
-    (let [x (first xs)]
-      (recur (next xs) (conj result (* x x))))
-    result))
+  doc: `(def mycolls
+  [[1 2] [3 4] [5 6] [7 8] [9 0]])
 
-(loop [[x & r :as xs] (seq [1 2 3 4 5])
-       result []]
-  (if xs
-    (recur r (conj result (* x x)))
-    result))`,
+(def f str)
+(def c1 [1 2])
+(def c2 [3 4])
+(def c3 [5 6])
+(def colls [[7 8] [9 0]])
+(def cs (conj colls c3 c2 c1))
+
+;; loop variables
+(def ss (map seq cs))
+(def res [])
+
+(count (rest ss))
+
+(every? identity ss)
+(map first ss)
+(map rest ss)
+
+(loop [ss (seq cs) res []]
+  (if-not (every? identity ss) res
+    (recur (rest ss) (conj res (map first ss)))))
+    
+(macroexpand
+  (map+ str [[1 2] [3 4] [5 6] [7 8] [9 0]]))`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -177,7 +191,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("go_counting")
-//loadExercise("all_your_base")
+//testSolution("go_counting")
+//loadExercise("go_counting")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()

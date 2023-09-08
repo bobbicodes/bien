@@ -24,19 +24,31 @@
             ([a b c d & more]
              (cons a (cons b (cons c (cons d (spread more))))))))
 
-(def apply (fn*
-            ([f args]
-             (if (keyword? f)
-               (get args f)
-               (apply* f args)))
-            ([f x args]
-             (apply f (list* x args)))
-            ([f x y args]
-             (apply f (list* x y args)))
-            ([f x y z args]
-             (apply f (list* x y z args)))
-            ([f a b c d & args]
-             (apply f (cons a (cons b (cons c (cons d (spread args)))))))))
+(def apply 
+  (fn*
+   ([f args]
+    (if (keyword? f)
+      (get args f)
+      (apply* f args)))
+   ([f x args]
+    (apply f (list* x args)))
+   ([f x y args]
+    (apply f (list* x y args)))
+   ([f x y z args]
+    (apply f (list* x y z args)))
+   ([f a b c d & args]
+    (apply f (cons a (cons b (cons c (cons d (spread args)))))))))
+
+(defmacro map+ [f colls]
+  (let [n (range (count colls))
+        binding-keys (conj (mapv #(symbol (str "s" %)) n) 'res)
+        binding-vals (conj (mapv #(list 'seq (symbol (str "c" %))) n) [])
+        ors (cons 'or (map #(list 'empty? (symbol (str "s" %))) n))
+        recur1 (cons 'recur (map #(list 'rest (symbol (str "s" %))) n))
+        recur2 (list 'conj 'res (cons 'f (map #(list 'first (symbol (str "s" %))) n)))]
+    `(loop ~(vec (interleave binding-keys binding-vals))
+       (if ~ors (apply list res)
+           ~(concat recur1 (list recur2))))))
 
 (def map
   (fn* 
@@ -55,11 +67,8 @@
       (if (or (empty? s1) (empty? s2) (empty? s3)) (apply list res)
           (recur (rest s1) (rest s2) (rest s3)
                  (conj res (f (first s1) (first s2) (first s3)))))))
-   ([f c1 c2 c3 c4]
-    (loop* [s1 (seq c1) s2 (seq c2) s3 (seq c3) s4 (seq c4) res []]
-      (if (or (empty? s1) (empty? s2) (empty? s3) (empty? s4)) (apply list res)
-          (recur (rest s1) (rest s2) (rest s3) (rest s4)
-                 (conj res (f (first s1) (first s2) (first s3) (first s4)))))))))
+   ([f c0 c1 c2 & colls]
+    (map+ f (list* c1 c2 c3 colls)))))
 
 (def seq? (fn* [x] (list? x)))
 
@@ -506,8 +515,15 @@
     (map? coll) {}
     (string? coll) ""))
 
-(defn mapv [f & colls]
-  (vec (map f (spread colls))))
+(defn mapv
+  ([f coll]
+   (-> (reduce (fn [v o] (conj v (f o))) [] coll)))
+  ([f c1 c2]
+   (into [] (map f c1 c2)))
+  ([f c1 c2 c3]
+   (into [] (map f c1 c2 c3)))
+  ([f c1 c2 c3 & colls]
+   (into [] (apply map f c1 c2 c3 colls))))
 
 (defn drop-last [n coll]
   (if-not coll
