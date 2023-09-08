@@ -636,6 +636,8 @@
 (defn get-in [m ks]
   (reduce #(get % %2) m ks))
 
+(defn some? [x] (not (nil? x)))
+
 (defn update
   ([m k f]
    (assoc m k (f (get m k))))
