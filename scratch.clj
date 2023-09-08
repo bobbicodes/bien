@@ -336,13 +336,23 @@
    " W W "
    "  W  "])
 
-(apply mapv vector grid)
-
 (defn grid->board [grid]
   (->> (apply mapv vector grid)
-       (mapv #(mapv {\space nil \B :black \W :white} %))))
+       (mapv #(mapv {" " nil "B" :black "W" :white} %))))
 
-(count (grid->board grid))
+(def board (grid->board grid))
+(def point [0 1])
+(def points #{point})
+
+(loop [points #{point}]
+  (let [new-points (->> (mapcat (partial neighbors board) points)
+                        (filter #(nil? (get-in board %)))
+                        set
+                        (set/union points))]
+    (cond
+      (get-in board point)  #{}
+      (= points new-points) points
+      :else                 (recur new-points))))
 
 (defn invalid? [board [x y]]
   (or (neg? x)
@@ -360,14 +370,18 @@
 (def point [0 1])
 (def points #{point})
 
-;; loop local
-(def points
-  #{[0 1] [0 0]})
+(def new-points
+  (->> (mapcat (partial neighbors board) points)
+       (filter #(nil? (get-in board %)))
+       set
+       (set/union points)))
 
-(->> (mapcat (partial neighbors board) points)
-     (filter #(nil? (get-in board %)))
-     set
-     (set/union points))
+
+(set/union
+ (set
+  (filter #(nil? (get-in board %))
+          (mapcat (partial neighbors board) points)))
+ points)
 
 (loop [points #{point}]
   (let [new-points (->> (mapcat (partial neighbors board) points)

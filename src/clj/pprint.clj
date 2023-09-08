@@ -37,6 +37,5 @@
 (defn pprint [obj]
   (if (nil? obj) "nil"
       (do (console-print obj)
-          (console-print (nil? obj))
           (cond (empty? obj) (str obj)
                 :else (pp- obj 0)))))

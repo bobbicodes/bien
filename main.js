@@ -201,8 +201,8 @@ function testExercisesUntilFail() {
   console.log("Fails:", fails)
 }
 
-//testSolution(randExercise())
-//testSolution("go_counting")
+testSolution(randExercise())
+//testSolution("powerset")
 //loadExercise("go_counting")
 //testExercisesUntilFail()
 //testExercises()

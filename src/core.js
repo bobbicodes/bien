@@ -354,14 +354,22 @@ function js_method_call(object_method_str) {
     return js_to_mal(res);
 }
 
-function toSet() {
-    return new Set(arguments[0])
+function toSet(coll) {
+    var new_set = new Set()
+    for (const item of seq(coll)) {
+        if (!contains_Q(new_set, item)) {
+            new_set.add(item)
+        }
+    }
+    return new_set
 }
 
 function _union(setA, setB) {
     const _union = new Set(setA);
     for (const elem of setB) {
-        _union.add(elem);
+        if (!contains_Q(_union, elem)) {
+            _union.add(elem);
+        }
     }
     return _union;
 }
@@ -369,18 +377,28 @@ function _union(setA, setB) {
 function _intersection(setA, setB) {
     const _intersection = new Set();
     for (const elem of setB) {
-        if (setA.has(elem)) {
+        if (contains_Q(setA, (elem))) {
             _intersection.add(elem);
         }
     }
     return _intersection;
 }
 
+function setDelete(set, item) {
+    var new_set = new Set()
+    for (const i of set) {
+        if (!types._equal_Q(i, item)) {
+            new_set.add(i)
+        }
+    }
+    return new_set
+}
+
 function symmetricDifference(setA, setB) {
-    const _difference = new Set(setA);
+    var _difference = new Set(setA);
     for (const elem of setB) {
-        if (_difference.has(elem)) {
-            _difference.delete(elem);
+        if (contains_Q(_difference, elem)) {
+            _difference = setDelete(_difference, elem);
         } else {
             _difference.add(elem);
         }
@@ -389,9 +407,9 @@ function symmetricDifference(setA, setB) {
 }
 
 function _difference(setA, setB) {
-    const _difference = new Set(setA);
+    var _difference = new Set(setA);
     for (const elem of setB) {
-        _difference.delete(elem);
+        _difference = setDelete(_difference, elem);
     }
     return _difference;
 }
