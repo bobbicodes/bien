@@ -130,7 +130,7 @@ function get(coll, key, notfound) {
     }
 }
 
-function contains_Q(coll, key) {
+export function contains_Q(coll, key) {
     if (coll === null) {
         return false
     }

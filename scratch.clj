@@ -447,4 +447,11 @@
 (def colls [[7 8] [9 0]])
 (def cs (conj colls c3 c2 c1))
 
-cs
+(def c ["meat" "mat" "team" "mate" "eat"])
+
+(group-by frequencies c)
+
+{{\m 1, \e 1, \a 1, \t 1} 
+ ["meat" "team" "mate"], 
+ {\m 1, \a 1, \t 1} ["mat"], 
+ {\e 1, \a 1, \t 1} ["eat"]}

@@ -1,5 +1,6 @@
 import { Fraction } from 'fraction.js'
 import { PRINT, READ } from './interpreter.js'
+import {contains_Q} from './core.js'
 
 export function _obj_type(obj) {
     //console.log("[obj_type]", obj)
@@ -396,14 +397,24 @@ export function _assoc_BANG(hm) {
         }
         return hm
     }
-
+    var assoc_keys = new Set()
+    for (let i = 1; i < arguments.length; i += 2) {
+        assoc_keys.add(arguments[i])
+    }
+    var new_map = new Map()
+    for (const [key, value] of hm) {
+        if (!contains_Q(assoc_keys, key)) {
+            new_map.set(key, value)
+        }
+    }
     for (var i = 1; i < arguments.length; i += 2) {
         var ktoken = arguments[i],
             vtoken = arguments[i + 1];
-        hm.set(ktoken, vtoken)
+        new_map.set(ktoken, vtoken)
     }
-    return hm;
+    return new_map;
 }
+
 export function _dissoc_BANG(hm) {
     for (var i = 1; i < arguments.length; i++) {
         var ktoken = arguments[i];

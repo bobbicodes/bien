@@ -784,9 +784,7 @@
                                (let* [mkns (namespace mk)
                                       mkn (name mk)]
                                      (cond (= mkn "keys") (assoc transforms mk (fn* [k] (keyword (or mkns (namespace k)) (name k))))
-                                           (= mkn "syms") 
-                                           (do (println "syms")
-                                               (assoc transforms mk (fn* [k] (list `quote (symbol (or mkns (namespace k)) (name k))))))
+                                           (= mkn "syms") (assoc transforms mk (fn* [k] (list `quote (symbol (or mkns (namespace k)) (name k)))))
                                            (= mkn "strs") (assoc transforms mk str)
                                            :else transforms))
                                transforms))
