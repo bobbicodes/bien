@@ -608,6 +608,26 @@
             name
             (last forms))))
 
+(defmacro some-> [expr & forms]
+  (let [g (gensym)
+        steps (map (fn [step] `(if (nil? ~g) nil (-> ~g ~step)))
+                   forms)]
+    `(let [~g ~expr
+           ~@(interleave (repeat (count forms) g) (butlast steps))]
+       ~(if (empty? steps)
+          g
+          (last steps)))))
+
+(defmacro some->> [expr & forms]
+  (let [g (gensym)
+        steps (map (fn [step] `(if (nil? ~g) nil (->> ~g ~step)))
+                   forms)]
+    `(let [~g ~expr
+           ~@(interleave (repeat (count forms) g) (butlast steps))]
+       ~(if (empty? steps)
+          g
+          (last steps)))))
+
 (defn distinct? [x y & more]
   (if-not more
     (if-not y
