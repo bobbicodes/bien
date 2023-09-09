@@ -490,4 +490,46 @@
 
 (re-matches #"What is (.+)\?" expr)
 
-(partition-all 2 ["plus" "1"])
+(def letters
+  (map char
+       (range (int \A) (inc (int \z)))))
+
+letters
+
+(def to-cipher
+  (apply hash-map
+         (interleave letters (reverse letters))))
+
+(defn sanitize
+  [plaintext]
+  (str/replace (str/lower-case plaintext) #"\W" ""))
+
+(defn cipher
+  [plain-char]
+  (or (to-cipher plain-char) plain-char))
+
+(defn to-chunks
+  [character-list]
+  (map #(apply str %) (partition 5 5 character-list)))
+
+(defn encode
+  [plaintext]
+  (->> plaintext
+       sanitize
+       (map cipher)
+       to-chunks
+       (str/join " ")))
+
+(->> "no"
+     sanitize
+     (map cipher)
+     to-chunks
+     (str/join " "))
+
+(->> "no"
+     sanitize
+     (map cipher))
+
+(partition 5 5 '(\M \L))
+
+(encode "no")

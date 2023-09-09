@@ -888,6 +888,26 @@
       (list* 'fn* name new-sigs)
       (cons 'fn* new-sigs))))
 
+(defmacro cond-> [expr & clauses]
+  (let [g (gensym)
+        steps (map (fn [[test step]] `(if ~test (-> ~g ~step) ~g))
+                   (partition 2 clauses))]
+    `(let [~g ~expr
+           ~@(interleave (repeat (count clauses) g) (butlast steps))]
+       ~(if (empty? steps)
+          g
+          (last steps)))))
+
+(defmacro cond->> [expr & clauses]
+  (let [g (gensym)
+        steps (map (fn [[test step]] `(if ~test (->> ~g ~step) ~g))
+                   (partition 2 clauses))]
+    `(let [~g ~expr
+           ~@(interleave (repeat (count clauses) g) (butlast steps))]
+       ~(if (empty? steps)
+          g
+          (last steps)))))
+
 (defmacro condp [pred expr & clauses]
   (let [gpred (gensym "pred__")
         gexpr (gensym "expr__")

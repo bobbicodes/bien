@@ -170,7 +170,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("wordy")
+testSolution("allergies")
 //loadExercise("go_counting")
 //testExercisesUntilFail()
 //testExercises()
