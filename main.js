@@ -165,8 +165,8 @@ function testExercisesUntilFail() {
   console.log("Fails:", fails)
 }
 
-testSolution(randExercise())
-//testSolution("anagram")
+//testSolution(randExercise())
+testSolution("anagram")
 //loadExercise("go_counting")
 //testExercisesUntilFail()
 //testExercises()

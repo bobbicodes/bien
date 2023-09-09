@@ -455,3 +455,33 @@
  ["meat" "team" "mate"], 
  {\m 1, \a 1, \t 1} ["mat"], 
  {\e 1, \a 1, \t 1} ["eat"]}
+
+(macroexpand
+ '(for [x (range 3) y (range 3) :while (not= x y)] [x y]))
+
+;; expansions of call to `for` that fails, followed by one that works:
+
+(let* [G__2561 (defn iter__2562 [s__2563]
+                 (loop [s__2563 s__2563]
+                   (when-let [s__2563 (seq s__2563)]
+                     (let [[x y] (first s__2563)]
+                       (if (= y 0)
+                         (cons x (iter__2562 (rest s__2563)))
+                         (#function[do-mod] (rest s__2563)))))))]
+      (remove nil?
+              (G__2561 (quote ([:a 1] [:b 2] [:c 0])))))
+ 
+(let* [G__2849 (defn iter__2850 [s__2851]
+                  (loop [s__2851 s__2851]
+                    (when-first [x s__2851]
+                      (when (not= x 1)
+                        (let [iterys__2852 (defn iter__2868 [s__2869]
+                                             (loop [s__2869 s__2869]
+                                               (when-let [s__2869 (seq s__2869)]
+                                                 (let [y (first s__2869)]
+                                                   (cons [x y] (iter__2868 (rest s__2869)))))))
+                              fs__2853     (seq (iterys__2852 (range 3)))]
+                          (if fs__2853
+                            (concat fs__2853 (iter__2850 (rest s__2851)))
+                            (#function[do-mod] (rest s__2851))))))))]
+  (remove nil? (G__2849 (range 3))))

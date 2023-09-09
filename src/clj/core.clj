@@ -673,27 +673,28 @@
                    :else `(cons ~body-expr (~giter (rest ~gxs)))))]
     (if (next bindings)
       `(defn ~giter [~gxs]
-         (loop* [~gxs ~gxs]
+         (loop [~gxs ~gxs]
            (when-first [~(ffirst bindings) ~gxs]
              ~(do-mod (subvec (first bindings) 2)))))
       `(defn ~giter [~gxs]
-         (loop* [~gxs ~gxs]
+         (loop [~gxs ~gxs]
            (when-let [~gxs (seq ~gxs)]
              (let [~(ffirst bindings) (first ~gxs)]
                ~(do-mod (subvec (first bindings) 2)))))))))
 
 (defmacro for [seq-exprs body-expr]
   (let [body-expr* body-expr
-         iter# (gensym)
-         to-groups (fn* [seq-exprs]
-                     (reduce (fn* [groups kv]
-                               (if (keyword? (first kv))
-                                 (conj (pop groups) (conj (peek groups) [(first kv) (last kv)]))
-                                 (conj groups [(first kv) (last kv)])))
-                             [] (partition 2 seq-exprs)))]
-        `(let [~iter# ~(emit-for (to-groups seq-exprs) body-expr)]
-               (remove nil?
-                       (~iter# ~(second seq-exprs))))))
+        iter#      (gensym)
+        to-groups  (fn* [seq-exprs]
+                        (reduce (fn* [groups kv]
+                                     (if (keyword? (first kv))
+                                       (conj (pop groups) 
+                                             (conj (peek groups) [(first kv) (last kv)]))
+                                       (conj groups [(first kv) (last kv)])))
+                                [] (partition 2 seq-exprs)))]
+    `(let [~iter# ~(emit-for (to-groups seq-exprs) body-expr)]
+       (remove nil?
+               (~iter# ~(second seq-exprs))))))
 
 (defn key [e]
   (first e))

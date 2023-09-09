@@ -304,7 +304,7 @@ export function seq(obj) {
     else if (obj === null) {
         return null;
     } else {
-        throw new Error("seq: called on non-sequence");
+        throw new Error("seq: called on non-sequence: " + obj);
     }
 }
 
