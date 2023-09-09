@@ -519,6 +519,9 @@ function _pow(x, n) {
 }
 
 function sum() {
+    if (Array.from(arguments).length === 0) {
+        return 0
+    }
     var res = Array.from(arguments).reduce((acc, a) => acc + a, 0);
     if (Array.from(arguments).every(function (element) { return types._ratio_Q(element) })) {
         res = types._ratio(res)
@@ -747,6 +750,7 @@ function cycle(coll) {
 function mod(x, y) {
     return x % y
 }
+
 
 function sort(x) {
     if (types._string_Q(x)) {

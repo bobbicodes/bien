@@ -170,7 +170,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-//testSolution("my_group_by")
+testSolution("binary")
 //loadExercise("go_counting")
 //testExercisesUntilFail()
-testExercises()
+//testExercises()
