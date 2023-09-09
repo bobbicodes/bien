@@ -485,3 +485,9 @@
                             (concat fs__2853 (iter__2850 (rest s__2851)))
                             (#function[do-mod] (rest s__2851))))))))]
   (remove nil? (G__2849 (range 3))))
+
+(def expr "What is 1 plus 1?")
+
+(re-matches #"What is (.+)\?" expr)
+
+(partition-all 2 ["plus" "1"])

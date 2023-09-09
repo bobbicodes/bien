@@ -444,13 +444,14 @@
 (defn str/split-lines [s]
   (str/split s #"\r?\n"))
 
-(defn partition-all [n step coll]
-  (if-not coll
-    (partition-all n n step)
-    (loop* [s coll p []]
-      (if (= 0 (count s)) p
-          (recur (drop step s)
-                 (conj p (take n s)))))))
+(defn partition-all
+  ([n coll]
+   (partition-all n n coll))
+  ([n step coll]
+     (loop* [s coll p []]
+            (if (= 0 (count s)) p
+                (recur (drop step s)
+                       (conj p (take n s)))))))
 
 (defn partition-by [f coll]
   (loop* [s (seq coll) res []]
@@ -551,9 +552,9 @@
     `(if-let ~bindings ~then nil)
     (let* [form (get bindings 0) tst (get bindings 1)
            temp# (gensym)]
-          `(let* [temp# ~tst]
+          `(let [temp# ~tst]
                  (if temp#
-                   (let* [~form temp#]
+                   (let [~form temp#]
                          ~then)
                    ~else)))))
 
