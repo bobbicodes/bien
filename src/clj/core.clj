@@ -928,6 +928,16 @@
           g
           (last steps)))))
 
+(defn update-in* [m ks f args]
+  (let [[k & ks] ks]
+    (if ks
+      (assoc m k (update-in* (get m k) ks f args))
+      (assoc m k (apply f (get m k) args)))))
+
+(defn update-in
+  ([m ks f & args]
+     (update-in* m ks f args)))
+
 (defmacro condp [pred expr & clauses]
   (let [gpred (gensym "pred__")
         gexpr (gensym "expr__")
