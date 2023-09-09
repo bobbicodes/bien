@@ -108,7 +108,7 @@ function dissoc(src_hm) {
     return types._dissoc_BANG.apply(null, args);
 }
 
-function get(coll, key, notfound) {
+export function get(coll, key, notfound) {
     if (types._vector_Q(coll)) {
         return coll[key]
     }

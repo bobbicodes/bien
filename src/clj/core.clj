@@ -658,8 +658,10 @@
         ;; TODO: create named lambdas so won't need to do this
         do-mod (defn do-mod [mod]
                  (cond
-                   (= (ffirst mod) :let) `(let ~(second (first mod)) ~(do-mod (next mod)))
-                   (= (ffirst mod) :while) `(when ~(second (first mod)) ~(do-mod (next mod)))
+                   (= (ffirst mod) :let) `(let ~(second (first mod)) 
+                                            ~(do-mod (next mod)))
+                   (= (ffirst mod) :while) `(when ~(second (first mod)) 
+                                              ~(do-mod (next mod)))
                    (= (ffirst mod) :when) `(if ~(second (first mod))
                                              ~(do-mod (next mod))
                                              (recur (rest ~gxs)))

@@ -1,6 +1,6 @@
 import { Fraction } from 'fraction.js'
 import { PRINT, READ } from './interpreter.js'
-import {contains_Q} from './core.js'
+import {contains_Q, get} from './core.js'
 
 export function _obj_type(obj) {
     //console.log("[obj_type]", obj)
@@ -113,8 +113,8 @@ export function _equal_Q(a, b) {
         case 'hash-map':
             if (a.size !== b.size) { return false; }
             for (var [key, value] of a) {
-                if (!b.has(key)) { return false; }
-                if (!_equal_Q(a.get(key), b.get(key))) { return false; }
+                if (!contains_Q(b, key)) { return false; }
+                if (!_equal_Q(get(a, key), get(b, key))) { return false; }
             }
             return true;
         case 'ratio': return a.equals(b);

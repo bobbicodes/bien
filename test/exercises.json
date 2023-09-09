@@ -29,7 +29,7 @@
   "pack" : "(defn pack [s]\r\n   (loop [s (rest s) prev (first s) res [] subseq [(first s)]]\r\n     (if (seq s)\r\n       (let [f (first s)]\r\n         (if (= f prev)\r\n           (recur (rest s) f res (conj subseq f))\r\n           (recur (rest s) f (conj res (seq subseq)) [f])))\r\n       (conj res (seq subseq)))))",
   "powerset" : "(defn powerset [s]\r\n  (reduce #(into % (for [subset %] (conj subset %2))) #{#{}} s))",
   "lcm" : "(defn gcd [a b] (if (zero? b) a (gcd b (mod a b))))\r\n\r\n(defn lcm [& args]\r\n    (/ (reduce * 1 args) (reduce gcd 1 args))))",
-  "anagram" : "(defn anagram [c]\r\n  (set (for [g (group-by frequencies c)\r\n             :when (next (last g))]\r\n         (set (last g)))))",
+  "anagram" : "(defn anagram [s]\r\n  (->> (group-by set s)\r\n       (vals)\r\n       (map set)\r\n       (filter #(> (count %) 1))\r\n       (set)))",
   "ss" : "(defn digits [n]\r\n  (if (< n 10)\r\n       (list n)\r\n       (cons (rem n 10) (digits (quot n 10)))))\r\n\r\n(defn ss [coll]\r\n    (count (filter\r\n            #(< % (apply + (map * (digits %) (digits %))))\r\n            coll)))",
   "graph" : "(defn graph [g]\r\n  ((fn f [e]\r\n     (#(if (= e %) (= % g) (f %))\r\n      (reduce (fn [a b] (into a (filter #(some (set b) %) g)))\r\n              #{}\r\n              e)))\r\n   #{(first g)}))",
   "set_sect" : "(defn set-sect [s1 s2]\r\n  (loop [res #{}\r\n  s1 s1]\r\n(if (empty? s1)\r\nres\r\n(recur (if (contains? s2 (first s1))\r\n        (conj res (first s1))\r\n        res) (rest s1)))))",

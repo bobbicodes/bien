@@ -7,7 +7,11 @@ import testSuites from './test/tests.json';
 import { evalString, deftests, clearTests } from "./src/interpreter"
 
 let editorState = EditorState.create({
-  doc: `(assoc {[1] 2} [1] 3)`,
+  doc: `(=
+{1/2 1
+ 2/3 1}
+{1/2 1
+ 2/3 1})`,
   extensions: [basicSetup, clojure()]
 })
 
@@ -166,7 +170,7 @@ function testExercisesUntilFail() {
 }
 
 //testSolution(randExercise())
-testSolution("anagram")
+//testSolution("my_group_by")
 //loadExercise("go_counting")
 //testExercisesUntilFail()
-//testExercises()
+testExercises()
