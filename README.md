@@ -2,7 +2,8 @@
 
 A browser-based interactive Lisp environment for learning Clojure
 
-## Status
+## Note:
+Development is moving to Codeberg: https://codeberg.org/bobbicodes/bobbi-lisp. I'll probably stop updating this once I'm sure I'm happy with it.
 
 Bobbi-lisp is based on [MAL (Make-a-Lisp)](https://github.com/kanaka/mal), which is a pedagogical Lisp interpreter inspired by Clojure. In a nutshell, this means that it has a set of built-in data structures besides lists, and is designed for functional programming using immutability by default with an `atom` type for controlled mutation. A goal is to support as much of Clojure as possible so it can be used for teaching Clojure.
 
